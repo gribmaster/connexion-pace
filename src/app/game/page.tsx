@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Container } from '@/components/ui/Container'
 import { TimerSettings } from '@/components/TimerSettings'
+import { LogoutButton } from '@/components/LogoutButton'
 
 const categories = [
   { label: 'Connection', value: 'CONNECTION' },
@@ -26,6 +27,7 @@ export default async function GamePage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#1a0a0e] px-4 py-10">
       <Container className="flex flex-col gap-4">
+        <LogoutButton />
         {/* Mode tabs */}
         <div className="flex gap-2">
           <button className="rounded-full border border-[#860119] bg-[#860119] px-4 py-2 text-sm font-medium text-[#D2AF9C]">
