@@ -1,8 +1,7 @@
-import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { Button } from '@/components/ui/Button'
+import { Category } from '@prisma/client'
 import { Card } from '@/components/ui/Card'
 import { Container } from '@/components/ui/Container'
 import { GameTimer } from '@/components/GameTimer'
@@ -13,10 +12,19 @@ type Props = {
 
 export default async function CardPage({ params }: Props) {
   const { category, cardId } = await params
+  const upperCategory = category.toUpperCase() as Category
 
-  const card = await prisma.card.findUnique({ where: { id: cardId } })
+  const [card, otherCards] = await Promise.all([
+    prisma.card.findUnique({ where: { id: cardId } }),
+    prisma.card.findMany({
+      where: { category: upperCategory, id: { not: cardId } },
+      select: { id: true },
+    }),
+  ])
 
   if (!card) notFound()
+
+  const otherCardIds = otherCards.map((c) => c.id)
 
   return (
     <div className="min-h-screen bg-[#1a0a0e] py-10">
@@ -38,11 +46,7 @@ export default async function CardPage({ params }: Props) {
           <p className="text-sm text-[#5a3a3a]">{card.description}</p>
         </Card>
 
-        <GameTimer />
-
-        <Link href="/game/result">
-          <Button variant="primary">Finish</Button>
-        </Link>
+        <GameTimer category={category} otherCardIds={otherCardIds} />
       </Container>
     </div>
   )

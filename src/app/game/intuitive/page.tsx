@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
+import { TimerSettings } from '@/components/TimerSettings'
 
 const categories = [
   { label: 'Connection', value: 'CONNECTION' },
@@ -11,7 +12,7 @@ const categories = [
 
 export default function IntuitiveGamePage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#1a0a0e] px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#1a0a0e] px-4">
       <Container>
         <Card className="flex flex-col gap-6">
           <h1 className="text-center text-xl font-semibold text-[#1a0a0e]">
@@ -25,6 +26,9 @@ export default function IntuitiveGamePage() {
             ))}
           </div>
         </Card>
+        <div className="mt-4">
+          <TimerSettings />
+        </div>
       </Container>
     </div>
   )
