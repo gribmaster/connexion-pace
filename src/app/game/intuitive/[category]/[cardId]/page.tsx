@@ -6,23 +6,29 @@ import { Card } from '@/components/ui/Card'
 import { Container } from '@/components/ui/Container'
 import { GameTimer } from '@/components/GameTimer'
 
+const VALID_CATEGORIES = ['CONNECTION', 'INTIMACY', 'LOVEMAKING']
+
 type Props = {
   params: Promise<{ category: string; cardId: string }>
 }
 
 export default async function CardPage({ params }: Props) {
   const { category, cardId } = await params
-  const upperCategory = category.toUpperCase() as Category
+  const upperCategory = category.toUpperCase()
+
+  if (!VALID_CATEGORIES.includes(upperCategory)) notFound()
+
+  const typedCategory = upperCategory as Category
 
   const [card, otherCards] = await Promise.all([
     prisma.card.findUnique({ where: { id: cardId } }),
     prisma.card.findMany({
-      where: { category: upperCategory, id: { not: cardId } },
+      where: { category: typedCategory, id: { not: cardId } },
       select: { id: true },
     }),
   ])
 
-  if (!card) notFound()
+  if (!card || card.category !== typedCategory) notFound()
 
   const otherCardIds = otherCards.map((c) => c.id)
 
@@ -46,7 +52,7 @@ export default async function CardPage({ params }: Props) {
           <p className="text-sm text-[#5a3a3a]">{card.description}</p>
         </Card>
 
-        <GameTimer category={category} otherCardIds={otherCardIds} />
+        <GameTimer category={category} cardId={cardId} otherCardIds={otherCardIds} />
       </Container>
     </div>
   )

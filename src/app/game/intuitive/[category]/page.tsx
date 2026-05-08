@@ -1,7 +1,11 @@
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { Category } from '@prisma/client'
 import { Container } from '@/components/ui/Container'
 import { IntuitiveCardSelector } from '@/components/IntuitiveCardSelector'
+
+const VALID_CATEGORIES = ['CONNECTION', 'INTIMACY', 'LOVEMAKING']
 
 const categoryInfo: Record<string, string> = {
   CONNECTION: 'Connection cards are focused on emotional closeness and communication.',
@@ -15,13 +19,28 @@ type Props = {
 
 export default async function CategoryPage({ params }: Props) {
   const { category } = await params
-  const upperCategory = category.toUpperCase() as Category
+  const upperCategory = category.toUpperCase()
+
+  if (!VALID_CATEGORIES.includes(upperCategory)) notFound()
 
   const cards = await prisma.card.findMany({
-    where: { category: upperCategory },
+    where: { category: upperCategory as Category },
     orderBy: { createdAt: 'asc' },
     select: { id: true, title: true, description: true, imageUrl: true },
   })
+
+  if (cards.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#1a0a0e] py-10">
+        <Container className="flex flex-col gap-6">
+          <Link href="/game/intuitive" className="text-sm text-[#D2AF9C] hover:underline">
+            ← Back
+          </Link>
+          <p className="text-[#D2AF9C] text-center">No cards available yet</p>
+        </Container>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-[#1a0a0e] py-10">

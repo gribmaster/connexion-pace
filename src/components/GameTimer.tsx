@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 
 type Props = {
   category: string
+  cardId: string
   otherCardIds: string[]
 }
 
@@ -24,7 +25,7 @@ function saveVisited(category: string, ids: string[]) {
   localStorage.setItem(VISITED_KEY(category), JSON.stringify(ids))
 }
 
-export function GameTimer({ category, otherCardIds }: Props) {
+export function GameTimer({ category, cardId, otherCardIds }: Props) {
   const router = useRouter()
   const [noLimit, setNoLimit] = useState(false)
   const [seconds, setSeconds] = useState(300)
@@ -34,11 +35,13 @@ export function GameTimer({ category, otherCardIds }: Props) {
     const stored = localStorage.getItem(STORAGE_KEY) ?? '5'
     if (stored === 'no_limit') {
       setNoLimit(true)
+      setSeconds(300)
     } else {
+      setNoLimit(false)
       setSeconds(stored === '10' ? 600 : 300)
     }
     setRunning(true)
-  }, [])
+  }, [cardId])
 
   useEffect(() => {
     if (noLimit || !running || seconds <= 0) return
