@@ -25,11 +25,28 @@ function saveVisited(category: string, ids: string[]) {
   localStorage.setItem(VISITED_KEY(category), JSON.stringify(ids))
 }
 
+function playBeep() {
+  try {
+    const ctx = new AudioContext()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.frequency.value = 880
+    gain.gain.setValueAtTime(0.3, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4)
+    osc.start()
+    osc.stop(ctx.currentTime + 0.4)
+    osc.onended = () => ctx.close()
+  } catch {}
+}
+
 export function GameTimer({ category, cardId, otherCardIds }: Props) {
   const router = useRouter()
   const [noLimit, setNoLimit] = useState(false)
   const [seconds, setSeconds] = useState(300)
   const [running, setRunning] = useState(false)
+  const [timeUp, setTimeUp] = useState(false)
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY) ?? '5'
@@ -38,20 +55,27 @@ export function GameTimer({ category, cardId, otherCardIds }: Props) {
       setSeconds(300)
     } else {
       setNoLimit(false)
-      setSeconds(stored === '10' ? 600 : 300)
+      setSeconds(parseInt(stored, 10) * 60)
     }
+    setTimeUp(false)
     setRunning(true)
   }, [cardId])
 
   useEffect(() => {
     if (noLimit || !running || seconds <= 0) return
-    const id = setInterval(() => setSeconds((s) => Math.max(0, s - 1)), 1000)
+    const id = setInterval(() => {
+      setSeconds((s) => {
+        if (s <= 1) {
+          setRunning(false)
+          setTimeUp(true)
+          playBeep()
+          return 0
+        }
+        return s - 1
+      })
+    }, 1000)
     return () => clearInterval(id)
   }, [noLimit, running, seconds])
-
-  useEffect(() => {
-    if (!noLimit && seconds === 0) router.push('/game/result')
-  }, [noLimit, seconds, router])
 
   const mm = String(Math.floor(seconds / 60)).padStart(2, '0')
   const ss = String(seconds % 60).padStart(2, '0')
@@ -84,7 +108,7 @@ export function GameTimer({ category, cardId, otherCardIds }: Props) {
           <div className="flex items-center gap-4">
             <button
               className="text-2xl font-bold text-[#D2AF9C] px-2"
-              onClick={() => setSeconds((s) => Math.max(0, s - 30))}
+              onClick={() => setSeconds((s) => Math.max(0, s - 10))}
             >
               −
             </button>
@@ -93,11 +117,20 @@ export function GameTimer({ category, cardId, otherCardIds }: Props) {
             </span>
             <button
               className="text-2xl font-bold text-[#D2AF9C] px-2"
-              onClick={() => setSeconds((s) => s + 30)}
+              onClick={() => {
+                setSeconds((s) => s + 30)
+                if (timeUp) {
+                  setTimeUp(false)
+                  setRunning(true)
+                }
+              }}
             >
               +
             </button>
           </div>
+        )}
+        {!noLimit && timeUp && (
+          <span className="text-sm font-semibold text-red-400">Time is up</span>
         )}
         {!noLimit && (
           <Button

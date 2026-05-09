@@ -11,6 +11,7 @@ type CardItem = {
   title: string
   description: string | null
   imageUrl: string | null
+  additional: string | null
 }
 
 type Props = {
@@ -22,6 +23,7 @@ type Props = {
 export function IntuitiveCardSelector({ cards, category, categoryInfo }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [previewCard, setPreviewCard] = useState<CardItem | null>(null)
+  const [learnMoreCard, setLearnMoreCard] = useState<CardItem | null>(null)
   const [infoOpen, setInfoOpen] = useState(false)
   const router = useRouter()
 
@@ -143,9 +145,33 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo }: Props) 
             {previewCard.description && (
               <p className="mb-6 text-sm text-[#5a3a3a]">{previewCard.description}</p>
             )}
-            <Button disabled className="opacity-40">
+            <Button
+              disabled={!previewCard.additional}
+              className={!previewCard.additional ? 'opacity-40' : ''}
+              onClick={() => setLearnMoreCard(previewCard)}
+            >
               Learn more
             </Button>
+          </div>
+        </div>
+      )}
+
+      {learnMoreCard && (
+        <div
+          className="fixed inset-0 z-60 flex items-end justify-center bg-black/70"
+          onClick={() => setLearnMoreCard(null)}
+        >
+          <div
+            className="w-full max-w-lg rounded-t-3xl bg-white p-6 pb-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="mb-4 text-lg font-semibold text-[#1a0a0e]">
+              Appreciative Words
+            </h2>
+            <p className="mb-8 text-sm leading-relaxed text-[#5a3a3a]">
+              {learnMoreCard.additional}
+            </p>
+            <Button onClick={() => setLearnMoreCard(null)}>Back</Button>
           </div>
         </div>
       )}

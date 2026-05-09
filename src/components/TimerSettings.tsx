@@ -3,19 +3,23 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 
-type TimerOption = '5' | '10' | 'no_limit'
+type TimerOption = '5' | '10' | '30' | '60' | 'no_limit'
 
 const STORAGE_KEY = 'intuitive_timer'
 
 const OPTIONS: { value: TimerOption; label: string }[] = [
   { value: '5', label: '5 minutes' },
   { value: '10', label: '10 minutes' },
+  { value: '30', label: '30 minutes' },
+  { value: '60', label: '60 minutes' },
   { value: 'no_limit', label: 'No limit' },
 ]
 
 function displayValue(opt: TimerOption): string {
   if (opt === '5') return '05:00'
   if (opt === '10') return '10:00'
+  if (opt === '30') return '30:00'
+  if (opt === '60') return '60:00'
   return 'No limit'
 }
 

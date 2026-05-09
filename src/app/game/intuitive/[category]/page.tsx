@@ -26,7 +26,7 @@ export default async function CategoryPage({ params }: Props) {
   const cards = await prisma.card.findMany({
     where: { category: upperCategory as Category },
     orderBy: { createdAt: 'asc' },
-    select: { id: true, title: true, description: true, imageUrl: true },
+    select: { id: true, title: true, description: true, imageUrl: true, additional: true },
   })
 
   if (cards.length === 0) {

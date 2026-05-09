@@ -19,11 +19,15 @@ export async function GET(request: Request) {
       const existing = await prisma.user.findUnique({ where: { email } })
       if (!existing) {
         await prisma.user.create({ data: { email, name: name ?? null } })
+        return NextResponse.redirect(`${origin}/privacy`)
       } else if (name && existing.name !== name) {
         await prisma.user.update({ where: { email }, data: { name } })
+      }
+      if (!existing?.privacyAcceptedAt) {
+        return NextResponse.redirect(`${origin}/privacy`)
       }
     }
   }
 
-  return NextResponse.redirect(`${origin}/game`)
+  return NextResponse.redirect(`${origin}/welcome`)
 }
