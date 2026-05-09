@@ -6,7 +6,10 @@
       "PowerShell(head *)",
       "PowerShell([System.IO.File]::ReadAllText\\(\"D:\\\\work\\\\connexion\\\\connexion-space\\\\src\\\\app\\\\api\\\\auth\\\\[...nextauth]\\\\route.ts\"\\))",
       "PowerShell(Test-Path \"D:\\\\work\\\\connexion\\\\connexion-space\\\\src\\\\app\\\\login\\\\page.tsx\"; \\(Get-Item \"D:\\\\work\\\\connexion\\\\connexion-space\\\\src\\\\app\\\\login\\\\page.tsx\"\\).Length)",
-      "PowerShell(Get-Content *)"
+      "PowerShell(Get-Content *)",
+      "Bash(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Directory -Force)",
+      "Bash(Select-Object Name)",
+      "Bash(pnpm tsc *)"
     ]
   }
 }
