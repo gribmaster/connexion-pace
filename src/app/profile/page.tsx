@@ -4,6 +4,7 @@ import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { ProfileClient } from '@/components/ProfileClient'
+import Link from "next/link";
 
 const PLAN_BENEFITS = [
   'Unlimited Cards',
@@ -25,6 +26,11 @@ export default async function ProfilePage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-start gap-4 bg-[#1a0a0e] px-4 py-10">
       <Container className="flex flex-col gap-4">
+        <Link href="/game">
+          <Button variant="secondary" className="w-auto px-5">
+            ← Back
+          </Button>
+        </Link>
         {/* User info */}
         <Card className="flex flex-col gap-1">
           <p className="text-sm font-medium text-[#1a0a0e]">Name: {name}</p>
