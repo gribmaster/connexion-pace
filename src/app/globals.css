@@ -1,15 +1,83 @@
 @import "tailwindcss";
 
+@layer base {
+  /* ── Box-sizing reset ───────────────────────────────────────── */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  /* ── Base reset ─────────────────────────────────────────────── */
+  html,
+  body,
+  #__next {
+    height: 100%;
+    min-height: 100%;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5, h6, p {
+    margin: 0;
+    padding: 0;
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  ul, ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  button, input, textarea, select {
+    margin: 0;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: none;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img, svg, video {
+    display: block;
+    max-width: 100%;
+  }
+}
+
+/* ── Design tokens ──────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #000000;
+  --foreground: #D2AF9C;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +90,138 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  min-height: 100%;
 }
+
+/* ── Reusable component classes ─────────────────────────────── */
+@layer components {
+
+  .button {
+    @apply flex items-center justify-center font-medium text-[14px] leading-[20px];
+  }
+
+  /* Full-screen page wrapper (mobile-first) */
+  .app-screen {
+    @apply min-h-screen w-full flex flex-col px-4 py-6;
+  }
+
+  /* Centered auth / onboarding layout */
+  .auth-layout {
+    @apply min-h-screen w-full flex flex-col items-center justify-center px-6 py-10;
+  }
+
+  /* Generic card surface */
+  .app-card {
+    @apply rounded-2xl bg-white shadow-sm border border-gray-100 p-4;
+  }
+
+  /* Modal surface */
+  .app-modal {
+    @apply rounded-2xl bg-white shadow-lg border border-gray-100 p-6 w-full max-w-sm mx-auto;
+  }
+
+  /* Section / page title */
+  .app-title {
+    @apply text-2xl font-bold tracking-tight text-gray-900;
+  }
+
+  /* Secondary / section subtitle */
+  .app-subtitle {
+    @apply text-base font-medium text-gray-700;
+  }
+
+  /* Muted helper / caption text */
+  .app-muted {
+    @apply text-sm text-gray-400;
+  }
+
+  /* Primary action button */
+  .app-button {
+    @apply inline-flex items-center justify-center rounded-xl px-6 py-3
+           bg-gray-900 text-white text-sm font-semibold
+           transition-opacity active:opacity-80;
+  }
+
+  /* Secondary / ghost button */
+  .app-button-secondary {
+    @apply inline-flex items-center justify-center rounded-xl px-6 py-3
+           border border-gray-200 bg-white text-gray-800 text-sm font-semibold
+           transition-colors hover:bg-gray-50 active:bg-gray-100;
+  }
+
+  /* Disabled button overlay — add alongside .app-button / .app-button-secondary */
+  .app-button-disabled {
+    @apply opacity-40 pointer-events-none;
+  }
+}
+button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bg-CONNECTION {
+  background-image: url('/img/cat-connection.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.bg-INTIMACY {
+  background-image: url('/img/cat-intimacy.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.bg-LOVEMAKING {
+  background-image: url('/img/cat-lovemaking.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.cat-CONNECTION {
+  background-image: url('/img/card-container-connection.svg');
+}
+
+.cat-INTIMACY {
+  background-image: url('/img/card-container-intimacy.svg');
+}
+
+.cat-LOVEMAKING {
+  background-image: url('/img/card-container-lovemaking.svg');
+}
+
+.cat-card {
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-container {
+  background-image: url('/img/main-head-bg.svg');
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: contain;
+}
+.single-card-connection {
+  background-image: url('/img/single-card-CONNECTION.svg');
+}
+.logo {
+  padding-top: 236px;
+}
+.timer-settings-badge {
+  position: relative;
+}
+.timer-settings-badge:after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 8px;
+  width: 50px;
+  height: 4px;
+  background: #69584E;
+}
+

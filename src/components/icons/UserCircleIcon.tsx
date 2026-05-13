@@ -4,19 +4,20 @@ type Props = {
 
 export function UserCircleIcon({ className }: Props) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <circle cx="12" cy="12" r="10" />
-      <circle cx="12" cy="10" r="3" />
-      <path d="M6.168 18.849A4 4 0 0 1 10 16h4a4 4 0 0 1 3.834 2.855" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <g clipPath="url(#clip0_125_20765)">
+        <path
+          d="M12 15C15.3137 15 18 12.3137 18 9C18 5.68629 15.3137 3 12 3C8.68629 3 6 5.68629 6 9C6 12.3137 8.68629 15 12 15Z"
+          stroke="#D2AF9C" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M3 20.25C4.81594 17.1122 8.11406 15 12 15C15.8859 15 19.1841 17.1122 21 20.25" stroke="#D2AF9C"
+              strokeLinecap="round" strokeLinejoin="round"/>
+      </g>
+      <defs>
+        <clipPath id="clip0_125_20765">
+          <rect width="24" height="24" fill="white"/>
+        </clipPath>
+      </defs>
     </svg>
+
   )
 }

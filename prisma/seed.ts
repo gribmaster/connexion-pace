@@ -4,40 +4,51 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  await prisma.card.deleteMany();
   await prisma.card.createMany({
     data: [
       {
         title: "Share something you never told anyone",
         description: "Deep connection prompt",
-        category: "CONNECTION"
+        imageUrl: 'https://placehold.net/1.png',
+        category: "CONNECTION",
+        additional: 'Share something you never told anyone'
       },
       {
         title: "What makes you feel emotionally close?",
         description: "Connection question",
-        category: "CONNECTION"
+        imageUrl: 'https://placehold.net/2.png',
+        category: "CONNECTION",
+        additional: 'Share something you never told anyone'
       },
 
       {
         title: "Describe your perfect touch",
         description: "Intimacy exploration",
-        category: "INTIMACY"
+        imageUrl: 'https://placehold.net/3.png',
+        category: "INTIMACY",
+        additional: 'Share something you never told anyone'
       },
       {
         title: "What kind of intimacy do you miss?",
         description: "Reflection prompt",
-        category: "INTIMACY"
+        imageUrl: 'https://placehold.net/4.png',
+        category: "INTIMACY",
+        additional: 'Share something you never told anyone'
       },
 
       {
         title: "Act out your fantasy",
         description: "Playful task",
-        category: "LOVEMAKING"
+        imageUrl: 'https://placehold.net/5.png',
+        category: "LOVEMAKING",
+        additional: 'Share something you never told anyone'
       },
       {
         title: "What turns you on the most?",
         description: "Desire exploration",
-        category: "LOVEMAKING"
+        imageUrl: 'https://placehold.net/6.png',
+        category: "LOVEMAKING",
+        additional: 'Share something you never told anyone'
       }
     ]
   })

@@ -13,12 +13,12 @@ export function Button({
   return (
     <button
       className={clsx(
-        'w-full rounded-xl border px-4 py-[15px] text-sm font-medium transition-all duration-200',
+        'w-full rounded-[12px] border px-4 py-[15px] transition-all duration-200 button',
         {
           'border-[#860119] bg-[#860119] text-[#D2AF9C]':
             variant === 'primary',
 
-          'border-[#D2AF9C] bg-transparent text-[#D2AF9C]':
+          'bg-[#D2AF9C1A] text-[#D2AF9C] border-[#D2AF9C4D]':
             variant === 'secondary',
         },
         className

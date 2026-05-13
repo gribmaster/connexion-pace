@@ -2,24 +2,26 @@ import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import Image from "next/image";
 
 export default function WelcomePage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#1a0a0e] px-4">
+    <main className="flex flex-col items-center w-[375px] mx-auto h-[800px] main-container">
       <Container>
-        <Card className="flex flex-col gap-8 text-center">
+        <div className="flex flex-col gap-5 text-center">
           <div className="flex flex-col gap-2">
-            <h1 className="text-2xl font-semibold text-[#1a0a0e]">
-              Welcome to<br />Connexion Space
+            <h1 className="text-center pt-[267px]">
+              <p className="font-semibold text-[20px] leading-[130%] mb-1">Welcome to</p>
+              <p className="font-semibold text-[24px] leading-[130%]">Connexion Space</p>
             </h1>
-            <p className="text-sm text-[#6b4c57]">
+            <p className="font-normal text-[16px] leading-[150%] text-center mt-3">
               You can play the full game once for free.
-              <br />
+              <br/>
               After your free session ends, you&apos;ll need to upgrade to continue playing.
             </p>
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-5">
             <Link href="/game">
               <Button variant="primary">Start Free Session</Button>
             </Link>
@@ -28,11 +30,9 @@ export default function WelcomePage() {
               View Premium Options
             </Button>
 
-            <Button variant="secondary" disabled>
-              Choose next play time
-            </Button>
+            <p className="font-medium text-[14px] leading-[20px] opacity-50">Choose next play time</p>
           </div>
-        </Card>
+        </div>
       </Container>
     </main>
   )

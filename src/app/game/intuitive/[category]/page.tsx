@@ -31,7 +31,7 @@ export default async function CategoryPage({ params }: Props) {
 
   if (cards.length === 0) {
     return (
-      <div className="min-h-screen bg-[#1a0a0e] py-10">
+      <div className="min-h-screen bg-black py-10">
         <Container className="flex flex-col gap-6">
           <Link href="/game/intuitive" className="text-sm text-[#D2AF9C] hover:underline">
             ← Back
@@ -43,7 +43,7 @@ export default async function CategoryPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-[#1a0a0e] py-10">
+    <div className="min-h-screen bg-black py-10">
       <Container className="flex flex-col gap-6">
         <IntuitiveCardSelector
           cards={cards}

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/Button'
+import {InfoCircleIcon} from "@/components/icons/InfoCircleIcon";
+import {CaretDownIcon} from "@/components/icons/CaretDownIcon";
 
 type TimerOption = '5' | '10' | '30' | '60' | 'no_limit'
 
@@ -51,31 +53,35 @@ export function TimerSettings() {
     <>
       <button
         onClick={handleOpen}
-        className="flex w-full items-center justify-between rounded-xl border border-[#D2AF9C]/30 px-4 py-3 text-[#D2AF9C]"
+        className="flex w-full items-center justify-between py-5"
       >
-        <div className="flex items-center gap-2 text-sm">
+        <div className="flex items-center font-normal text-[16px] leading-[100%]">
           <span>Set timer</span>
-          <span className="text-xs opacity-50">ⓘ</span>
+          <span className="ml-1">
+            <InfoCircleIcon />
+          </span>
         </div>
-        <div className="flex items-center gap-2 text-sm font-mono">
+        <div className="flex items-center font-semibold text-[16px] leading-[100%]">
           <span>{displayValue(current)}</span>
-          <span className="text-base">⏱</span>
+          <span className="ml-1">
+            <CaretDownIcon />
+          </span>
         </div>
       </button>
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60">
-          <div className="flex w-full max-w-md flex-col gap-5 rounded-t-3xl bg-white px-6 py-8">
-            <h2 className="text-lg font-semibold text-[#1a0a0e]">Set timer</h2>
-            <div className="flex flex-col gap-3">
+          <div className="flex w-full max-w-md flex-col gap-6 rounded-t-3xl bg-black p-6 pt-9 timer-settings-badge">
+            <h2 className="text-lg font-semibold">Set timer</h2>
+            <div className="flex flex-col gap-2">
               {OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => setPending(opt.value)}
-                  className={`rounded-xl border px-4 py-3 text-left text-sm font-medium transition-colors ${
+                  className={`rounded-[8px] px-3 py-[7px] font-normal text-[16px] leading-[24px] text-left ${
                     pending === opt.value
-                      ? 'border-[#860119] bg-[#860119]/10 text-[#860119]'
-                      : 'border-[#D2AF9C]/40 text-[#5a3a3a]'
+                      ? 'bg-[#69584E33]'
+                      : ''
                   }`}
                 >
                   {opt.label}
