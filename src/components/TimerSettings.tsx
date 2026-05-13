@@ -6,8 +6,16 @@ import {InfoCircleIcon} from "@/components/icons/InfoCircleIcon";
 import {CaretDownIcon} from "@/components/icons/CaretDownIcon";
 
 type TimerOption = '5' | '10' | '30' | '60' | 'no_limit'
+type TimerMode = 'intuitive' | 'surprise' | 'journey'
 
-const STORAGE_KEY = 'intuitive_timer'
+const MODE_KEYS: Record<TimerMode, string> = {
+  intuitive: 'connexion_timer_intuitive',
+  surprise: 'connexion_timer_surprise',
+  journey: 'connexion_timer_journey',
+}
+
+const LEGACY_KEY = 'intuitive_timer'
+
 const DEFAULT_TIMER_OPTION: TimerOption = '5'
 
 const OPTIONS: { value: TimerOption; label: string }[] = [
@@ -26,7 +34,30 @@ function displayValue(opt: TimerOption): string {
   return 'No limit'
 }
 
-export function TimerSettings() {
+function isValidOption(v: string | null): v is TimerOption {
+  return v === '5' || v === '10' || v === '30' || v === '60' || v === 'no_limit'
+}
+
+function readStoredOption(storageKey: string): TimerOption {
+  const stored = window.localStorage.getItem(storageKey)
+  if (isValidOption(stored)) return stored
+  // one-time migration from legacy key for intuitive mode
+  if (storageKey === MODE_KEYS.intuitive) {
+    const legacy = window.localStorage.getItem(LEGACY_KEY)
+    if (isValidOption(legacy)) {
+      window.localStorage.setItem(storageKey, legacy)
+      return legacy
+    }
+  }
+  return DEFAULT_TIMER_OPTION
+}
+
+type Props = {
+  mode: TimerMode
+}
+
+export function TimerSettings({ mode }: Props) {
+  const storageKey = MODE_KEYS[mode]
   const [open, setOpen] = useState(false)
   const [current, setCurrent] = useState<TimerOption>(DEFAULT_TIMER_OPTION)
   const [pending, setPending] = useState<TimerOption>(DEFAULT_TIMER_OPTION)
@@ -34,20 +65,12 @@ export function TimerSettings() {
 
   useEffect(() => {
     queueMicrotask(() => {
-      const stored = window.localStorage.getItem(STORAGE_KEY) as TimerOption | null
-      if (
-        stored === '5' ||
-        stored === '10' ||
-        stored === '30' ||
-        stored === '60' ||
-        stored === 'no_limit'
-      ) {
-        setCurrent(stored)
-        setPending(stored)
-      }
+      const opt = readStoredOption(storageKey)
+      setCurrent(opt)
+      setPending(opt)
       setIsMounted(true)
     })
-  }, [])
+  }, [storageKey])
 
   const handleOpen = () => {
     setPending(current)
@@ -56,7 +79,7 @@ export function TimerSettings() {
 
   const handleOk = () => {
     setCurrent(pending)
-    localStorage.setItem(STORAGE_KEY, pending)
+    localStorage.setItem(storageKey, pending)
     setOpen(false)
   }
 

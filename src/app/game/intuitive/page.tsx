@@ -27,7 +27,7 @@ export default function IntuitiveGamePage() {
           </div>
         </Card>
         <div className="mt-4">
-          <TimerSettings />
+          <TimerSettings mode="intuitive" />
         </div>
       </Container>
     </div>

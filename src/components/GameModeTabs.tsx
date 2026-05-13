@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { TimerSettings } from '@/components/TimerSettings'
 
 type CategoryBlock = {
   label: string
@@ -238,6 +239,8 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
           </div>
         </div>
       )}
+
+      <TimerSettings mode={tab} />
     </>
   )
 }

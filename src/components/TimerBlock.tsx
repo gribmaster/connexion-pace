@@ -3,14 +3,13 @@
 import { useEffect, useReducer, useRef } from 'react'
 import { Button } from '@/components/ui/Button'
 
-const STORAGE_KEY = 'intuitive_timer'
-
 type TimerState = {
   seconds: number
   noLimit: boolean
   running: boolean
   timeUp: boolean
   resetKey: string
+  storageKey: string
 }
 
 type TimerAction =
@@ -20,9 +19,9 @@ type TimerAction =
   | { type: 'SUBTRACT_SECONDS'; amount: number }
   | { type: 'RESET'; resetKey: string }
 
-function getStoredTimerValues(): { seconds: number; noLimit: boolean } {
+function getStoredTimerValues(storageKey: string): { seconds: number; noLimit: boolean } {
   if (typeof window === 'undefined') return { seconds: 300, noLimit: false }
-  const stored = window.localStorage.getItem(STORAGE_KEY) ?? '5'
+  const stored = window.localStorage.getItem(storageKey) ?? '5'
   if (stored === 'no_limit') return { seconds: 300, noLimit: true }
   const minutes = Number(stored)
   if (!Number.isFinite(minutes) || minutes <= 0) return { seconds: 300, noLimit: false }
@@ -32,8 +31,8 @@ function getStoredTimerValues(): { seconds: number; noLimit: boolean } {
 function timerReducer(state: TimerState, action: TimerAction): TimerState {
   switch (action.type) {
     case 'RESET': {
-      const { seconds, noLimit } = getStoredTimerValues()
-      return { seconds, noLimit, running: true, timeUp: false, resetKey: action.resetKey }
+      const { seconds, noLimit } = getStoredTimerValues(state.storageKey)
+      return { ...state, seconds, noLimit, running: true, timeUp: false, resetKey: action.resetKey }
     }
     case 'TICK': {
       if (state.noLimit || !state.running || state.seconds <= 0) return state
@@ -63,13 +62,14 @@ function timerReducer(state: TimerState, action: TimerAction): TimerState {
 
 type Props = {
   resetKey: string
+  storageKey: string
   stopSoundRef?: React.MutableRefObject<() => void>
 }
 
-export function TimerBlock({ resetKey, stopSoundRef }: Props) {
-  const [state, dispatch] = useReducer(timerReducer, resetKey, (key) => {
-    const { seconds, noLimit } = getStoredTimerValues()
-    return { seconds, noLimit, running: true, timeUp: false, resetKey: key }
+export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
+  const [state, dispatch] = useReducer(timerReducer, undefined, () => {
+    const { seconds, noLimit } = getStoredTimerValues(storageKey)
+    return { seconds, noLimit, running: true, timeUp: false, resetKey, storageKey }
   })
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -97,7 +97,6 @@ export function TimerBlock({ resetKey, stopSoundRef }: Props) {
 
   useEffect(() => {
     return () => { stopSound() }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

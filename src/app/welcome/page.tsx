@@ -1,8 +1,6 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
-import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import Image from "next/image";
 
 export default function WelcomePage() {
   return (

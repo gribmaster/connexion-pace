@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { Container } from '@/components/ui/Container'
-import { TimerSettings } from '@/components/TimerSettings'
 import { UserCircleIcon } from '@/components/icons/UserCircleIcon'
 import { InfoCircleIcon } from "@/components/icons/InfoCircleIcon"
 import { GameModeTabs } from '@/components/GameModeTabs'
@@ -48,9 +47,6 @@ export default async function GamePage({
         </div>
         <div className="font-normal text-[16px] leading-[150%] mt-[10px] opacity-70">Choose the number of cards and set the time for each category before starting your session.</div>
         <GameModeTabs categories={categoriesWithCounts} cards={cardsRaw} initialTab={initialTab} />
-
-        {/* Timer settings */}
-        <TimerSettings />
       </Container>
     </div>
   )

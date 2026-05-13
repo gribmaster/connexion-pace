@@ -68,37 +68,48 @@ function findNextValidIndex(queue: Queue, cardIds: Set<string>, fromIndex: numbe
   return null
 }
 
-function initQueue(cardIds: Set<string>): Queue | null {
-  if (typeof window === 'undefined') return null
+type InitResult =
+  | { status: 'ok'; queue: Queue }
+  | { status: 'redirect'; to: string }
+
+function initQueue(cardIds: Set<string>): InitResult {
+  if (typeof window === 'undefined') return { status: 'redirect', to: '/game' }
 
   const raw = loadQueue()
-  if (!raw) return null
+  if (!raw) return { status: 'redirect', to: '/game' }
 
   const sanitized = sanitizeIndex(raw)
 
-  if (sanitized.currentIndex >= sanitized.cards.length) return null
+  if (sanitized.currentIndex >= sanitized.cards.length) {
+    return { status: 'redirect', to: '/game/surprise-me/result' }
+  }
 
   const validIndex = findNextValidIndex(sanitized, cardIds, sanitized.currentIndex)
-  if (validIndex === null) return null
+  if (validIndex === null) {
+    return { status: 'redirect', to: '/game/surprise-me/result' }
+  }
 
   if (validIndex !== sanitized.currentIndex) {
     const advanced = { ...sanitized, currentIndex: validIndex }
     window.localStorage.setItem(QUEUE_KEY, JSON.stringify(advanced))
-    return advanced
+    return { status: 'ok', queue: advanced }
   }
 
-  return sanitized
+  return { status: 'ok', queue: sanitized }
 }
 
 export function SurpriseMePlay({ cards }: Props) {
   const router = useRouter()
   const cardIds = new Set(cards.map((c) => c.id))
-  const [queue, setQueue] = useState<Queue | null>(() => initQueue(cardIds))
+  const initResult = useState<InitResult>(() => initQueue(cardIds))[0]
+  const [queue, setQueue] = useState<Queue | null>(
+    initResult.status === 'ok' ? initResult.queue : null
+  )
   const stopSoundRef = useRef<() => void>(() => {})
 
   useEffect(() => {
-    if (queue === null) {
-      router.replace('/game')
+    if (initResult.status === 'redirect') {
+      router.replace(initResult.to)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -170,7 +181,7 @@ export function SurpriseMePlay({ cards }: Props) {
         </Card>
 
         <div className="flex flex-col gap-3">
-          <TimerBlock resetKey={entry.id} stopSoundRef={stopSoundRef} />
+          <TimerBlock resetKey={entry.id} storageKey="connexion_timer_surprise" stopSoundRef={stopSoundRef} />
           <Button onClick={handleNext}>
             {queue.currentIndex + 1 >= queue.cards.length ? 'Finish' : 'Next card'}
           </Button>

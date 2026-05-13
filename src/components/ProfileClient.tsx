@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
-import Link from "next/link";
 
 type Modal = 'help' | 'language' | 'timer_sound' | null
 
@@ -26,7 +25,7 @@ export function ProfileClient() {
   const router = useRouter()
   const [modal, setModal] = useState<Modal>(null)
   const [language, setLanguage] = useState('English')
-  const [dailyConnection, setDailyConnection] = useState(false)
+  const [dailyConnection] = useState(false)
 
   const [selectedSound, setSelectedSound] = useState<string>(() => {
     if (typeof window === 'undefined') return DEFAULT_SOUND
