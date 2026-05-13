@@ -9,7 +9,10 @@
       "PowerShell(Get-Content *)",
       "Bash(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Directory -Force)",
       "Bash(Select-Object Name)",
-      "Bash(pnpm tsc *)"
+      "Bash(pnpm tsc *)",
+      "Bash(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Recurse -Filter \"*game*\" -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Directory)"
     ]
   }
 }
