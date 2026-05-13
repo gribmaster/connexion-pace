@@ -12,7 +12,14 @@ const categories = [
   { label: 'Lovemaking', value: 'LOVEMAKING' },
 ] as const
 
-export default async function GamePage() {
+export default async function GamePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ mode?: string }>
+}) {
+  const { mode } = await searchParams
+  const initialTab = mode === 'surprise' ? 'surprise' : 'intuitive'
+
   const cardsRaw = await prisma.card.findMany({
     select: { id: true, category: true },
   })
@@ -40,7 +47,7 @@ export default async function GamePage() {
           </div>
         </div>
         <div className="font-normal text-[16px] leading-[150%] mt-[10px] opacity-70">Choose the number of cards and set the time for each category before starting your session.</div>
-        <GameModeTabs categories={categoriesWithCounts} cards={cardsRaw} />
+        <GameModeTabs categories={categoriesWithCounts} cards={cardsRaw} initialTab={initialTab} />
 
         {/* Timer settings */}
         <TimerSettings />

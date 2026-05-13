@@ -29,7 +29,7 @@ export function GameTimer({ category, cardId, otherCardIds }: Props) {
 
   const handleNext = () => {
     if (otherCardIds.length === 0) {
-      router.push('/game/result')
+      router.push('/game/intuitive/result')
       return
     }
 
@@ -51,7 +51,7 @@ export function GameTimer({ category, cardId, otherCardIds }: Props) {
       <TimerBlock resetKey={cardId} />
 
       <div className="flex gap-3">
-        <Button variant="secondary" onClick={() => router.push('/game/result')}>
+        <Button variant="secondary" onClick={() => router.push('/game/intuitive/result')}>
           Finish game
         </Button>
         <Button variant="primary" onClick={handleNext}>

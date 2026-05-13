@@ -36,29 +36,76 @@ const CATEGORY_LABELS: Record<string, string> = {
   LOVEMAKING: 'Lovemaking',
 }
 
+const QUEUE_KEY = 'connexion_surprise_queue'
+
+function loadQueue(): Queue | null {
+  try {
+    const raw = localStorage.getItem(QUEUE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as Queue
+    if (!Array.isArray(parsed?.cards) || parsed.cards.length === 0) return null
+    return parsed
+  } catch {
+    localStorage.removeItem(QUEUE_KEY)
+    return null
+  }
+}
+
+function sanitizeIndex(queue: Queue): Queue {
+  const idx = queue.currentIndex
+  if (typeof idx !== 'number' || !isFinite(idx) || idx < 0 || Math.floor(idx) !== idx) {
+    const fixed = { ...queue, currentIndex: 0 }
+    localStorage.setItem(QUEUE_KEY, JSON.stringify(fixed))
+    return fixed
+  }
+  return queue
+}
+
+function findNextValidIndex(queue: Queue, cardIds: Set<string>, fromIndex: number): number | null {
+  for (let i = fromIndex; i < queue.cards.length; i++) {
+    if (cardIds.has(queue.cards[i].id)) return i
+  }
+  return null
+}
+
 export function SurpriseMePlay({ cards }: Props) {
   const router = useRouter()
   const [queue, setQueue] = useState<Queue | null>(null)
   const [ready, setReady] = useState(false)
 
+  const cardIds = new Set(cards.map((c) => c.id))
+
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('connexion_surprise_queue')
-      if (!raw) {
-        router.replace('/game')
-        return
-      }
-      const parsed: Queue = JSON.parse(raw)
-      if (!parsed.cards || parsed.cards.length === 0) {
-        router.replace('/game')
-        return
-      }
-      setQueue(parsed)
-    } catch {
+    const raw = loadQueue()
+    if (!raw) {
       router.replace('/game')
+      return
     }
+
+    const sanitized = sanitizeIndex(raw)
+
+    if (sanitized.currentIndex >= sanitized.cards.length) {
+      router.replace('/game/surprise-me/result')
+      return
+    }
+
+    const validIndex = findNextValidIndex(sanitized, cardIds, sanitized.currentIndex)
+    if (validIndex === null) {
+      router.replace('/game/surprise-me/result')
+      return
+    }
+
+    if (validIndex !== sanitized.currentIndex) {
+      const advanced = { ...sanitized, currentIndex: validIndex }
+      localStorage.setItem(QUEUE_KEY, JSON.stringify(advanced))
+      setQueue(advanced)
+    } else {
+      setQueue(sanitized)
+    }
+
     setReady(true)
-  }, [router])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function handleNext() {
     if (!queue) return
@@ -69,13 +116,19 @@ export function SurpriseMePlay({ cards }: Props) {
       return
     }
 
-    const updated: Queue = { ...queue, currentIndex: nextIndex }
-    localStorage.setItem('connexion_surprise_queue', JSON.stringify(updated))
+    const validIndex = findNextValidIndex(queue, cardIds, nextIndex)
+    if (validIndex === null) {
+      router.push('/game/surprise-me/result')
+      return
+    }
+
+    const updated: Queue = { ...queue, currentIndex: validIndex }
+    localStorage.setItem(QUEUE_KEY, JSON.stringify(updated))
     setQueue(updated)
   }
 
   function handleChangeCards() {
-    router.push('/game')
+    router.push('/game?mode=surprise')
   }
 
   if (!ready || !queue) return null
@@ -83,10 +136,7 @@ export function SurpriseMePlay({ cards }: Props) {
   const entry = queue.cards[queue.currentIndex]
   const card = cards.find((c) => c.id === entry?.id)
 
-  if (!card) {
-    router.replace('/game')
-    return null
-  }
+  if (!card) return null
 
   const progress = `${queue.currentIndex + 1} / ${queue.cards.length}`
 

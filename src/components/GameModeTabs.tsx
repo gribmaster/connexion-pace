@@ -20,6 +20,7 @@ type CardData = {
 type Props = {
   categories: CategoryBlock[]
   cards?: CardData[]
+  initialTab?: Tab
 }
 
 const CATEGORY_ORDER = ['CONNECTION', 'INTIMACY', 'LOVEMAKING'] as const
@@ -53,9 +54,9 @@ function buildSurpriseQueue(
 
 type Tab = 'intuitive' | 'surprise'
 
-export function GameModeTabs({ categories, cards = [] }: Props) {
+export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' }: Props) {
   const router = useRouter()
-  const [tab, setTab] = useState<Tab>('intuitive')
+  const [tab, setTab] = useState<Tab>(initialTab)
   const [selected, setSelected] = useState<Record<string, number>>(
     Object.fromEntries(categories.map((c) => [c.value, 0]))
   )

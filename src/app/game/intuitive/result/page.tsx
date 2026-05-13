@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 
-export default function SurpriseMeResultPage() {
+export default function IntuitiveResultPage() {
   return (
     <main className="flex flex-col items-center w-[375px] mx-auto h-[800px] main-container">
       <Container>
