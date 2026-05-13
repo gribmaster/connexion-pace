@@ -28,7 +28,7 @@ export default function IntuitiveResultPage() {
               Choose next play time
             </Button>
 
-            <Link href="/welcome">
+            <Link href="/game">
               <Button variant="primary">Back to &ldquo;Connexion space&rdquo;</Button>
             </Link>
           </div>

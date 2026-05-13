@@ -1,60 +1,129 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useReducer, useRef } from 'react'
 import { Button } from '@/components/ui/Button'
 
 const STORAGE_KEY = 'intuitive_timer'
 
-function playBeep() {
-  try {
-    const file = localStorage.getItem('connexion_timer_sound') ?? 'beep1.wav'
-    const vol = localStorage.getItem('connexion_timer_volume')
-    const volume = vol !== null ? Number(vol) / 100 : 0.7
-    const audio = new Audio(`/sound/${file}`)
-    audio.volume = volume
-    audio.play()
-  } catch {}
+type TimerState = {
+  seconds: number
+  noLimit: boolean
+  running: boolean
+  timeUp: boolean
+  resetKey: string
+}
+
+type TimerAction =
+  | { type: 'TICK' }
+  | { type: 'TOGGLE_RUNNING' }
+  | { type: 'ADD_SECONDS'; amount: number }
+  | { type: 'SUBTRACT_SECONDS'; amount: number }
+  | { type: 'RESET'; resetKey: string }
+
+function getStoredTimerValues(): { seconds: number; noLimit: boolean } {
+  if (typeof window === 'undefined') return { seconds: 300, noLimit: false }
+  const stored = window.localStorage.getItem(STORAGE_KEY) ?? '5'
+  if (stored === 'no_limit') return { seconds: 300, noLimit: true }
+  const minutes = Number(stored)
+  if (!Number.isFinite(minutes) || minutes <= 0) return { seconds: 300, noLimit: false }
+  return { seconds: minutes * 60, noLimit: false }
+}
+
+function timerReducer(state: TimerState, action: TimerAction): TimerState {
+  switch (action.type) {
+    case 'RESET': {
+      const { seconds, noLimit } = getStoredTimerValues()
+      return { seconds, noLimit, running: true, timeUp: false, resetKey: action.resetKey }
+    }
+    case 'TICK': {
+      if (state.noLimit || !state.running || state.seconds <= 0) return state
+      if (state.seconds <= 1) {
+        return { ...state, seconds: 0, running: false, timeUp: true }
+      }
+      return { ...state, seconds: state.seconds - 1 }
+    }
+    case 'TOGGLE_RUNNING': {
+      const isTimeUp = !state.noLimit && state.seconds <= 0
+      if (isTimeUp) return state
+      return { ...state, running: !state.running }
+    }
+    case 'ADD_SECONDS': {
+      const next = state.seconds + action.amount
+      return { ...state, seconds: next, timeUp: false, running: true }
+    }
+    case 'SUBTRACT_SECONDS': {
+      const next = Math.max(0, state.seconds - action.amount)
+      const hitZero = !state.noLimit && next <= 0
+      return { ...state, seconds: next, running: hitZero ? false : state.running, timeUp: hitZero ? true : state.timeUp }
+    }
+    default:
+      return state
+  }
 }
 
 type Props = {
   resetKey: string
+  stopSoundRef?: React.MutableRefObject<() => void>
 }
 
-export function TimerBlock({ resetKey }: Props) {
-  const [noLimit, setNoLimit] = useState(false)
-  const [seconds, setSeconds] = useState(300)
-  const [running, setRunning] = useState(false)
-  const [timeUp, setTimeUp] = useState(false)
+export function TimerBlock({ resetKey, stopSoundRef }: Props) {
+  const [state, dispatch] = useReducer(timerReducer, resetKey, (key) => {
+    const { seconds, noLimit } = getStoredTimerValues()
+    return { seconds, noLimit, running: true, timeUp: false, resetKey: key }
+  })
+
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  const stopSound = () => {
+    const audio = audioRef.current
+    if (!audio) return
+    try {
+      audio.pause()
+      audio.currentTime = 0
+    } catch {}
+    audioRef.current = null
+  }
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY) ?? '5'
-    if (stored === 'no_limit') {
-      setNoLimit(true)
-      setSeconds(300)
-    } else {
-      setNoLimit(false)
-      setSeconds(parseInt(stored, 10) * 60)
+    if (stopSoundRef) stopSoundRef.current = stopSound
+  })
+
+  useEffect(() => {
+    if (state.resetKey !== resetKey) {
+      stopSound()
+      dispatch({ type: 'RESET', resetKey })
     }
-    setTimeUp(false)
-    setRunning(true)
-  }, [resetKey])
+  }, [resetKey, state.resetKey])
 
   useEffect(() => {
-    if (noLimit || !running || seconds <= 0) return
+    return () => { stopSound() }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    const wasTimeUp = !state.noLimit && state.seconds === 0 && state.timeUp
+    if (wasTimeUp) {
+      try {
+        const file = localStorage.getItem('connexion_timer_sound') ?? 'beep1.wav'
+        const vol = localStorage.getItem('connexion_timer_volume')
+        const volume = vol !== null ? Number(vol) / 100 : 0.7
+        const audio = new Audio(`/sound/${file}`)
+        audio.volume = volume
+        audioRef.current = audio
+        audio.play()
+      } catch {}
+    }
+  }, [state.noLimit, state.seconds, state.timeUp])
+
+  useEffect(() => {
+    if (state.noLimit || !state.running || state.seconds <= 0) return
     const id = setInterval(() => {
-      setSeconds((s) => {
-        if (s <= 1) {
-          setRunning(false)
-          setTimeUp(true)
-          playBeep()
-          return 0
-        }
-        return s - 1
-      })
+      dispatch({ type: 'TICK' })
     }, 1000)
     return () => clearInterval(id)
-  }, [noLimit, running, seconds])
+  }, [state.noLimit, state.running, state.seconds])
 
+  const { seconds, noLimit, running, timeUp } = state
   const mm = String(Math.floor(seconds / 60)).padStart(2, '0')
   const ss = String(seconds % 60).padStart(2, '0')
 
@@ -66,7 +135,7 @@ export function TimerBlock({ resetKey }: Props) {
         <div className="flex items-center gap-4">
           <button
             className="text-2xl font-bold text-[#D2AF9C] px-2"
-            onClick={() => setSeconds((s) => Math.max(0, s - 10))}
+            onClick={() => dispatch({ type: 'SUBTRACT_SECONDS', amount: 10 })}
           >
             −
           </button>
@@ -75,13 +144,7 @@ export function TimerBlock({ resetKey }: Props) {
           </span>
           <button
             className="text-2xl font-bold text-[#D2AF9C] px-2"
-            onClick={() => {
-              setSeconds((s) => s + 30)
-              if (timeUp) {
-                setTimeUp(false)
-                setRunning(true)
-              }
-            }}
+            onClick={() => { stopSound(); dispatch({ type: 'ADD_SECONDS', amount: 30 }) }}
           >
             +
           </button>
@@ -94,9 +157,10 @@ export function TimerBlock({ resetKey }: Props) {
         <Button
           variant="secondary"
           className="w-auto px-8"
-          onClick={() => setRunning((r) => !r)}
+          disabled={timeUp}
+          onClick={() => dispatch({ type: 'TOGGLE_RUNNING' })}
         >
-          {running ? 'Stop' : 'Play'}
+          {running && !timeUp ? 'Stop' : 'Play'}
         </Button>
       )}
     </div>

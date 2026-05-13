@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
@@ -68,47 +68,45 @@ function findNextValidIndex(queue: Queue, cardIds: Set<string>, fromIndex: numbe
   return null
 }
 
+function initQueue(cardIds: Set<string>): Queue | null {
+  if (typeof window === 'undefined') return null
+
+  const raw = loadQueue()
+  if (!raw) return null
+
+  const sanitized = sanitizeIndex(raw)
+
+  if (sanitized.currentIndex >= sanitized.cards.length) return null
+
+  const validIndex = findNextValidIndex(sanitized, cardIds, sanitized.currentIndex)
+  if (validIndex === null) return null
+
+  if (validIndex !== sanitized.currentIndex) {
+    const advanced = { ...sanitized, currentIndex: validIndex }
+    window.localStorage.setItem(QUEUE_KEY, JSON.stringify(advanced))
+    return advanced
+  }
+
+  return sanitized
+}
+
 export function SurpriseMePlay({ cards }: Props) {
   const router = useRouter()
-  const [queue, setQueue] = useState<Queue | null>(null)
-  const [ready, setReady] = useState(false)
-
   const cardIds = new Set(cards.map((c) => c.id))
+  const [queue, setQueue] = useState<Queue | null>(() => initQueue(cardIds))
+  const stopSoundRef = useRef<() => void>(() => {})
 
   useEffect(() => {
-    const raw = loadQueue()
-    if (!raw) {
+    if (queue === null) {
       router.replace('/game')
-      return
     }
-
-    const sanitized = sanitizeIndex(raw)
-
-    if (sanitized.currentIndex >= sanitized.cards.length) {
-      router.replace('/game/surprise-me/result')
-      return
-    }
-
-    const validIndex = findNextValidIndex(sanitized, cardIds, sanitized.currentIndex)
-    if (validIndex === null) {
-      router.replace('/game/surprise-me/result')
-      return
-    }
-
-    if (validIndex !== sanitized.currentIndex) {
-      const advanced = { ...sanitized, currentIndex: validIndex }
-      localStorage.setItem(QUEUE_KEY, JSON.stringify(advanced))
-      setQueue(advanced)
-    } else {
-      setQueue(sanitized)
-    }
-
-    setReady(true)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   function handleNext() {
     if (!queue) return
+    stopSoundRef.current()
+
     const nextIndex = queue.currentIndex + 1
 
     if (nextIndex >= queue.cards.length) {
@@ -128,10 +126,11 @@ export function SurpriseMePlay({ cards }: Props) {
   }
 
   function handleChangeCards() {
+    stopSoundRef.current()
     router.push('/game?mode=surprise')
   }
 
-  if (!ready || !queue) return null
+  if (!queue) return null
 
   const entry = queue.cards[queue.currentIndex]
   const card = cards.find((c) => c.id === entry?.id)
@@ -171,7 +170,7 @@ export function SurpriseMePlay({ cards }: Props) {
         </Card>
 
         <div className="flex flex-col gap-3">
-          <TimerBlock resetKey={entry.id} />
+          <TimerBlock resetKey={entry.id} stopSoundRef={stopSoundRef} />
           <Button onClick={handleNext}>
             {queue.currentIndex + 1 >= queue.cards.length ? 'Finish' : 'Next card'}
           </Button>

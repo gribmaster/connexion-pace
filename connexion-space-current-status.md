@@ -402,7 +402,7 @@ Buttons:
 
 - `Back to “Connexion space”`
   - active
-  - navigates to `/game`
+  - navigates to `/welcome`
 
 ---
 
@@ -635,7 +635,7 @@ Buttons:
 
 - `Back to “Connexion space”`
   - active
-  - navigates to `/game`
+  - navigates to `/welcome`
 
 ---
 
@@ -839,3 +839,11 @@ Recommended next tasks:
    - PWA
    - real i18n
 
+---
+
+## Suggested Commit Message
+
+```bash
+git add .
+git commit -m "Update game modes structure and result flow"
+```

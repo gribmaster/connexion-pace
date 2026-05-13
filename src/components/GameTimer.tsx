@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { TimerBlock } from '@/components/TimerBlock'
@@ -26,8 +27,11 @@ function saveVisited(category: string, ids: string[]) {
 
 export function GameTimer({ category, cardId, otherCardIds }: Props) {
   const router = useRouter()
+  const stopSoundRef = useRef<() => void>(() => {})
 
   const handleNext = () => {
+    stopSoundRef.current()
+
     if (otherCardIds.length === 0) {
       router.push('/game/intuitive/result')
       return
@@ -46,12 +50,17 @@ export function GameTimer({ category, cardId, otherCardIds }: Props) {
     router.push(`/game/intuitive/${category}/${randomId}`)
   }
 
+  const handleFinish = () => {
+    stopSoundRef.current()
+    router.push('/game/intuitive/result')
+  }
+
   return (
     <div className="flex flex-col gap-4">
-      <TimerBlock resetKey={cardId} />
+      <TimerBlock resetKey={cardId} stopSoundRef={stopSoundRef} />
 
       <div className="flex gap-3">
-        <Button variant="secondary" onClick={() => router.push('/game/intuitive/result')}>
+        <Button variant="secondary" onClick={handleFinish}>
           Finish game
         </Button>
         <Button variant="primary" onClick={handleNext}>

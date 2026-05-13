@@ -8,6 +8,7 @@ import {CaretDownIcon} from "@/components/icons/CaretDownIcon";
 type TimerOption = '5' | '10' | '30' | '60' | 'no_limit'
 
 const STORAGE_KEY = 'intuitive_timer'
+const DEFAULT_TIMER_OPTION: TimerOption = '5'
 
 const OPTIONS: { value: TimerOption; label: string }[] = [
   { value: '5', label: '5 minutes' },
@@ -27,15 +28,25 @@ function displayValue(opt: TimerOption): string {
 
 export function TimerSettings() {
   const [open, setOpen] = useState(false)
-  const [current, setCurrent] = useState<TimerOption>('5')
-  const [pending, setPending] = useState<TimerOption>('5')
+  const [current, setCurrent] = useState<TimerOption>(DEFAULT_TIMER_OPTION)
+  const [pending, setPending] = useState<TimerOption>(DEFAULT_TIMER_OPTION)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY) as TimerOption | null
-    if (stored) {
-      setCurrent(stored)
-      setPending(stored)
-    }
+    queueMicrotask(() => {
+      const stored = window.localStorage.getItem(STORAGE_KEY) as TimerOption | null
+      if (
+        stored === '5' ||
+        stored === '10' ||
+        stored === '30' ||
+        stored === '60' ||
+        stored === 'no_limit'
+      ) {
+        setCurrent(stored)
+        setPending(stored)
+      }
+      setIsMounted(true)
+    })
   }, [])
 
   const handleOpen = () => {
@@ -62,7 +73,7 @@ export function TimerSettings() {
           </span>
         </div>
         <div className="flex items-center font-semibold text-[16px] leading-[100%]">
-          <span>{displayValue(current)}</span>
+          <span>{isMounted ? displayValue(current) : displayValue(DEFAULT_TIMER_OPTION)}</span>
           <span className="ml-1">
             <CaretDownIcon />
           </span>

@@ -12,7 +12,9 @@
       "Bash(pnpm tsc *)",
       "Bash(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Recurse -Filter \"*game*\" -Directory)",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Directory)"
+      "Bash(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Directory)",
+      "Bash(Remove-Item *)",
+      "Bash(pnpm lint *)"
     ]
   }
 }
