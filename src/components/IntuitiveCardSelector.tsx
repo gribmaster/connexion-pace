@@ -26,10 +26,17 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo }: Props) 
   const [previewCard, setPreviewCard] = useState<CardItem | null>(null)
   const [learnMoreCard, setLearnMoreCard] = useState<CardItem | null>(null)
   const [infoOpen, setInfoOpen] = useState(false)
+  const [introOpen, setIntroOpen] = useState(false)
+  const [moreSuggestionsOpen, setMoreSuggestionsOpen] = useState(false)
   const router = useRouter()
 
   function handleStart() {
     if (!selectedId) return
+    setIntroOpen(true)
+  }
+
+  function handleConfirmStart() {
+    setIntroOpen(false)
     router.push(`/game/intuitive/${category}/${selectedId}`)
   }
 
@@ -156,6 +163,61 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo }: Props) 
             >
               Learn more
             </Button>
+          </div>
+        </div>
+      )}
+
+      {introOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+          onClick={() => setIntroOpen(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-3xl bg-white p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="mb-4 text-lg font-semibold text-[#1a0a0e]">
+              Tune into the play
+            </h2>
+            <p className="mb-8 text-sm leading-relaxed text-[#5a3a3a]">
+              Intro text placeholder.
+            </p>
+            <div className="flex gap-3">
+              <Button variant="secondary" className="flex-1" onClick={() => setMoreSuggestionsOpen(true)}>
+                More suggestions
+              </Button>
+              <Button className="flex-1" onClick={handleConfirmStart}>
+                OK
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {moreSuggestionsOpen && (
+        <div
+          className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 px-4"
+          onClick={() => setMoreSuggestionsOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-sm rounded-3xl bg-white p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setMoreSuggestionsOpen(false)}
+              aria-label="Close"
+              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[#1a0a0e] hover:bg-black/10"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
+                <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+              </svg>
+            </button>
+            <h2 className="mb-4 text-lg font-semibold text-[#1a0a0e]">
+              More suggestions
+            </h2>
+            <p className="text-sm leading-relaxed text-[#5a3a3a]">
+              Detailed suggestions placeholder.
+            </p>
           </div>
         </div>
       )}
