@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { Category } from '@prisma/client'
 import { Container } from '@/components/ui/Container'
 import { IntuitiveCardSelector } from '@/components/IntuitiveCardSelector'
+import { getCategoryTheme } from '@/lib/categoryThemes'
 
 const VALID_CATEGORIES = ['CONNECTION', 'INTIMACY', 'LOVEMAKING']
 
@@ -29,9 +30,11 @@ export default async function CategoryPage({ params }: Props) {
     select: { id: true, title: true, description: true, imageUrl: true, additional: true },
   })
 
+  const theme = getCategoryTheme(upperCategory)
+
   if (cards.length === 0) {
     return (
-      <div className="min-h-screen bg-black py-10">
+      <div className={`min-h-screen py-10 ${theme.screenClassName}`}>
         <Container className="flex flex-col gap-6">
           <Link href="/game/intuitive" className="text-sm text-[#D2AF9C] hover:underline">
             ← Back
@@ -43,12 +46,13 @@ export default async function CategoryPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-black py-10">
+    <div className={`min-h-screen py-10 ${theme.screenClassName}`}>
       <Container className="flex flex-col gap-6">
         <IntuitiveCardSelector
           cards={cards}
           category={category}
           categoryInfo={categoryInfo[upperCategory] ?? ''}
+          theme={theme}
         />
       </Container>
     </div>

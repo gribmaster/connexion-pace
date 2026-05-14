@@ -13,7 +13,7 @@ export function Card({
   return (
     <div
       className={clsx(
-        'rounded-[10px]',
+        'rounded-[10px] p-2',
         className
       )}
     >

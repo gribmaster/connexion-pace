@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Container } from '@/components/ui/Container'
 import { TimerBlock } from '@/components/TimerBlock'
+import { getCategoryTheme } from '@/lib/categoryThemes'
 
 type CardData = {
   id: string
@@ -149,19 +150,20 @@ export function SurpriseMePlay({ cards }: Props) {
   if (!card) return null
 
   const progress = `${queue.currentIndex + 1} / ${queue.cards.length}`
+  const theme = getCategoryTheme(card.category)
 
   return (
-    <div className="min-h-screen bg-[#1a0a0e] py-10">
+    <div className={`min-h-screen py-10 ${theme.screenClassName}`}>
       <Container className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
           <span className="text-sm text-[#D2AF9C80]">Surprise me</span>
           <span className="text-sm text-[#D2AF9C80]">{progress}</span>
         </div>
 
-        <Card className="flex flex-col gap-5 bg-white p-5">
+        <Card className={`flex flex-col gap-5 p-5 ${theme.cardContainerClassName}`}>
           <div className="flex items-start justify-between gap-2">
-            <h1 className="text-xl font-semibold text-[#1a0a0e]">{card.title}</h1>
-            <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium bg-${card.category} text-[#D2AF9C]`}>
+            <h1 className="text-xl font-semibold text-[#D2AF9C]">{card.title}</h1>
+            <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${theme.badgeClassName}`}>
               {CATEGORY_LABELS[card.category] ?? card.category}
             </span>
           </div>

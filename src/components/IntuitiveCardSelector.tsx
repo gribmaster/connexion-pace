@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import {ExpandIcon} from "@/components/icons/ExpandIcon";
+import { ExpandIcon } from '@/components/icons/ExpandIcon'
+import type { CategoryTheme } from '@/lib/categoryThemes'
 
 type CardItem = {
   id: string
@@ -19,9 +20,10 @@ type Props = {
   cards: CardItem[]
   category: string
   categoryInfo: string
+  theme: CategoryTheme
 }
 
-export function IntuitiveCardSelector({ cards, category, categoryInfo }: Props) {
+export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [previewCard, setPreviewCard] = useState<CardItem | null>(null)
   const [learnMoreCard, setLearnMoreCard] = useState<CardItem | null>(null)
@@ -66,45 +68,51 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo }: Props) 
         </h1>
       </div>
 
-      <div className="flex flex-wrap gap-[6px] pb-28">
+      <div className="flex flex-wrap pb-28 mx-[-3px]">
         {cards.map((card) => {
           const selected = card.id === selectedId
           return (
             <div
               key={card.id}
-              onClick={() => setSelectedId(card.id)}
-              className="relative cursor-pointer w-[128px] p-2"
+              className="w-[33.3%] p-[3px]"
             >
-              <Card
-                className={
-                  selected
-                    ? 'border-2 border-[#860119] ring-2 ring-[#860119]/30 single-card-connection'
-                    : 'border-2 border-transparent single-card-connection'
-                }
+              <div
+                onClick={() => setSelectedId(card.id)}
+                className="relative cursor-pointer"
               >
-                <h2 className="mb-1 text-base font-semibold text-[#1a0a0e]">
-                  {card.title}
-                </h2>
-                {card.imageUrl && (
-                  <img
-                    src={card.imageUrl}
-                    alt={card.title}
-                    className="h-[136px] w-full rounded-[5px] object-cover"
-                  />
-                )}
-              </Card>
+                <Card
+                  className={`${theme.singleCardClassName} ${
+                    selected
+                      ? 'border-1 border-[#D2AF9C]'
+                      : 'border-1 border-[#69584E]'
+                  }`}
+                >
+                  <div className="cat-card-head flex items-start justify-between mb-[10px]">
+                    <h2 className="mb-1 text-[8px] text-[#D2AF9C] pr-[3px]">
+                      {card.title}
+                    </h2>
 
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setPreviewCard(card)
-                }}
-                aria-label="Card details"
-                className="absolute right-4 top-4 flex h-4 w-4 items-center justify-center"
-              >
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setPreviewCard(card)
+                      }}
+                      aria-label="Card details"
+                      className="flex flex-none basis-[16px] items-center justify-center"
+                    >
 
-                <ExpandIcon />
-              </button>
+                      <ExpandIcon className="h-4 w-4"/>
+                    </button>
+                  </div>
+                  {card.imageUrl && (
+                    <img
+                      src={card.imageUrl}
+                      alt={card.title}
+                      className="h-[136px] w-full rounded-[5px] object-cover"
+                    />
+                  )}
+                </Card>
+              </div>
             </div>
           )
         })}

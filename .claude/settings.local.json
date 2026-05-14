@@ -14,7 +14,15 @@
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Directory)",
       "Bash(Remove-Item *)",
-      "Bash(pnpm lint *)"
+      "Bash(pnpm lint *)",
+      "Bash(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\\\\src\\\\app\\\\game\\\\intuitive\" -Recurse -File)",
+      "Bash(Find \"D:\\\\work\\\\connexion\\\\connexion-space\" -type d -name \"game\")",
+      "Bash(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\\\\src\\\\components\" -Recurse -File -Filter \"*.tsx\")",
+      "Bash(Find \"D:\\\\work\\\\connexion\\\\connexion-space\" -name \"schema.prisma\" -type f)",
+      "Bash(Find \"D:\\\\work\\\\connexion\\\\connexion-space\\\\src\" -type f \\\\\\( -name \"*.css\" -o -name \"*.scss\" -o -name \"globals.css\" \\\\\\))",
+      "Bash(Find D:\\\\work\\\\connexion\\\\connexion-space *)",
+      "Bash(Find \"D:\\\\work\\\\connexion\\\\connexion-space\" -maxdepth 3 -name \"tailwind*\" -type f)",
+      "Bash(npx tsc *)"
     ]
   }
 }
