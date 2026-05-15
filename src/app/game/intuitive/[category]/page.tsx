@@ -47,7 +47,7 @@ export default async function CategoryPage({ params }: Props) {
 
   return (
     <div className={`min-h-screen py-10 ${theme.screenClassName}`}>
-      <Container className="flex flex-col gap-6">
+      <Container className="flex flex-col">
         <IntuitiveCardSelector
           cards={cards}
           category={category}

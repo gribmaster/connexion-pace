@@ -161,19 +161,19 @@ button[disabled] {
 }
 
 .bg-CONNECTION {
-  background-image: url('/img/cat-connection.svg');
+  background-image: url('/img/connection-card-page.svg');
   background-size: cover;
   background-repeat: no-repeat;
 }
 
 .bg-INTIMACY {
-  background-image: url('/img/cat-intimacy.svg');
+  background-image: url('/img/intimacy-card-page.svg');
   background-size: cover;
   background-repeat: no-repeat;
 }
 
 .bg-LOVEMAKING {
-  background-image: url('/img/cat-lovemaking.svg');
+  background-image: url('/img/lovemaking-card-page.svg');
   background-size: cover;
   background-repeat: no-repeat;
 }
@@ -209,6 +209,14 @@ button[disabled] {
   background-image: url('/img/single-card-CONNECTION.svg');
   background-size: cover;
 }
+.single-card-intimacy {
+  background-image: url('/img/single-card-INTIMACY.svg');
+  background-size: cover;
+}
+.single-card-lovemaking {
+  background-image: url('/img/single-card-LOVEMAKING.svg');
+  background-size: cover;
+}
 .logo {
   padding-top: 236px;
 }
@@ -225,4 +233,3 @@ button[disabled] {
   height: 4px;
   background: #69584E;
 }
-

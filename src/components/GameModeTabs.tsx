@@ -121,22 +121,25 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
 
       {/* Intuitive tab content */}
       {tab === 'intuitive' && (
-        <Card className="flex flex-col mt-5 gap-3">
-          {categories.map(({ label, value, count }) => (
-            <div
-              key={value}
-              className={`flex items-center justify-between p-3 bg-${value} rounded-[24px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000]`}
-            >
-              <div className="flex flex-col self-start p-2">
-                <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
-                <span className="font-normal text-[16px] leading-[100%]">{count} cards</span>
+        <>
+          <Card className="flex flex-col mt-5 gap-3">
+            {categories.map(({ label, value, count }) => (
+              <div
+                key={value}
+                className={`flex items-center justify-between p-3 bg-${value} rounded-[24px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000]`}
+              >
+                <div className="flex flex-col self-start p-2">
+                  <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
+                  <span className="font-normal text-[16px] leading-[100%]">{count} cards</span>
+                </div>
+                <Link href={`/game/intuitive/${value}`} className={`h-[154px] w-[96px] cat-${value} cat-card`}>
+                  <div className="font-semibold text-[12px] leading-[100%]">Choose</div>
+                </Link>
               </div>
-              <Link href={`/game/intuitive/${value}`} className={`h-[154px] w-[96px] cat-${value} cat-card`}>
-                <div className="font-semibold text-[12px] leading-[100%]">Choose</div>
-              </Link>
-            </div>
-          ))}
-        </Card>
+            ))}
+          </Card>
+          <TimerSettings mode={tab} />
+        </>
       )}
 
       {/* Surprise me tab content */}
@@ -175,6 +178,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
             ))}
           </Card>
 
+          <TimerSettings mode={tab} />
           <Button
             onClick={handleStartSurprise}
             disabled={total === 0}
@@ -239,8 +243,6 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
           </div>
         </div>
       )}
-
-      <TimerSettings mode={tab} />
     </>
   )
 }

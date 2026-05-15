@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { ExpandIcon } from '@/components/icons/ExpandIcon'
 import type { CategoryTheme } from '@/lib/categoryThemes'
+import {InfoCircleIcon} from "@/components/icons/InfoCircleIcon";
 
 type CardItem = {
   id: string
@@ -44,29 +45,30 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
 
   return (
     <>
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between mb-3">
         <Link href="/game">
-          <Button variant="secondary" className="w-auto px-5">
-            ← Back
-          </Button>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clipPath="url(#clip0_64_2414)">
+              <path d="M20.25 12L3.75 12" stroke="#D2AF9C" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M10.5 5.25L3.75 12L10.5 18.75" stroke="#D2AF9C" strokeLinecap="round" strokeLinejoin="round"/>
+            </g>
+            <defs>
+              <clipPath id="clip0_64_2414">
+                <rect width="24" height="24" fill="white" transform="translate(24 1.04907e-06) rotate(90)"/>
+              </clipPath>
+            </defs>
+          </svg>
         </Link>
-        <button
+        <div
           onClick={() => setInfoOpen(true)}
           aria-label="Category info"
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[#D2AF9C] hover:bg-white/20"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
-            <path fillRule="evenodd"
-                  d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z"
-                  clipRule="evenodd"/>
-          </svg>
-        </button>
+          <InfoCircleIcon/>
+        </div>
       </div>
-      <div className="flex justify-center">
-        <h1 className="">
-          {category.toLowerCase()}
-        </h1>
-      </div>
+      <h1 className="font-semibold text-[20px] leading-[30px] text-center mb-4">
+        {category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}
+      </h1>
 
       <div className="flex flex-wrap pb-28 mx-[-3px]">
         {cards.map((card) => {
@@ -78,7 +80,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
             >
               <div
                 onClick={() => setSelectedId(card.id)}
-                className="relative cursor-pointer"
+                className="relative cursor-pointer h-[100%]"
               >
                 <Card
                   className={`${theme.singleCardClassName} ${
@@ -87,7 +89,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
                       : 'border-1 border-[#69584E]'
                   }`}
                 >
-                  <div className="cat-card-head flex items-start justify-between mb-[10px]">
+                  <div className="cat-card-head flex flex-grow-1 items-start justify-between mb-[10px]">
                     <h2 className="mb-1 text-[8px] text-[#D2AF9C] pr-[3px]">
                       {card.title}
                     </h2>
@@ -118,9 +120,9 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
         })}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-[#1a0a0e] px-4 py-4">
+      <div className="fixed bottom-0 left-0 right-0 px-4 py-6">
         <Button onClick={handleStart} disabled={!selectedId}>
-          Start game
+          Start playing
         </Button>
       </div>
 
@@ -217,7 +219,8 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
               className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[#1a0a0e] hover:bg-black/10"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
-                <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                <path
+                  d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"/>
               </svg>
             </button>
             <h2 className="mb-4 text-lg font-semibold text-[#1a0a0e]">

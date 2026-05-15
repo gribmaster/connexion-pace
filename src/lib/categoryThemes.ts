@@ -17,14 +17,14 @@ const themes: Record<string, CategoryTheme> = {
   INTIMACY: {
     screenClassName: 'bg-INTIMACY',
     cardContainerClassName: 'cat-INTIMACY',
-    singleCardClassName: 'single-card-connection',
+    singleCardClassName: 'single-card-intimacy',
     badgeClassName: 'bg-[#6b2d4a] text-[#f4b8d0]',
     accentClassName: 'text-[#f4b8d0]',
   },
   LOVEMAKING: {
     screenClassName: 'bg-LOVEMAKING',
     cardContainerClassName: 'cat-LOVEMAKING',
-    singleCardClassName: 'single-card-connection',
+    singleCardClassName: 'single-card-lovemaking',
     badgeClassName: 'bg-[#4a1a3a] text-[#d4a0c0]',
     accentClassName: 'text-[#d4a0c0]',
   },
