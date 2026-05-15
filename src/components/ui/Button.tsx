@@ -2,7 +2,7 @@ import { ButtonHTMLAttributes } from 'react'
 import clsx from 'clsx'
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'primary' | 'secondary'
+  variant?: 'primary' | 'secondary' | 'brown-transparent'
 }
 
 export function Button({
@@ -20,6 +20,9 @@ export function Button({
 
           'bg-[#D2AF9C1A] text-[#D2AF9C] border-[#D2AF9C4D]':
             variant === 'secondary',
+
+          'bg-[#D2AF9C1A] border-[#D2AF9C4D]':
+          variant === 'brown-transparent',
         },
         className
       )}

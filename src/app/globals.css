@@ -263,3 +263,15 @@ button[disabled] {
 .privacy-block li {
   list-style-type: disc;
 }
+.cat-description-CONNECTION {
+  background-image: url('/img/single-card-CONNECTION.svg');
+  background-size: cover;
+}
+.cat-description-INTIMACY {
+  background-image: url('/img/single-card-INTIMACY.svg');
+  background-size: cover;
+}
+.cat-description-LOVEMAKING {
+  background-image: url('/img/single-card-LOVEMAKING.svg');
+  background-size: cover;
+}

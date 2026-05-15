@@ -261,23 +261,23 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
 
       {instructionOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-6 "
           onClick={() => setInstructionOpen(false)}
         >
           <div
-            className="relative w-full max-w-sm rounded-3xl bg-white p-6"
+            className="relative w-full max-h-[85vh] overflow-auto max-w-sm rounded-[16px] bg-black p-6 border border-[#69584E]"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setInstructionOpen(false)}
               aria-label="Close"
-              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[#1a0a0e] hover:bg-black/10"
+              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
                 <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
               </svg>
             </button>
-            <h2 className="mb-4 text-lg font-semibold text-[#1a0a0e]">
+            <h2 className="mb-6 text-lg font-semibold text-[#D2AF9C]">
               {modeInstructions[tab].title}
             </h2>
             <ActiveInstruction />

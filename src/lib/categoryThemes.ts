@@ -14,7 +14,7 @@ const themes: Record<string, CategoryTheme> = {
     singleCardClassName: 'single-card-connection',
     badgeClassName: 'bg-[#2d5a3d] text-[#a8d5b5]',
     accentClassName: 'text-[#a8d5b5]',
-    descriptionModalClassName: 'cat-CONNECTION',
+    descriptionModalClassName: 'cat-description-CONNECTION',
   },
   INTIMACY: {
     screenClassName: 'bg-INTIMACY',
@@ -22,7 +22,7 @@ const themes: Record<string, CategoryTheme> = {
     singleCardClassName: 'single-card-intimacy',
     badgeClassName: 'bg-[#6b2d4a] text-[#f4b8d0]',
     accentClassName: 'text-[#f4b8d0]',
-    descriptionModalClassName: 'cat-INTIMACY',
+    descriptionModalClassName: 'cat-description-INTIMACY',
   },
   LOVEMAKING: {
     screenClassName: 'bg-LOVEMAKING',
@@ -30,7 +30,7 @@ const themes: Record<string, CategoryTheme> = {
     singleCardClassName: 'single-card-lovemaking',
     badgeClassName: 'bg-[#4a1a3a] text-[#d4a0c0]',
     accentClassName: 'text-[#d4a0c0]',
-    descriptionModalClassName: 'cat-LOVEMAKING',
+    descriptionModalClassName: 'cat-description-LOVEMAKING',
   },
 }
 

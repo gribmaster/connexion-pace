@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { ExpandIcon } from '@/components/icons/ExpandIcon'
 import type { CategoryTheme } from '@/lib/categoryThemes'
 import {InfoCircleIcon} from "@/components/icons/InfoCircleIcon";
+import {CollapseIcon} from "@/components/icons/CollapseIcon";
 
 type CardItem = {
   id: string
@@ -60,7 +61,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
           </svg>
         </Link>
         <div
-          onClick={() => setInfoOpen(true)}
+          //onClick={() => setInfoOpen(true)}
           aria-label="Category info"
         >
           <InfoCircleIcon/>
@@ -90,7 +91,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
                   }`}
                 >
                   <div className="cat-card-head flex flex-grow-1 items-start justify-between mb-[10px]">
-                    <h2 className="mb-1 text-[8px] text-[#D2AF9C] pr-[3px]">
+                    <h2 className="text-[8px] text-[#D2AF9C] pr-[3px] pt-[3px]">
                       {card.title}
                     </h2>
 
@@ -146,13 +147,24 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
 
       {previewCard && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 card-full-description"
+          className="fixed inset-0 z-50 flex justify-center items-center p-5 bg-black/60 card-full-description"
           onClick={() => setPreviewCard(null)}
         >
           <div
-            className={`w-full max-w-lg rounded-t-3xl bg-white p-6 pb-10  ${theme.descriptionModalClassName}`}
+            className={`w-full max-h-[80vh] max-w-lg rounded-[24px] bg-white p-5 pb-10 border border-[#69584E]  ${theme.descriptionModalClassName}`}
             onClick={(e) => e.stopPropagation()}
           >
+            <div className="flex justify-between items-start mb-3">
+              <h2 className="text-[20px] text-[#D2AF9C] pr-2">
+                {previewCard.title}
+              </h2>
+              <div
+                className="h-6 w-6 flex-none basis-[24px]"
+                onClick={() => setPreviewCard(null)}
+              >
+                <CollapseIcon />
+              </div>
+            </div>
             {previewCard.imageUrl && (
               <img
                 src={previewCard.imageUrl}
@@ -160,15 +172,13 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
                 className="mb-4 h-48 w-full rounded-2xl object-cover"
               />
             )}
-            <h2 className="mb-3 text-lg font-semibold text-[#1a0a0e]">
-              {previewCard.title}
-            </h2>
             {previewCard.description && (
-              <p className="mb-6 text-sm text-[#5a3a3a]">{previewCard.description}</p>
+              <p className="mb-6 text-[14px] leading-[140%] text-[#D2AF9C]">{previewCard.description}</p>
             )}
             <Button
               disabled={!previewCard.additional}
-              className={!previewCard.additional ? 'opacity-40' : ''}
+              variant="brown-transparent"
+              className={!previewCard.additional ? 'opacity-40 bg-[#D2AF9C1A]' : ''}
               onClick={() => setLearnMoreCard(previewCard)}
             >
               Learn more
@@ -235,20 +245,28 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
 
       {learnMoreCard && (
         <div
-          className="fixed inset-0 z-60 flex items-end justify-center bg-black/70"
+          className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 p-4"
           onClick={() => setLearnMoreCard(null)}
         >
           <div
-            className="w-full max-w-lg rounded-t-3xl bg-white p-6 pb-10"
+            className="w-full overflow-auto max-h-[80vh] max-w-lg rounded-[16px] bg-black p-6 border border-[#69584E] relative"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="mb-4 text-lg font-semibold text-[#1a0a0e]">
+            <h2 className="mb-4 font-semibold text-[20px] leading-[120%] text-[#D2AF9C]">
               Appreciative Words
             </h2>
-            <p className="mb-8 text-sm leading-relaxed text-[#5a3a3a]">
+            <p className="text-[16px] leading-[150%] text-[#D2AF9C]/70">
               {learnMoreCard.additional}
             </p>
-            <Button onClick={() => setLearnMoreCard(null)}>Back</Button>
+            <div
+              onClick={() => setLearnMoreCard(null)}
+              className="absolute right-[24px] top-[24px]"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
+                <path
+                  d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"/>
+              </svg>
+            </div>
           </div>
         </div>
       )}

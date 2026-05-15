@@ -22,7 +22,9 @@
       "Bash(Find \"D:\\\\work\\\\connexion\\\\connexion-space\\\\src\" -type f \\\\\\( -name \"*.css\" -o -name \"*.scss\" -o -name \"globals.css\" \\\\\\))",
       "Bash(Find D:\\\\work\\\\connexion\\\\connexion-space *)",
       "Bash(Find \"D:\\\\work\\\\connexion\\\\connexion-space\" -maxdepth 3 -name \"tailwind*\" -type f)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(cat -A \"src/app/api/auth/[...nextauth]/route.ts\")",
+      "Bash(powershell -Command \"Get-Content 'src\\\\app\\\\api\\\\auth\\\\[...nextauth]\\\\route.ts' | Format-Hex | Select-Object -First 5\")"
     ]
   }
 }
