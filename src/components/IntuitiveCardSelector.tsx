@@ -146,11 +146,11 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
 
       {previewCard && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 card-full-description"
           onClick={() => setPreviewCard(null)}
         >
           <div
-            className="w-full max-w-lg rounded-t-3xl bg-white p-6 pb-10"
+            className={`w-full max-w-lg rounded-t-3xl bg-white p-6 pb-10  ${theme.descriptionModalClassName}`}
             onClick={(e) => e.stopPropagation()}
           >
             {previewCard.imageUrl && (
