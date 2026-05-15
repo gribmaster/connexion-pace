@@ -1,11 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { TimerSettings } from '@/components/TimerSettings'
+import { InfoCircleIcon } from '@/components/icons/InfoCircleIcon'
+import { UserCircleIcon } from '@/components/icons/UserCircleIcon'
+import { IntuitiveInstruction } from '@/components/game/instructions/IntuitiveInstruction'
+import { SurpriseInstruction } from '@/components/game/instructions/SurpriseInstruction'
+import { JourneyInstruction } from '@/components/game/instructions/JourneyInstruction'
 
 type CategoryBlock = {
   label: string
@@ -53,7 +58,22 @@ function buildSurpriseQueue(
   return queue
 }
 
-type Tab = 'intuitive' | 'surprise'
+type Tab = 'intuitive' | 'surprise' | 'journey'
+
+const modeInstructions: Record<Tab, { title: string; Content: () => React.ReactElement }> = {
+  intuitive: {
+    title: 'Dynamics of the game',
+    Content: IntuitiveInstruction,
+  },
+  surprise: {
+    title: 'Dynamics of the game',
+    Content: SurpriseInstruction,
+  },
+  journey: {
+    title: 'Dynamics of the game',
+    Content: JourneyInstruction,
+  },
+}
 
 export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' }: Props) {
   const router = useRouter()
@@ -63,8 +83,10 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
   )
   const [introOpen, setIntroOpen] = useState(false)
   const [moreSuggestionsOpen, setMoreSuggestionsOpen] = useState(false)
+  const [instructionOpen, setInstructionOpen] = useState(false)
 
   const total = Object.values(selected).reduce((a, b) => a + b, 0)
+  const ActiveInstruction = modeInstructions[tab].Content
 
   function increment(value: string, max: number) {
     setSelected((prev) => ({ ...prev, [value]: Math.min(prev[value] + 1, max) }))
@@ -89,6 +111,27 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
 
   return (
     <>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="flex items-center font-semibold text-[20px] leading-[100%]">
+          <span>Choose your cards</span>
+          <button
+            id="game-main-instruction"
+            onClick={() => setInstructionOpen(true)}
+            aria-label="Mode instructions"
+            className="ml-1 flex items-center"
+          >
+            <InfoCircleIcon />
+          </button>
+        </h1>
+        <div className="flex items-center">
+          <Link href="/profile" aria-label="Profile">
+            <UserCircleIcon className="h-6 w-6 text-[#D2AF9C]/60 hover:text-[#D2AF9C] transition-colors" />
+          </Link>
+        </div>
+      </div>
+      <div className="font-normal text-[16px] leading-[150%] mt-[10px] opacity-70">Choose the number of cards and set the time for each category before starting your session.</div>
+
       {/* Mode tabs */}
       <div className="flex mt-5">
         <button
@@ -212,6 +255,32 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
                 OK
               </Button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {instructionOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+          onClick={() => setInstructionOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-sm rounded-3xl bg-white p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setInstructionOpen(false)}
+              aria-label="Close"
+              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[#1a0a0e] hover:bg-black/10"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
+                <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+              </svg>
+            </button>
+            <h2 className="mb-4 text-lg font-semibold text-[#1a0a0e]">
+              {modeInstructions[tab].title}
+            </h2>
+            <ActiveInstruction />
           </div>
         </div>
       )}
