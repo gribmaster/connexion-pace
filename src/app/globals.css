@@ -233,3 +233,33 @@ button[disabled] {
   height: 4px;
   background: #69584E;
 }
+.checkbox-default {
+  position: relative;
+  display: flex;
+}
+.checkbox-default input + i {
+  position: relative;
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  border:1px solid #69584E;
+  border-radius: 4px;
+  transition: 0.25s all linear;
+}
+.checkbox-default input:checked + i {
+  position: relative;
+  background-color: #D2AF9C;
+  border-color: #D2AF9C;
+  background-image: url('/img/check.svg');
+  background-size: 14px 10px;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: 0.25s all linear;
+}
+.privacy-block ul {
+  list-style-type: disc;
+  margin-left: 24px;
+}
+.privacy-block li {
+  list-style-type: disc;
+}

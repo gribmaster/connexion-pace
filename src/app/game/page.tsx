@@ -34,7 +34,7 @@ export default async function GamePage({
         <div className="flex items-center justify-between">
           <h1 className="flex items-center font-semibold text-[20px] leading-[100%]">
             <span>Choose your cards</span>
-            <div className="ml-1">
+            <div className="ml-1" id="game-main-instruction">
               <InfoCircleIcon />
             </div>
           </h1>

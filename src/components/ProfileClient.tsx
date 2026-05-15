@@ -87,7 +87,7 @@ export function ProfileClient() {
   return (
     <>
       {/* Settings section */}
-      <div className="flex flex-col gap-0 rounded-3xl bg-white shadow-sm overflow-hidden">
+      <div className="flex flex-col gap-0 rounded-3xl bg-white shadow-sm">
         {/* Daily connection */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#D2AF9C]/20">
           <span className="text-sm font-medium text-[#1a0a0e]">Daily connection</span>
