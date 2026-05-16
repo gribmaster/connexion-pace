@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import PwaRegister from "@/components/PwaRegister";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -9,8 +10,17 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Connexion space",
-  description: "Connexion space – card game for meaningful conversations",
+  title: "Connexion Space",
+  description: "Connexion Space card game",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    title: "Connexion",
+    statusBarStyle: "black-translucent",
+  },
+  other: {
+    "theme-color": "#000000",
+  },
 };
 
 export default function RootLayout({
@@ -20,7 +30,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${poppins.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col justify-center">{children}</body>
+      <head>
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+      </head>
+      <body className="min-h-full flex flex-col justify-center">
+        {children}
+        <PwaRegister />
+      </body>
     </html>
   );
 }
