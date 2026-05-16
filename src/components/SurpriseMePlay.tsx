@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
 import { Container } from '@/components/ui/Container'
 import { TimerBlock } from '@/components/TimerBlock'
 import { getCategoryTheme } from '@/lib/categoryThemes'
@@ -155,42 +154,45 @@ export function SurpriseMePlay({ cards }: Props) {
 
   return (
     <div className={`min-h-screen py-10 ${theme.screenClassName}`}>
-      <Container className="flex flex-col gap-6">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-[#D2AF9C80]">Surprise me</span>
-          <span className="text-sm text-[#D2AF9C80]">{progress}</span>
-        </div>
-
-        <Card className={`flex flex-col gap-5 p-5 ${theme.cardContainerClassName}`}>
-          <div className="flex items-start justify-between gap-2">
-            <h1 className="text-xl font-semibold text-[#D2AF9C]">{card.title}</h1>
-            <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${theme.badgeClassName}`}>
-              {CATEGORY_LABELS[card.category] ?? card.category}
-            </span>
+      <Container className="">
+        <div className="text-[#D2AF9C] mb-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-[#D2AF9C80]">Surprise me</span>
+            <span className="text-sm text-[#D2AF9C80]">{progress}</span>
           </div>
-
-          {card.imageUrl && (
-            <div className="relative h-52 w-full overflow-hidden rounded-2xl">
-              <Image
-                src={card.imageUrl}
-                alt={card.title}
-                fill
-                className="object-cover"
-              />
+          <div className={`h-[582px] overflow-auto border border-[#69584E] p-4 ${theme.cardContainerClassName} rounded-[24px]`}>
+            <div className="flex items-start justify-between gap-2 mb-4">
+              <h1 className="text-[20px] leading-[26px] font-semibold">{card.title}</h1>
+              <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${theme.badgeClassName}`}>
+                {CATEGORY_LABELS[card.category] ?? card.category}
+              </span>
             </div>
-          )}
 
-          <HtmlContent html={card.description} className="text-sm text-[#5a3a3a]" />
-        </Card>
+            {card.imageUrl && (
+              <div className="relative h-[140px] w-full mb-4">
+                <Image
+                  src={card.imageUrl}
+                  alt={card.title}
+                  fill
+                  className="object-cover rounded-[12px]"
+                />
+              </div>
+            )}
+
+            <HtmlContent html={card.description} className="game-card-content" />
+          </div>
+        </div>
 
         <div className="flex flex-col gap-3">
           <TimerBlock resetKey={entry.id} storageKey="connexion_timer_surprise" stopSoundRef={stopSoundRef} />
-          <Button onClick={handleNext}>
-            {queue.currentIndex + 1 >= queue.cards.length ? 'Finish' : 'Next card'}
-          </Button>
-          <Button variant="secondary" onClick={handleChangeCards}>
-            Change cards
-          </Button>
+          <div className="flex gap-3">
+            <Button variant="secondary" onClick={handleChangeCards} className="border-none">
+              Change cards
+            </Button>
+            <Button variant="secondary" onClick={handleNext} className="border-none">
+              {queue.currentIndex + 1 >= queue.cards.length ? 'Finish' : 'Next card'}
+            </Button>
+          </div>
         </div>
       </Container>
     </div>

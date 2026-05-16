@@ -24,7 +24,9 @@
       "Bash(Find \"D:\\\\work\\\\connexion\\\\connexion-space\" -maxdepth 3 -name \"tailwind*\" -type f)",
       "Bash(npx tsc *)",
       "Bash(cat -A \"src/app/api/auth/[...nextauth]/route.ts\")",
-      "Bash(powershell -Command \"Get-Content 'src\\\\app\\\\api\\\\auth\\\\[...nextauth]\\\\route.ts' | Format-Hex | Select-Object -First 5\")"
+      "Bash(powershell -Command \"Get-Content 'src\\\\app\\\\api\\\\auth\\\\[...nextauth]\\\\route.ts' | Format-Hex | Select-Object -First 5\")",
+      "Bash(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Recurse -Directory)",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Recurse -Directory | Where-Object { $_.FullName -match \"\\(game|intuitive|surprise\\)\" } | Select-Object -ExpandProperty FullName)"
     ]
   }
 }
