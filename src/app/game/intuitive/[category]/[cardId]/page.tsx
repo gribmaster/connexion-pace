@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card'
 import { Container } from '@/components/ui/Container'
 import { GameTimer } from '@/components/GameTimer'
 import { getCategoryTheme } from '@/lib/categoryThemes'
+import { HtmlContent } from '@/components/HtmlContent'
 
 const VALID_CATEGORIES = ['CONNECTION', 'INTIMACY', 'LOVEMAKING']
 
@@ -36,24 +37,24 @@ export default async function CardPage({ params }: Props) {
 
   return (
     <div className={`min-h-screen py-10 ${theme.screenClassName}`}>
-      <Container className="flex flex-col gap-6">
-        <Card className={`flex flex-col gap-5 ${theme.cardContainerClassName}`}>
-          <h1 className="text-xl font-semibold text-[#D2AF9C]">{card.title}</h1>
+      <Container className="">
+        <div className="text-[#D2AF9C] mb-3">
+          <div className={`h-[582px] overflow-auto border border-[#69584E] p-4 ${theme.cardContainerClassName} rounded-[24px]`}>
+            <h1 className="text-[20px] leading-[26px] mb-4 font-semibold">{card.title}</h1>
 
-          {card.imageUrl && (
-            <div className="relative h-52 w-full overflow-hidden rounded-2xl">
-              <Image
-                src={card.imageUrl}
-                alt={card.title}
-                fill
-                className="object-cover"
-              />
-            </div>
-          )}
-
-          <p className="text-sm text-[#5a3a3a]">{card.description}</p>
-        </Card>
-
+            {card.imageUrl && (
+              <div className="relative h-[140px] w-full mb-4">
+                <Image
+                  src={card.imageUrl}
+                  alt={card.title}
+                  fill
+                  className="object-cover rounded-[12px]"
+                />
+              </div>
+            )}
+            <HtmlContent html={card.description} className="game-card-content" />
+          </div>
+        </div>
         <GameTimer category={category} cardId={cardId} otherCardIds={otherCardIds} />
       </Container>
     </div>

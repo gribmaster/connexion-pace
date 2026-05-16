@@ -175,7 +175,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
                   <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
                   <span className="font-normal text-[16px] leading-[100%]">{count} cards</span>
                 </div>
-                <Link href={`/game/intuitive/${value}`} className={`h-[154px] w-[96px] cat-${value} cat-card`}>
+                <Link href={`/game/intuitive/${value}`} className={`h-[154px] w-[96px] cat-card-${value} cat-card`}>
                   <div className="font-semibold text-[12px] leading-[100%]">Choose</div>
                 </Link>
               </div>

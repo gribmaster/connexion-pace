@@ -56,14 +56,14 @@ export function GameTimer({ category, cardId, otherCardIds }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       <TimerBlock resetKey={cardId} storageKey="connexion_timer_intuitive" stopSoundRef={stopSoundRef} />
 
       <div className="flex gap-3">
-        <Button variant="secondary" onClick={handleFinish}>
+        <Button variant="secondary" onClick={handleFinish} className="border-none">
           Finish game
         </Button>
-        <Button variant="primary" onClick={handleNext}>
+        <Button variant="secondary" onClick={handleNext} className="border-none">
           Next card
         </Button>
       </div>

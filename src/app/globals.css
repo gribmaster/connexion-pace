@@ -179,15 +179,21 @@ button[disabled] {
 }
 
 .cat-CONNECTION {
-  background-image: url('/img/card-container-connection.svg');
+  background-image: url('/img/game-connection.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .cat-INTIMACY {
-  background-image: url('/img/card-container-intimacy.svg');
+  background-image: url('/img/game-intimacy.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .cat-LOVEMAKING {
-  background-image: url('/img/card-container-lovemaking.svg');
+  background-image: url('/img/game-lovemaking.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .cat-card {
@@ -215,6 +221,18 @@ button[disabled] {
 }
 .single-card-lovemaking {
   background-image: url('/img/single-card-LOVEMAKING.svg');
+  background-size: cover;
+}
+.cat-card-CONNECTION {
+  background-image: url('/img/card-container-connection.svg');
+  background-size: cover;
+}
+.cat-card-INTIMACY {
+  background-image: url('/img/card-container-intimacy.svg');
+  background-size: cover;
+}
+.cat-card-LOVEMAKING {
+  background-image: url('/img/card-container-lovemaking.svg');
   background-size: cover;
 }
 .logo {
@@ -264,15 +282,15 @@ button[disabled] {
   list-style-type: disc;
 }
 .cat-description-CONNECTION {
-  background-image: url('/img/single-card-CONNECTION.svg');
+  background-image: url('/img/game-connection.svg');
   background-size: cover;
 }
 .cat-description-INTIMACY {
-  background-image: url('/img/single-card-INTIMACY.svg');
+  background-image: url('/img/game-intimacy.svg');
   background-size: cover;
 }
 .cat-description-LOVEMAKING {
-  background-image: url('/img/single-card-LOVEMAKING.svg');
+  background-image: url('/img/game-lovemaking.svg');
   background-size: cover;
 }
 .input-range {
@@ -324,4 +342,64 @@ button[disabled] {
   width: 50px;
   height: 4px;
   background: #69584E;
+}
+.modal-html-content p {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  opacity: 0.7;
+  margin-top: 8px;
+}
+.modal-html-content h5 {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 120%;
+  margin-top: 16px;
+}
+.modal-html-content ul {
+  margin-left: 24px;
+  list-style-type: disc;
+}
+.modal-html-content li {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  opacity: 0.7;
+}
+
+.game-card-content h5 {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  margin-top: 12px;
+}
+
+.game-card-content p {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
+  margin: 6px 0;
+}
+
+.game-card-content ul {
+  margin: 6px 0;
+  padding-left: 24px;
+  list-style-type: disc;
+}
+
+.game-card-content li {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
+  margin: 6px 0;
+}
+
+.game-card-content ol {
+  list-style-type: decimal;
+  margin: 6px 0;
+  padding-left: 24px;
+}
+
+.game-card-content *:first-child {
+  margin-top: 0;
 }

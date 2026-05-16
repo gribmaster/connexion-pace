@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/Card'
 import { Container } from '@/components/ui/Container'
 import { TimerBlock } from '@/components/TimerBlock'
 import { getCategoryTheme } from '@/lib/categoryThemes'
+import { HtmlContent } from '@/components/HtmlContent'
 
 type CardData = {
   id: string
@@ -179,7 +180,7 @@ export function SurpriseMePlay({ cards }: Props) {
             </div>
           )}
 
-          <p className="text-sm text-[#5a3a3a]">{card.description}</p>
+          <HtmlContent html={card.description} className="text-sm text-[#5a3a3a]" />
         </Card>
 
         <div className="flex flex-col gap-3">

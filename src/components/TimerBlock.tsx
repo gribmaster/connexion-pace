@@ -131,21 +131,19 @@ export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
       {noLimit ? (
         <span className="text-3xl font-mono font-semibold text-[#D2AF9C]">No limit</span>
       ) : (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button
-            className="text-2xl font-bold text-[#D2AF9C] px-2"
-            onClick={() => dispatch({ type: 'SUBTRACT_SECONDS', amount: 10 })}
+            onClick={() => dispatch({type: 'SUBTRACT_SECONDS', amount: 10})}
           >
-            −
+            <img src="/img/timer-minus.svg" width="32" height="32" alt=""/>
           </button>
-          <span className="min-w-[80px] text-center text-3xl font-mono font-semibold text-[#D2AF9C]">
+          <span className="min-w-[60px] text-center text-[16px] leading-[24px] font-mono font-semibold text-[#D2AF9C]">
             {`${mm}:${ss}`}
           </span>
           <button
-            className="text-2xl font-bold text-[#D2AF9C] px-2"
             onClick={() => { stopSound(); dispatch({ type: 'ADD_SECONDS', amount: 30 }) }}
           >
-            +
+            <img src="/img/timer-plus.svg" width="32" height="32" alt=""/>
           </button>
         </div>
       )}
@@ -154,7 +152,7 @@ export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
       )}
       {!noLimit && (
         <Button
-          variant="secondary"
+          variant="primary"
           className="w-auto px-8"
           disabled={timeUp}
           onClick={() => dispatch({ type: 'TOGGLE_RUNNING' })}

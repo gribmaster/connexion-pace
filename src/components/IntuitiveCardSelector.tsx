@@ -9,6 +9,7 @@ import { ExpandIcon } from '@/components/icons/ExpandIcon'
 import type { CategoryTheme } from '@/lib/categoryThemes'
 import {InfoCircleIcon} from "@/components/icons/InfoCircleIcon";
 import {CollapseIcon} from "@/components/icons/CollapseIcon";
+import { HtmlContent } from '@/components/HtmlContent'
 
 type CardItem = {
   id: string
@@ -151,7 +152,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
           onClick={() => setPreviewCard(null)}
         >
           <div
-            className={`w-full max-h-[80vh] max-w-lg rounded-[24px] bg-white p-5 pb-10 border border-[#69584E]  ${theme.descriptionModalClassName}`}
+            className={`w-full max-h-[80vh] max-w-lg overflow-auto rounded-[24px] bg-white p-5 pb-10 border border-[#69584E]  ${theme.descriptionModalClassName}`}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-3">
@@ -173,7 +174,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
               />
             )}
             {previewCard.description && (
-              <p className="mb-6 text-[14px] leading-[140%] text-[#D2AF9C]">{previewCard.description}</p>
+              <HtmlContent html={previewCard.description} className="mb-6 text-[14px] leading-[140%] text-[#D2AF9C]" />
             )}
             <Button
               disabled={!previewCard.additional}
@@ -193,21 +194,37 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
           onClick={() => setIntroOpen(false)}
         >
           <div
-            className="w-full max-w-sm rounded-3xl bg-white p-6"
+            className="w-full max-w-sm h-[100vh] py-6 overflow-auto bg-black text-[#D2AF9C]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="mb-4 text-lg font-semibold text-[#1a0a0e]">
+            <h2 className="mb-4 text-[20px] font-semibold">
               Tune into the play
             </h2>
-            <p className="mb-8 text-sm leading-relaxed text-[#5a3a3a]">
-              Intro text placeholder.
-            </p>
-            <div className="flex gap-3">
-              <Button variant="secondary" className="flex-1" onClick={() => setMoreSuggestionsOpen(true)}>
-                More suggestions
-              </Button>
-              <Button className="flex-1" onClick={handleConfirmStart}>
+            <div className="mb-8 text-[16px] leading-[150%] modal-html-content">
+              <p>When starting the game, guidelines are presented before start of play:</p>
+              <h5>Consent</h5>
+              <p>Make sure that you both want to play. Respect each other’s boundaries and desires.</p>
+              <h5>Get in the mood</h5>
+              <p>Arrange the room the way you want it, choose romantic lighting and mood music, make sure that you won’t be disturbed, put your phones on silent or switch them off.</p>
+              <h5>Use oil</h5>
+              <p>Some cards require use of oil. Make sure you have a high-quality intimacy oil on hand.</p>
+              <h5>Cleanliness</h5>
+              <p>Wash your whole body, including brushing teeth, so ensure that there aren’t any little turnoffs.</p>
+              <h5>Get attuned</h5>
+              <p>Before beginning play, tell yourselves:</p>
+              <ul>
+                <li>“Neither of us have any expectations or preconceived notions about what might happen.”</li>
+                <li>“I now devote myself to enjoying the moment. I’ll come back to everyday thoughts later.”</li>
+                <li>“I’m ready to discover and experience something new.”</li>
+                <li>“I’m going to let my body relax, become aroused and experience pleasure.”</li>
+              </ul>
+            </div>
+            <div>
+              <Button className="flex-1 mb-1" onClick={handleConfirmStart}>
                 OK
+              </Button>
+              <Button variant="link" className="flex-1" onClick={() => setMoreSuggestionsOpen(true)}>
+                More suggestions
               </Button>
             </div>
           </div>
@@ -220,25 +237,38 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
           onClick={() => setMoreSuggestionsOpen(false)}
         >
           <div
-            className="relative w-full max-w-sm rounded-3xl bg-white p-6"
+            className="relative w-full max-w-sm max-h-[85vh] overflow-auto rounded-3xl bg-black p-6 border border-[#69584E]"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setMoreSuggestionsOpen(false)}
               aria-label="Close"
-              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[#1a0a0e] hover:bg-black/10"
+              className="absolute right-4 top-6 flex h-8 w-8 items-center justify-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
                 <path
                   d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"/>
               </svg>
             </button>
-            <h2 className="mb-4 text-lg font-semibold text-[#1a0a0e]">
+            <h2 className="mb-4 text-[20px] font-semibold">
               More suggestions
             </h2>
-            <p className="text-sm leading-relaxed text-[#5a3a3a]">
-              Detailed suggestions placeholder.
-            </p>
+            <div className="text-sm leading-relaxed modal-html-content">
+              <h5>Spontaneity</h5>
+              <p>Creating a shared pleasure space is what is important, not necessarily following all rules and guidelines for their own sake. If you lose track of time, trust your instincts and continue in a spontaneous manner.</p>
+              <h5>Perfectionism</h5>
+              <p>Don’t sweat it if it doesn’t come out exactly the way you intended. Taking sexuality to deeper levels is a journey. Don’t be hard or too demanding on yourselves.</p>
+              <h5>Feedback</h5>
+              <p>After playing cards, talk to each other in the first person about what you liked, what could be different, and what could be repeated.</p>
+              <p>Time out for the male partner: if arousal exceeds 70%, try the following techniques:</p>
+              <ul>
+                <li>pause the activity and wait until the arousal level subsides, then resume from exactly where you left off</li>
+                <li>clench all the muscles in your body at once, hold your breath for 30 seconds and then release the tension. Repeat; bring your attention from the sex organs to your heart or your third eye</li>
+                <li>if you begin intercourse while extremely aroused, that can make premature ejaculation more likely. Go back to the intimacy cards to let the arousal level subside a little</li>
+              </ul>
+              <h5>Responsibility</h5>
+              <p>Each partner is responsible for their own physical, mental and emotional well-being. If you experience strong feelings, see “ABCs of Emotions”.</p>
+            </div>
           </div>
         </div>
       )}
@@ -255,9 +285,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
             <h2 className="mb-4 font-semibold text-[20px] leading-[120%] text-[#D2AF9C]">
               Appreciative Words
             </h2>
-            <p className="text-[16px] leading-[150%] text-[#D2AF9C]/70">
-              {learnMoreCard.additional}
-            </p>
+            <HtmlContent html={learnMoreCard.additional} className="text-[16px] leading-[150%] text-[#D2AF9C]/70" />
             <div
               onClick={() => setLearnMoreCard(null)}
               className="absolute right-[24px] top-[24px]"

@@ -5,9 +5,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'placehold.net',
+        hostname: 'sahradyan.com',
         port: '',
-        pathname: '/**', // разрешает любые пути на этом домене
+        pathname: '/**',
       },
     ],
   },
