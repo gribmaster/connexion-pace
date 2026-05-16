@@ -24,26 +24,32 @@ export default async function ProfilePage() {
   const email = user.email ?? ''
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-start gap-4 bg-[#1a0a0e] px-4 py-10">
+    <div className="flex min-h-screen flex-col items-center justify-start gap-4 bg-[#000000] py-5">
       <Container className="flex flex-col gap-4">
-        <Link href="/game">
-          <Button variant="secondary" className="w-auto px-5">
-            ← Back
-          </Button>
+        <Link href="/game" className="flex items-center">
+          <svg width="9" height="16" viewBox="0 0 9 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 0.5L0.5 8L8 15.5" stroke="#69584E" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span className="ml-4 text-[20px] leading-[30px]">Profile page</span>
         </Link>
         {/* User info */}
-        <Card className="flex flex-col gap-1">
-          <p className="text-sm font-medium text-[#1a0a0e]">Name: {name}</p>
-          <p className="text-sm text-[#5a3a3a]">{email}</p>
-          <p className="text-xs text-[#5a3a3a]/60">(logged in via email)</p>
+        <Card className="flex flex-col border-b border-[#69584E80] rounded-none">
+          <div className="mb-4">
+            <p className="text-[10px] leading-[18px] text-[#69584E] mb-1">Name</p>
+            <p className="text-[16px] leading-[24px] text-[#D2AF9C] font-medium">{name}</p>
+          </div>
+          <div className="mb-4">
+            <p className="text-[16px] leading-[24px] text-[#D2AF9C] font-medium">{email}</p>
+            <p className="text-[10px] leading-[18px] text-[#69584E] mt-1">(logged in via email)</p>
+          </div>
         </Card>
 
         {/* Plan section */}
-        <div className="flex flex-col gap-3">
-          <h2 className="text-sm font-semibold text-[#D2AF9C] px-1">Your plan information</h2>
+        <div className="flex flex-col">
+          <h2 className="text-sm font-semibold text-[#D2AF9C] mb-5">Your plan information</h2>
 
           {/* Plan tabs */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 hidden">
             <button className="rounded-full border border-[#860119] bg-[#860119] px-4 py-2 text-sm font-medium text-[#D2AF9C]">
               Monthly
             </button>
@@ -62,7 +68,7 @@ export default async function ProfilePage() {
           </div>
 
           {/* Monthly plan card */}
-          <Card className="flex flex-col gap-4">
+          <Card className="hidden">
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-0.5">
                 <span className="text-base font-semibold text-[#1a0a0e]">Monthly</span>
@@ -81,6 +87,7 @@ export default async function ProfilePage() {
               ))}
             </ul>
           </Card>
+          <img src="/img/plan-placeholder.svg" alt=""/>
         </div>
 
         {/* Settings / options — client component handles modals + logout */}

@@ -87,10 +87,10 @@ export function ProfileClient() {
   return (
     <>
       {/* Settings section */}
-      <div className="flex flex-col gap-0 rounded-3xl bg-white shadow-sm">
+      <div className="flex flex-col gap-0 text-[#D2AF9C]">
         {/* Daily connection */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#D2AF9C]/20">
-          <span className="text-sm font-medium text-[#1a0a0e]">Daily connection</span>
+        <div className="flex items-center justify-between p-2">
+          <span className="text-[16px] leading-[24px] font-medium ">Daily connection</span>
           <button
             role="switch"
             aria-checked={dailyConnection}
@@ -104,20 +104,20 @@ export function ProfileClient() {
         {/* Help & Support */}
         <button
           onClick={() => setModal('help')}
-          className="flex items-center justify-between px-5 py-4 border-b border-[#D2AF9C]/20 text-left hover:bg-[#f9f5f3] transition-colors"
+          className="flex items-center justify-between p-2"
         >
-          <span className="text-sm font-medium text-[#1a0a0e]">Help &amp; Support</span>
+          <span className="text-[16px] leading-[24px] font-medium">Help &amp; Support</span>
           <ChevronRight />
         </button>
 
         {/* Language */}
         <button
           onClick={() => setModal('language')}
-          className="flex items-center justify-between px-5 py-4 border-b border-[#D2AF9C]/20 text-left hover:bg-[#f9f5f3] transition-colors"
+          className="flex items-center justify-between p-2"
         >
-          <span className="text-sm font-medium text-[#1a0a0e]">Language</span>
+          <span className="text-[16px] leading-[24px] font-medium">Language</span>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-[#5a3a3a]">{language}</span>
+            <span className="text-xs">{language}</span>
             <ChevronRight />
           </div>
         </button>
@@ -125,28 +125,29 @@ export function ProfileClient() {
         {/* Timer sound */}
         <button
           onClick={() => setModal('timer_sound')}
-          className="flex items-center justify-between px-5 py-4 border-b border-[#D2AF9C]/20 text-left hover:bg-[#f9f5f3] transition-colors"
+          className="flex items-center justify-between p-2"
         >
-          <span className="text-sm font-medium text-[#1a0a0e]">Timer sound</span>
+          <span className="text-[16px] leading-[24px] font-medium">Timer sound</span>
           <ChevronRight />
         </button>
 
         {/* Log out */}
         <button
           onClick={handleLogout}
-          className="flex items-center px-5 py-4 text-left hover:bg-[#fff0f0] transition-colors"
+          className="flex items-center justify-between p-2 text-left"
         >
-          <span className="text-sm font-medium text-[#860119]">Log out</span>
+          <span className="text-[16px] leading-[24px] font-medium">Log out</span>
+          <LogoutIcon />
         </button>
       </div>
 
       {/* Help & Support modal */}
       {modal === 'help' && (
         <BottomModal onClose={() => setModal(null)}>
-          <h2 className="text-base font-semibold text-[#1a0a0e] mb-3">Help &amp; Support</h2>
-          <p className="text-sm text-[#5a3a3a] mb-6">
+          <h2 className="text-[20px] leading-[24px] font-semibold mb-6">Help &amp; Support</h2>
+          <p className="text-[16px] leading-[24px] text-[#D2AF9C] mb-6">
             For help and support, please contact our team via{' '}
-            <span className="text-[#860119]">support@connexion.com</span>. We&apos;re here to assist you anytime.
+            <span>support@connexion.com</span>. We&apos;re here to assist you anytime.
           </p>
           <a href="mailto:support@connexion.com">
             <Button variant="primary">Contact us</Button>
@@ -157,19 +158,20 @@ export function ProfileClient() {
       {/* Language modal */}
       {modal === 'language' && (
         <BottomModal onClose={() => setModal(null)}>
-          <h2 className="text-base font-semibold text-[#1a0a0e] mb-4">Language</h2>
+          <h2 className="text-[20px] leading-[24px] font-semibold mb-6">Language</h2>
           <div className="flex flex-col gap-2 mb-6">
             {(['English', 'Estonian'] as const).map((lang) => (
               <button
                 key={lang}
                 onClick={() => setLanguage(lang)}
-                className={`flex items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${
-                  language === lang
-                    ? 'border-[#860119] bg-[#860119]/5 text-[#860119]'
-                    : 'border-[#D2AF9C]/30 text-[#1a0a0e] hover:bg-[#f9f5f3]'
+                className={`flex items-center justify-between rounded-[12px] px-2 py-3 mb-1 text-sm font-medium transition-colors leading-[24px] ${
+                  language === lang && 'bg-[#69584E33]'
                 }`}
               >
-                {lang}
+                <div className="flex">
+                  <img src={`img/${lang}.svg`} alt="lang"/>
+                  <span className="ml-2">{lang}</span>
+                </div>
                 {language === lang && <CheckIcon />}
               </button>
             ))}
@@ -181,7 +183,7 @@ export function ProfileClient() {
       {/* Timer sound modal */}
       {modal === 'timer_sound' && (
         <BottomModal onClose={handleCloseSoundModal}>
-          <h2 className="text-base font-semibold text-[#1a0a0e] mb-4">Timer sound</h2>
+          <h2 className="text-[20px] leading-[24px] font-semibold mb-6">Timer sound</h2>
           <div className="flex flex-col gap-2 mb-5">
             {SOUND_OPTIONS.map((opt) => {
               const isPlaying = playingFile === opt.file
@@ -192,10 +194,8 @@ export function ProfileClient() {
                   tabIndex={0}
                   onClick={() => { stopPreview(); setSelectedSound(opt.file) }}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { stopPreview(); setSelectedSound(opt.file) } }}
-                  className={`flex items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium transition-colors cursor-pointer ${
-                    selectedSound === opt.file
-                      ? 'border-[#860119] bg-[#860119]/5 text-[#860119]'
-                      : 'border-[#D2AF9C]/30 text-[#1a0a0e] hover:bg-[#f9f5f3]'
+                  className={`flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition-colors cursor-pointer ${
+                    selectedSound === opt.file && 'bg-[#69584E33]'
                   }`}
                 >
                   <span className="flex items-center gap-3">
@@ -226,8 +226,8 @@ export function ProfileClient() {
           </div>
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-[#1a0a0e]">Volume</span>
-              <span className="text-sm text-[#5a3a3a]">{volume}%</span>
+              <span className="text-sm font-medium">Volume</span>
+              <span className="text-sm">{volume}%</span>
             </div>
             <input
               type="range"
@@ -235,7 +235,7 @@ export function ProfileClient() {
               max={100}
               value={volume}
               onChange={(e) => setVolume(Number(e.target.value))}
-              className="w-full accent-[#860119]"
+              className="w-full accent-[#860119] input-range"
             />
           </div>
           <Button variant="primary" onClick={handleSoundOk}>OK</Button>
@@ -248,8 +248,8 @@ export function ProfileClient() {
 function BottomModal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center">
-      <div className="absolute inset-0 bg-black/40" />
-      <div className="relative w-full max-w-md rounded-t-3xl bg-white px-6 pt-6 pb-10 shadow-xl">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative w-full max-w-md rounded-t-3xl bg-black px-6 py-9 text-[#D2AF9C] bottom-modal-body">
         <button
           onClick={onClose}
           className="absolute right-5 top-4 text-[#D2AF9C]/60 hover:text-[#D2AF9C] transition-colors"
@@ -265,8 +265,15 @@ function BottomModal({ children, onClose }: { children: React.ReactNode; onClose
 
 function ChevronRight() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-[#D2AF9C]">
-      <path d="M6 12l4-4-4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g clipPath="url(#clip0_113_14079)">
+        <path d="M9 4.5L16.5 12L9 19.5" stroke="#69584E" strokeLinecap="round" strokeLinejoin="round"/>
+      </g>
+      <defs>
+        <clipPath id="clip0_113_14079">
+          <rect width="24" height="24" fill="white"/>
+        </clipPath>
+      </defs>
     </svg>
   )
 }
@@ -274,7 +281,7 @@ function ChevronRight() {
 function XIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
   )
 }
@@ -295,10 +302,20 @@ function PlayIcon() {
   )
 }
 
+function LogoutIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9M16 17L21 12M21 12L16 7M21 12H9"
+        stroke="#860119" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+
 function StopIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <rect x="4" y="4" width="8" height="8" rx="1" fill="currentColor" />
+      <rect x="4" y="4" width="8" height="8" rx="1" fill="currentColor"/>
     </svg>
   )
 }
