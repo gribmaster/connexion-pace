@@ -165,7 +165,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
       {/* Intuitive tab content */}
       {tab === 'intuitive' && (
         <>
-          <Card className="flex flex-col mt-5 gap-3">
+          <div className="flex flex-col mt-5 gap-3">
             {categories.map(({ label, value, count }) => (
               <div
                 key={value}
@@ -173,59 +173,59 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
               >
                 <div className="flex flex-col self-start p-2">
                   <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
-                  <span className="font-normal text-[16px] leading-[100%]">{count} cards</span>
+                  <span className="font-normal text-[16px] leading-[24px]">{count} cards</span>
                 </div>
                 <Link href={`/game/intuitive/${value}`} className={`h-[154px] w-[96px] cat-card-${value} cat-card`}>
                   <div className="font-semibold text-[12px] leading-[100%]">Choose</div>
                 </Link>
               </div>
             ))}
-          </Card>
+          </div>
           <TimerSettings mode={tab} />
         </>
       )}
 
       {/* Surprise me tab content */}
       {tab === 'surprise' && (
-        <div className="flex flex-col mt-5 gap-3">
-          <Card className="flex flex-col gap-3">
+        <div className="flex flex-col mt-5">
+          <div className="flex flex-col gap-3 p-0">
             {categories.map(({ label, value, count }) => (
               <div
                 key={value}
-                className={`flex items-center justify-between p-3 bg-${value} rounded-[24px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000]`}
+                className={`flex flex-col justify-between p-3 bg-surprised-${value} rounded-[24px] h-[180px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000]`}
               >
                 <div className="flex flex-col self-start p-2">
                   <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
-                  <span className="font-normal text-[16px] leading-[100%]">{count} cards</span>
+                  <span className="font-normal text-[16px] leading-[24px]">{count} cards</span>
                 </div>
                 <div className="flex items-center gap-3 pr-2">
                   <button
                     onClick={() => decrement(value)}
                     disabled={selected[value] === 0}
-                    className="w-8 h-8 rounded-full border border-[#69584E] flex items-center justify-center text-[#D2AF9C] disabled:opacity-30 transition-opacity"
+                    className="w-10 h-10"
                   >
-                    −
+                    <img src="/img/timer-minus.svg" width="40" alt=""/>
                   </button>
-                  <span className="w-5 text-center font-semibold text-[#D2AF9C] text-[16px]">
+                  <span className="w-5 text-center font-semibold text-[#D2AF9C] text-[20px]">
                     {selected[value]}
                   </span>
                   <button
                     onClick={() => increment(value, count)}
                     disabled={selected[value] === count}
-                    className="w-8 h-8 rounded-full border border-[#69584E] flex items-center justify-center text-[#D2AF9C] disabled:opacity-30 transition-opacity"
+                    className="w-10 h-10"
                   >
-                    +
+                    <img src="/img/timer-plus.svg" width="40" alt=""/>
                   </button>
                 </div>
               </div>
             ))}
-          </Card>
+          </div>
 
           <TimerSettings mode={tab} />
           <Button
             onClick={handleStartSurprise}
             disabled={total === 0}
-            className="mt-2 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="disabled:opacity-40 disabled:cursor-not-allowed mb-[28px]"
           >
             Start game
           </Button>

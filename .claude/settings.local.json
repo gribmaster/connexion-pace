@@ -26,7 +26,11 @@
       "Bash(cat -A \"src/app/api/auth/[...nextauth]/route.ts\")",
       "Bash(powershell -Command \"Get-Content 'src\\\\app\\\\api\\\\auth\\\\[...nextauth]\\\\route.ts' | Format-Hex | Select-Object -First 5\")",
       "Bash(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Recurse -Directory)",
-      "PowerShell(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Recurse -Directory | Where-Object { $_.FullName -match \"\\(game|intuitive|surprise\\)\" } | Select-Object -ExpandProperty FullName)"
+      "PowerShell(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Recurse -Directory | Where-Object { $_.FullName -match \"\\(game|intuitive|surprise\\)\" } | Select-Object -ExpandProperty FullName)",
+      "Bash(pnpm exec *)",
+      "Bash(pnpm build *)",
+      "Bash(cp src/middleware.ts src/proxy.ts)",
+      "Bash(rm src/middleware.ts)"
     ]
   }
 }

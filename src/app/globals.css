@@ -293,6 +293,21 @@ button[disabled] {
   background-image: url('/img/game-lovemaking.svg');
   background-size: cover;
 }
+.bg-surprised-CONNECTION {
+  background-image: url('/img/cat-connection-surprised.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.bg-surprised-INTIMACY {
+  background-image: url('/img/cat-intimacy-surprised.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.bg-surprised-LOVEMAKING {
+  background-image: url('/img/cat-lovemaking-surprised.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 .input-range {
   -webkit-appearance: none;
   appearance: none;

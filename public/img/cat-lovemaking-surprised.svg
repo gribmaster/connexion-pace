@@ -30,7 +30,6 @@
 <ellipse cx="139" cy="180.5" rx="139" ry="180.5" transform="matrix(1 0 0 -1 139 134)" fill="black"/>
 </g>
 </g>
-<rect x="0.5" y="0.5" width="342" height="179" stroke="#69584E"/>
 <defs>
 <filter id="filter0_f_396_1732" x="-476.724" y="-355.356" width="848.645" height="848.645" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>

@@ -40,7 +40,10 @@ export default async function CardPage({ params }: Props) {
       <Container className="">
         <div className="text-[#D2AF9C] mb-3">
           <div className={`h-[582px] overflow-auto border border-[#69584E] p-4 ${theme.cardContainerClassName} rounded-[24px]`}>
-            <h1 className="text-[20px] leading-[26px] mb-4 font-semibold">{card.title}</h1>
+            <div className="flex justify-between items-start">
+              <h1 className="text-[20px] leading-[26px] mb-4 font-semibold">{card.title}</h1>
+              <img src="/img/x-plhldr.svg" width="48" alt=""/>
+            </div>
 
             {card.imageUrl && (
               <div className="relative h-[140px] w-full mb-4">
