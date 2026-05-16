@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import PwaRegister from "@/components/PwaRegister";
+import PwaRegister from "@/components/PwaRegister"
+import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -36,6 +37,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col justify-center">
         {children}
         <PwaRegister />
+        <PwaInstallPrompt />
       </body>
     </html>
   );
