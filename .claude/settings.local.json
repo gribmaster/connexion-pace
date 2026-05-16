@@ -30,7 +30,9 @@
       "Bash(pnpm exec *)",
       "Bash(pnpm build *)",
       "Bash(cp src/middleware.ts src/proxy.ts)",
-      "Bash(rm src/middleware.ts)"
+      "Bash(rm src/middleware.ts)",
+      "Bash(python3 *)",
+      "Bash(python -c ' *)"
     ]
   }
 }
