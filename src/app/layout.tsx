@@ -34,8 +34,8 @@ export default function RootLayout({
       <head>
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
-      <body className="min-h-full">
-        <div className="bg-black">
+      <body className="bg-black">
+        <div className="bg-black min-h-[100vh]">
           {children}
           <PwaRegister />
           <PwaInstallPrompt />

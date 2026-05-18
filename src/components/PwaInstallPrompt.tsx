@@ -9,7 +9,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const DISMISSED_KEY = 'connexion_pwa_install_dismissed_at'
-const DISMISS_TTL_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
+const DISMISS_TTL_MS = 1 * 24 * 60 * 60 * 1000 // 1 day
 
 function isStandalone(): boolean {
   if (typeof window === 'undefined') return false
