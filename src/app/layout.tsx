@@ -34,7 +34,7 @@ export default function RootLayout({
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body className="min-h-full flex flex-col justify-center">
+      <body className="min-h-full flex flex-col justify-center bg-black">
         {children}
         <PwaRegister />
         <PwaInstallPrompt />
