@@ -190,14 +190,14 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
 
       {introOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black px-4"
           onClick={() => setIntroOpen(false)}
         >
           <div
             className="w-full max-w-sm h-[100vh] py-6 overflow-auto bg-black text-[#D2AF9C]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="mb-4 text-[20px] font-semibold">
+            <h2 className="my-4 text-[20px] font-semibold">
               Tune into the play
             </h2>
             <div className="mb-8 text-[16px] leading-[150%] modal-html-content">

@@ -42,7 +42,7 @@ export function SurpriseMeSelector({ categories }: Props) {
 
   return (
     <>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 pb-4">
         <Card className="flex flex-col gap-3">
           {categories.map(({ label, value, count }) => (
             <div

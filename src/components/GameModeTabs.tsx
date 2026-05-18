@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
 import { TimerSettings } from '@/components/TimerSettings'
 import { InfoCircleIcon } from '@/components/icons/InfoCircleIcon'
 import { UserCircleIcon } from '@/components/icons/UserCircleIcon'
@@ -234,14 +233,14 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
 
       {introOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black px-4"
           onClick={() => setIntroOpen(false)}
         >
           <div
             className="w-full max-w-sm h-[100vh] py-6 overflow-auto bg-black text-[#D2AF9C]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="mb-4 text-[20px] font-semibold">
+            <h2 className="my-4 text-[20px] font-semibold">
               Tune into the play
             </h2>
             <div className="mb-8 text-[16px] leading-[150%] modal-html-content">

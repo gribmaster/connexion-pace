@@ -1,7 +1,13 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { isDevAuthBypassEnabled } from '@/lib/devAuth'
 
 export async function proxy(request: NextRequest) {
+  // Dev bypass: skip all auth checks, allow the request through
+  if (isDevAuthBypassEnabled()) {
+    return NextResponse.next({ request })
+  }
+
   const response = NextResponse.next({ request })
 
   const supabase = createServerClient(

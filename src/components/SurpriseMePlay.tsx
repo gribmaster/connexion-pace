@@ -156,14 +156,14 @@ export function SurpriseMePlay({ cards }: Props) {
     <div className={`min-h-screen py-10 ${theme.screenClassName}`}>
       <Container className="">
         <div className="text-[#D2AF9C] mb-3">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-2 hidden">
             <span className="text-sm text-[#D2AF9C80]">Surprise me</span>
             <span className="text-sm text-[#D2AF9C80]">{progress}</span>
           </div>
           <div className={`h-[582px] overflow-auto border border-[#69584E] p-4 ${theme.cardContainerClassName} rounded-[24px]`}>
             <div className="flex items-start justify-between gap-2 mb-4">
               <h1 className="text-[20px] leading-[26px] font-semibold">{card.title}</h1>
-              <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${theme.badgeClassName}`}>
+              <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${theme.badgeClassName} hidden`}>
                 {CATEGORY_LABELS[card.category] ?? card.category}
               </span>
             </div>

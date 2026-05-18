@@ -133,7 +133,7 @@ export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
       ) : (
         <div className="flex items-center gap-3">
           <button
-            onClick={() => dispatch({type: 'SUBTRACT_SECONDS', amount: 10})}
+            onClick={() => dispatch({type: 'SUBTRACT_SECONDS', amount: 30})}
           >
             <img src="/img/timer-minus.svg" width="32" height="32" alt=""/>
           </button>

@@ -8,12 +8,12 @@ import { Button } from '@/components/ui/Button'
 type Modal = 'help' | 'language' | 'timer_sound' | null
 
 const SOUND_OPTIONS = [
-  { label: 'Sound 1', file: 'beep1.wav' },
-  { label: 'Sound 2', file: 'beep2.wav' },
-  { label: 'Sound 3', file: 'beep3.wav' },
-  { label: 'Sound 4', file: 'beep4.wav' },
-  { label: 'Sound 5', file: 'beep5.wav' },
-  { label: 'Sound 6', file: 'beep6.wav' },
+  { label: 'Sound 1', file: 'beep1.mp3' },
+  { label: 'Sound 2', file: 'beep2.mp3' },
+  { label: 'Sound 3', file: 'beep3.mp3' },
+  { label: 'Sound 4', file: 'beep4.mp3' },
+  { label: 'Sound 5', file: 'beep5.mp3' },
+  { label: 'Sound 6', file: 'beep6.mp3' },
 ]
 
 const SOUND_KEY = 'connexion_timer_sound'

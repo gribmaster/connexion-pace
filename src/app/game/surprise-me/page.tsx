@@ -21,7 +21,7 @@ export default async function SurpriseMePage() {
   }))
 
   return (
-    <div className="flex flex-col items-center w-[375px] mx-auto min-h-[800px] bg-[#000000]">
+    <div className="flex flex-col items-center max-w-[525px] mx-auto min-h-[800px] bg-[#000000]">
       <Container className="flex flex-col pt-10">
         <div className="flex items-center justify-between mb-[10px]">
           <h1 className="font-semibold text-[20px] leading-[100%]">Surprise me</h1>

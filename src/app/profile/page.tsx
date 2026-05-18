@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getDevUser } from '@/lib/devAuth'
 import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -13,15 +14,25 @@ const PLAN_BENEFITS = [
 ]
 
 export default async function ProfilePage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const devUser = getDevUser()
 
-  if (!user) {
-    redirect('/login')
+  let name: string
+  let email: string
+
+  if (devUser) {
+    name = devUser.user_metadata.full_name
+    email = devUser.email
+  } else {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      redirect('/login')
+    }
+
+    name = user.user_metadata?.name ?? user.user_metadata?.full_name ?? 'User'
+    email = user.email ?? ''
   }
-
-  const name = user.user_metadata?.name ?? user.user_metadata?.full_name ?? 'User'
-  const email = user.email ?? ''
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-start gap-4 bg-[#000000] py-5">

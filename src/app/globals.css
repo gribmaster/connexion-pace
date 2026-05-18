@@ -348,6 +348,10 @@ button[disabled] {
   border-radius: 50%;
   cursor: pointer;
 }
+.bottom-modal-body {
+  max-height: 100vh;
+  overflow: auto;
+}
 .bottom-modal-body:before {
   content: '';
   position: absolute;

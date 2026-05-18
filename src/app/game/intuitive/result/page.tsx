@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button'
 
 export default function IntuitiveResultPage() {
   return (
-    <main className="flex flex-col items-center w-[375px] mx-auto h-[800px] main-container">
+    <main className="flex flex-col items-center max-w-[525px] mx-auto h-[800px] main-container">
       <Container>
         <div className="flex flex-col gap-5 text-center">
           <div className="flex flex-col gap-2">
