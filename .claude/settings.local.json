@@ -33,7 +33,9 @@
       "Bash(rm src/middleware.ts)",
       "Bash(python3 *)",
       "Bash(python -c ' *)",
-      "PowerShell(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Filter \"middleware.ts\" -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.FullName -notmatch 'node_modules|\\\\.next' })"
+      "PowerShell(Get-ChildItem -Path \"D:\\\\work\\\\connexion\\\\connexion-space\" -Filter \"middleware.ts\" -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.FullName -notmatch 'node_modules|\\\\.next' })",
+      "Bash(Get-ChildItem -Recurse -Path \"D:\\\\work\\\\connexion\\\\connexion-space\\\\src\\\\app\\\\game\" -Directory)",
+      "Bash(Select-Object FullName)"
     ]
   }
 }
