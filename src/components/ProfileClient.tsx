@@ -203,21 +203,13 @@ export function ProfileClient() {
                     {selectedSound !== opt.file && <span className="w-4" />}
                     {opt.label}
                   </span>
-                  <span className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                  <span className="flex items-center" onClick={(e) => e.stopPropagation()}>
                     <button
-                      onClick={() => previewSound(opt.file)}
+                      onClick={() => isPlaying ? stopPreview() : previewSound(opt.file)}
                       className="p-1.5 rounded-full hover:bg-[#D2AF9C]/20 transition-colors text-[#D2AF9C] hover:text-[#5a3a3a]"
-                      aria-label={`Preview ${opt.label}`}
+                      aria-label={isPlaying ? `Stop ${opt.label}` : `Preview ${opt.label}`}
                     >
-                      <PlayIcon />
-                    </button>
-                    <button
-                      onClick={stopPreview}
-                      disabled={!isPlaying}
-                      className="p-1.5 rounded-full hover:bg-[#D2AF9C]/20 transition-colors text-[#D2AF9C] hover:text-[#5a3a3a] disabled:opacity-30 disabled:cursor-not-allowed"
-                      aria-label={`Stop ${opt.label}`}
-                    >
-                      <StopIcon />
+                      {isPlaying ? <StopIcon /> : <PlayIcon />}
                     </button>
                   </span>
                 </div>
