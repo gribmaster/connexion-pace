@@ -1,18 +1,9 @@
-/**
- * True only when NODE_ENV=development AND NEXT_PUBLIC_DISABLE_AUTH=true.
- * Always false in production, so the check can never be satisfied by accident.
- */
+// Controlled solely by NEXT_PUBLIC_DISABLE_AUTH=true — works in any environment.
 export function isDevAuthBypassEnabled(): boolean {
-  return (
-    process.env.NODE_ENV === 'development' &&
-    process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true'
-  )
+  return process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true'
 }
 
-/**
- * Returns a fake authenticated user when the dev bypass is enabled.
- * In production this always returns null so the real Supabase auth takes over.
- */
+// Returns a fake authenticated user when bypass is enabled, null otherwise.
 export function getDevUser() {
   if (!isDevAuthBypassEnabled()) return null
 
