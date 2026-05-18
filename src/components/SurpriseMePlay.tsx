@@ -107,6 +107,7 @@ export function SurpriseMePlay({ cards }: Props) {
     initResult.status === 'ok' ? initResult.queue : null
   )
   const stopSoundRef = useRef<() => void>(() => {})
+  const [isNextLoading, setIsNextLoading] = useState(false)
 
   useEffect(() => {
     if (initResult.status === 'redirect') {
@@ -116,8 +117,9 @@ export function SurpriseMePlay({ cards }: Props) {
   }, [])
 
   function handleNext() {
-    if (!queue) return
+    if (!queue || isNextLoading) return
     stopSoundRef.current()
+    setIsNextLoading(true)
 
     const nextIndex = queue.currentIndex + 1
 
@@ -135,6 +137,7 @@ export function SurpriseMePlay({ cards }: Props) {
     const updated: Queue = { ...queue, currentIndex: validIndex }
     localStorage.setItem(QUEUE_KEY, JSON.stringify(updated))
     setQueue(updated)
+    setIsNextLoading(false)
   }
 
   function handleChangeCards() {
@@ -189,8 +192,8 @@ export function SurpriseMePlay({ cards }: Props) {
             <Button variant="secondary" onClick={handleChangeCards} className="border-none">
               Change cards
             </Button>
-            <Button variant="secondary" onClick={handleNext} className="border-none">
-              {queue.currentIndex + 1 >= queue.cards.length ? 'Finish' : 'Next card'}
+            <Button variant="secondary" onClick={handleNext} disabled={isNextLoading} className="border-none">
+              {isNextLoading ? 'Loading...' : queue.currentIndex + 1 >= queue.cards.length ? 'Finish' : 'Next card'}
             </Button>
           </div>
         </div>

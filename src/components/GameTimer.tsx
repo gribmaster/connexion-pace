@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { TimerBlock } from '@/components/TimerBlock'
@@ -28,9 +28,12 @@ function saveVisited(category: string, ids: string[]) {
 export function GameTimer({ category, cardId, otherCardIds }: Props) {
   const router = useRouter()
   const stopSoundRef = useRef<() => void>(() => {})
+  const [isNextLoading, setIsNextLoading] = useState(false)
 
   const handleNext = () => {
+    if (isNextLoading) return
     stopSoundRef.current()
+    setIsNextLoading(true)
 
     if (otherCardIds.length === 0) {
       router.push('/game/intuitive/result')
@@ -63,8 +66,8 @@ export function GameTimer({ category, cardId, otherCardIds }: Props) {
         <Button variant="secondary" onClick={handleFinish} className="border-none">
           Finish game
         </Button>
-        <Button variant="secondary" onClick={handleNext} className="border-none">
-          Next card
+        <Button variant="secondary" onClick={handleNext} disabled={isNextLoading} className="border-none">
+          {isNextLoading ? 'Loading...' : 'Next card'}
         </Button>
       </div>
     </div>
