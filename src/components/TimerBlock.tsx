@@ -147,9 +147,9 @@ export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
           </button>
         </div>
       )}
-      {!noLimit && timeUp && (
-        <span className="text-sm font-semibold text-red-400">Time is up</span>
-      )}
+      {/*{!noLimit && timeUp && (*/}
+      {/*  <span className="text-sm font-semibold text-red-400">Time is up</span>*/}
+      {/*)}*/}
       {!noLimit && (
         <Button
           variant="primary"
