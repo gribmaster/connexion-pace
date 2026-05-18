@@ -1,9 +1,10 @@
-const CACHE_NAME = 'connexion-static-v2';
+const CACHE_NAME = 'connexion-static-v3';
 
 // Only these specific paths are safe to cache
 const CACHEABLE_PATHS = [
   '/icons/icon-192.png',
   '/icons/icon-512.png',
+  '/apple-touch-icon.png',
   '/manifest.json',
 ];
 
