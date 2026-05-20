@@ -7,6 +7,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum Locale {
+  ET
+  EN
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -28,6 +33,22 @@ model Card {
   imageUrl    String?
   category    Category
   createdAt   DateTime @default(now())
+  translations CardTranslation[]
+}
+
+model CardTranslation {
+  id          String   @id @default(cuid())
+  cardId      String
+  locale      Locale
+  title       String
+  description String
+  additional  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  card        Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([cardId, locale])
 }
 
 enum Category {

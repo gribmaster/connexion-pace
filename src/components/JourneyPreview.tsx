@@ -168,8 +168,8 @@ function SortableCard({ card, counter, theme, onOpenPreview }: SortableCardProps
         </Card>
 
         {/* Global counter badge */}
-        <div className="absolute top-[6px] left-[6px] h-5 w-5 rounded-full bg-[#860119] flex items-center justify-center pointer-events-none">
-          <span className="text-[#D2AF9C] text-[9px] font-semibold leading-none">{counter}</span>
+        <div className="absolute bottom-3 right-3 h-5 w-5 rounded-[8px] border border-[#D2AF9C4D] bg-[#D2AF9C1A] flex items-center justify-center pointer-events-none">
+          <span className="text-[#000000] text-[12px] font-semibold leading-none">{counter}</span>
         </div>
 
         {/* Drag handle — bottom-right corner */}
@@ -177,7 +177,7 @@ function SortableCard({ card, counter, theme, onOpenPreview }: SortableCardProps
           ref={setActivatorNodeRef}
           {...attributes}
           {...listeners}
-          className="absolute bottom-[6px] right-[6px] flex h-10 w-10 items-center justify-center touch-none cursor-grab active:cursor-grabbing"
+          className="absolute bottom-[6px] left-[6px] flex h-10 w-10 items-center justify-center touch-none cursor-grab active:cursor-grabbing"
           aria-label="Drag to reorder"
           onClick={(e) => e.stopPropagation()}
         >
