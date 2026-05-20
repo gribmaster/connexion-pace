@@ -1,14 +1,40 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useActionState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { acceptPrivacy } from './actions'
 import { Button } from '@/components/ui/Button'
 
-export function PrivacyAcceptForm() {
-  const [checked, setChecked] = useState(false)
+function SubmitButton({ checked }: { checked: boolean }) {
+  const { pending } = useFormStatus()
+  const disabled = !checked || pending
 
   return (
-    <form action={acceptPrivacy} className="flex flex-col">
+    <Button
+      type="submit"
+      variant="primary"
+      disabled={disabled}
+      className={disabled ? 'opacity-40 cursor-not-allowed' : ''}
+    >
+      {pending ? 'Loading...' : 'Start now'}
+    </Button>
+  )
+}
+
+export function PrivacyAcceptForm() {
+  const [checked, setChecked] = useState(false)
+  const [error, dispatch] = useActionState(async () => {
+    try {
+      await acceptPrivacy()
+      return null
+    } catch (e: unknown) {
+      if (e instanceof Error && (e as { digest?: string }).digest?.startsWith('NEXT_REDIRECT')) throw e
+      return 'Something went wrong. Please try again.'
+    }
+  }, null)
+
+  return (
+    <form action={dispatch} className="flex flex-col">
       <div
         className="pb-23 overflow-y-auto rounded-xl text-sm text-[#D2AF9C] leading-relaxed privacy-block"
       >
@@ -78,14 +104,10 @@ export function PrivacyAcceptForm() {
       </div>
 
       <div className="fixed bottom-10 left-0 w-full px-4">
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={!checked}
-          className={!checked ? 'opacity-40 cursor-not-allowed' : ''}
-        >
-          Start now
-        </Button>
+        {error && (
+          <p className="text-red-400 text-sm text-center mb-3">{error}</p>
+        )}
+        <SubmitButton checked={checked} />
       </div>
     </form>
   )
