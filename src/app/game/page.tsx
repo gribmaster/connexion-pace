@@ -14,7 +14,7 @@ export default async function GamePage({
   searchParams: Promise<{ mode?: string }>
 }) {
   const { mode } = await searchParams
-  const initialTab = mode === 'surprise' ? 'surprise' : 'intuitive'
+  const initialTab = mode === 'surprise' ? 'surprise' : mode === 'journey' ? 'journey' : 'intuitive'
 
   const cardsRaw = await prisma.card.findMany({
     select: { id: true, category: true },

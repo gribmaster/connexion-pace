@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
@@ -10,6 +10,35 @@ import { UserCircleIcon } from '@/components/icons/UserCircleIcon'
 import { IntuitiveInstruction } from '@/components/game/instructions/IntuitiveInstruction'
 import { SurpriseInstruction } from '@/components/game/instructions/SurpriseInstruction'
 import { JourneyInstruction } from '@/components/game/instructions/JourneyInstruction'
+
+const JOURNEY_STORAGE_KEY = 'connexion_journey_selection'
+
+type JourneySelection = {
+  CONNECTION: string[]
+  INTIMACY: string[]
+  LOVEMAKING: string[]
+}
+
+const DEFAULT_JOURNEY_SELECTION: JourneySelection = {
+  CONNECTION: [],
+  INTIMACY: [],
+  LOVEMAKING: [],
+}
+
+function readJourneySelection(): JourneySelection {
+  try {
+    const raw = localStorage.getItem(JOURNEY_STORAGE_KEY)
+    if (!raw) return DEFAULT_JOURNEY_SELECTION
+    const parsed = JSON.parse(raw)
+    return {
+      CONNECTION: Array.isArray(parsed.CONNECTION) ? parsed.CONNECTION : [],
+      INTIMACY: Array.isArray(parsed.INTIMACY) ? parsed.INTIMACY : [],
+      LOVEMAKING: Array.isArray(parsed.LOVEMAKING) ? parsed.LOVEMAKING : [],
+    }
+  } catch {
+    return DEFAULT_JOURNEY_SELECTION
+  }
+}
 
 type CategoryBlock = {
   label: string
@@ -83,8 +112,24 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
   const [introOpen, setIntroOpen] = useState(false)
   const [moreSuggestionsOpen, setMoreSuggestionsOpen] = useState(false)
   const [instructionOpen, setInstructionOpen] = useState(false)
+  const [journeySelection, setJourneySelection] = useState<JourneySelection>(DEFAULT_JOURNEY_SELECTION)
+
+  useEffect(() => {
+    setJourneySelection(readJourneySelection())
+  }, [])
+
+  // Re-read Journey selection when switching to journey tab
+  useEffect(() => {
+    if (tab === 'journey') {
+      setJourneySelection(readJourneySelection())
+    }
+  }, [tab])
 
   const total = Object.values(selected).reduce((a, b) => a + b, 0)
+  const journeyTotal =
+    journeySelection.CONNECTION.length +
+    journeySelection.INTIMACY.length +
+    journeySelection.LOVEMAKING.length
   const ActiveInstruction = modeInstructions[tab].Content
 
   function increment(value: string, max: number) {
@@ -144,8 +189,12 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
           Intuitive
         </button>
         <button
-          disabled
-          className="font-semibold text-[14px] leading-[20px] p-2 border-b border-[#69584E80] text-[#D2AF9C40] flex-1 cursor-not-allowed"
+          onClick={() => setTab('journey')}
+          className={`font-semibold text-[14px] leading-[20px] p-2 border-b flex-1 transition-colors ${
+            tab === 'journey'
+              ? 'border-[#69584E] text-[#D2AF9C]'
+              : 'border-[#69584E80] text-[#D2AF9C80]'
+          }`}
         >
           Journey
         </button>
@@ -227,6 +276,46 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
             className="disabled:opacity-40 disabled:cursor-not-allowed mb-[28px]"
           >
             Start game
+          </Button>
+        </div>
+      )}
+
+      {/* Journey tab content */}
+      {tab === 'journey' && (
+        <div className="flex flex-col mt-5">
+          <div className="flex flex-col gap-3">
+            {categories.map(({ label, value, count }) => {
+              const selectedCount = journeySelection[value as keyof JourneySelection]?.length ?? 0
+              const selectedLabel =
+                selectedCount === 0
+                  ? '0 cards selected'
+                  : selectedCount === 1
+                  ? '1 card selected'
+                  : `${selectedCount} cards selected`
+              return (
+                <div
+                  key={value}
+                  className={`flex items-center justify-between p-3 bg-${value} rounded-[24px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000]`}
+                >
+                  <div className="flex flex-col self-start p-2">
+                    <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
+                    <span className="font-normal text-[16px] leading-[24px]">{count} cards</span>
+                    <span className="font-normal text-[13px] leading-[20px] opacity-70 mt-[2px]">{selectedLabel}</span>
+                  </div>
+                  <Link href={`/game/journey/${value}`} className={`h-[154px] w-[96px] cat-card-${value} cat-card`}>
+                    <div className="font-semibold text-[12px] leading-[100%]">Choose</div>
+                  </Link>
+                </div>
+              )
+            })}
+          </div>
+          <TimerSettings mode="journey" />
+          <Button
+            onClick={() => router.push('/game/journey/preview')}
+            disabled={journeyTotal === 0}
+            className="disabled:opacity-40 disabled:cursor-not-allowed mb-[28px]"
+          >
+            Preview selected cards
           </Button>
         </div>
       )}
