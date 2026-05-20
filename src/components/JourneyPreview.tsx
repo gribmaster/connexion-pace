@@ -1,7 +1,23 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import {
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  closestCenter,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  useSortable,
+  arrayMove,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { ExpandIcon } from '@/components/icons/ExpandIcon'
@@ -63,6 +79,10 @@ function readSelection(): JourneySelection | null {
   }
 }
 
+function saveSelection(sel: JourneySelection) {
+  localStorage.setItem(SELECTION_KEY, JSON.stringify(sel))
+}
+
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
@@ -82,6 +102,165 @@ function buildQueue(selection: JourneySelection, randomOrder: boolean): QueueEnt
   }
   return queue
 }
+
+// ── Sortable card item ────────────────────────────────────────────────────────
+
+type SortableCardProps = {
+  card: CardData
+  counter: number
+  theme: ReturnType<typeof getCategoryTheme>
+  onOpenPreview: (card: CardData) => void
+}
+
+function SortableCard({ card, counter, theme, onOpenPreview }: SortableCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: card.id })
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+    position: 'relative',
+    zIndex: isDragging ? 10 : undefined,
+  }
+
+  function handleCardClick() {
+    if (isDragging) return
+    onOpenPreview(card)
+  }
+
+  function handleExpandClick(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (isDragging) return
+    onOpenPreview(card)
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} className="w-[33.3%] p-[3px]">
+      <div className="relative h-[100%]" onClick={handleCardClick}>
+        <Card className={`${theme.singleCardClassName} border-1 border-[#D2AF9C]`}>
+          <div className="cat-card-head flex flex-grow-1 items-start justify-between mb-[10px]">
+            <h2 className="text-[8px] text-[#D2AF9C] pr-[3px] pt-[3px]">
+              {card.title}
+            </h2>
+            <button
+              onClick={handleExpandClick}
+              aria-label="Card details"
+              className="flex flex-none basis-[16px] items-center justify-center"
+            >
+              <ExpandIcon className="h-4 w-4" />
+            </button>
+          </div>
+          {card.imageUrl && (
+            <img
+              src={card.imageUrl}
+              alt={card.title}
+              className="h-[136px] w-full rounded-[5px] object-cover"
+            />
+          )}
+        </Card>
+
+        {/* Global counter badge */}
+        <div className="absolute top-[6px] left-[6px] h-5 w-5 rounded-full bg-[#860119] flex items-center justify-center pointer-events-none">
+          <span className="text-[#D2AF9C] text-[9px] font-semibold leading-none">{counter}</span>
+        </div>
+
+        {/* Drag handle — bottom-right corner */}
+        <div
+          ref={setActivatorNodeRef}
+          {...attributes}
+          {...listeners}
+          className="absolute bottom-[6px] right-[6px] flex h-10 w-10 items-center justify-center touch-none cursor-grab active:cursor-grabbing"
+          aria-label="Drag to reorder"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <svg width="25" height="25" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="3.5" cy="2.5" r="1" fill="#000000" fillOpacity="0.6" />
+            <circle cx="8.5" cy="2.5" r="1" fill="#000000" fillOpacity="0.6" />
+            <circle cx="3.5" cy="6" r="1" fill="#000000" fillOpacity="0.6" />
+            <circle cx="8.5" cy="6" r="1" fill="#000000" fillOpacity="0.6" />
+            <circle cx="3.5" cy="9.5" r="1" fill="#000000" fillOpacity="0.6" />
+            <circle cx="8.5" cy="9.5" r="1" fill="#000000" fillOpacity="0.6" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Sortable category group ───────────────────────────────────────────────────
+
+type SortableGroupProps = {
+  cat: Category
+  ids: string[]
+  cardMap: Map<string, CardData>
+  counterOffset: number
+  onReorder: (cat: Category, newIds: string[]) => void
+  onOpenPreview: (card: CardData) => void
+}
+
+function SortableCategoryGroup({
+  cat,
+  ids,
+  cardMap,
+  counterOffset,
+  onReorder,
+  onOpenPreview,
+}: SortableGroupProps) {
+  const theme = getCategoryTheme(cat)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 8 },
+    })
+  )
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const oldIndex = ids.indexOf(active.id as string)
+    const newIndex = ids.indexOf(over.id as string)
+    if (oldIndex === -1 || newIndex === -1) return
+    onReorder(cat, arrayMove(ids, oldIndex, newIndex))
+  }
+
+  const cards = ids.map((id) => cardMap.get(id)).filter(Boolean) as CardData[]
+
+  return (
+    <div>
+      <h2 className="font-['Baskervville'] font-normal text-[20px] leading-[26px] text-[#D2AF9C] mb-3">
+        {CATEGORY_LABELS[cat]}
+      </h2>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={ids} strategy={rectSortingStrategy}>
+          <div className="flex flex-wrap mx-[-3px]">
+            {cards.map((card, idx) => (
+              <SortableCard
+                key={card.id}
+                card={card}
+                counter={counterOffset + idx + 1}
+                theme={theme}
+                onOpenPreview={onOpenPreview}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
+    </div>
+  )
+}
+
+// ── Main preview component ────────────────────────────────────────────────────
 
 export function JourneyPreview({ cards }: Props) {
   const router = useRouter()
@@ -105,6 +284,13 @@ export function JourneyPreview({ cards }: Props) {
     setMounted(true)
   }, [router])
 
+  function handleReorder(cat: Category, newIds: string[]) {
+    if (!selection) return
+    const updated: JourneySelection = { ...selection, [cat]: newIds }
+    setSelection(updated)
+    saveSelection(updated)
+  }
+
   function handleStartPlaying() {
     setIntroOpen(true)
   }
@@ -121,31 +307,24 @@ export function JourneyPreview({ cards }: Props) {
 
   if (!mounted || !selection) return null
 
-  // Build grouped card lists in display order
-  let globalCounter = 0
-  const groups = CATEGORY_ORDER.map((cat) => {
-    const ids = selection[cat]
-    const catCards = ids.map((id) => cardMap.get(id)).filter(Boolean) as CardData[]
-    return { cat, cards: catCards }
-  }).filter((g) => g.cards.length > 0)
+  const groups = CATEGORY_ORDER.map((cat) => ({
+    cat,
+    ids: selection[cat].filter((id) => cardMap.has(id)),
+  })).filter((g) => g.ids.length > 0)
 
-  // Build a flat list with global counters for rendering
-  const flatWithIndex: { card: CardData; counter: number }[] = []
-  for (const g of groups) {
-    for (const card of g.cards) {
-      globalCounter++
-      flatWithIndex.push({ card, counter: globalCounter })
-    }
-  }
+  // compute counter offsets per group
+  let runningOffset = 0
+  const groupsWithOffset = groups.map((g) => {
+    const offset = runningOffset
+    runningOffset += g.ids.length
+    return { ...g, offset }
+  })
 
   return (
     <>
       {/* Header */}
       <div className="flex items-center justify-between mb-3 pt-2">
-        <button
-          onClick={() => router.push('/game?mode=journey')}
-          aria-label="Back"
-        >
+        <button onClick={() => router.push('/game?mode=journey')} aria-label="Back">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g clipPath="url(#clip0_journey_preview_back)">
               <path d="M20.25 12L3.75 12" stroke="#D2AF9C" strokeLinecap="round" strokeLinejoin="round" />
@@ -165,89 +344,48 @@ export function JourneyPreview({ cards }: Props) {
       </div>
 
       {/* Random order toggle */}
-      <div className="flex items-center justify-between py-4 border-b border-[#69584E40] mb-4">
-        <span className="font-normal text-[16px] leading-[100%] text-[#D2AF9C]">Random order</span>
-        <button
-          onClick={() => setRandomOrder((v) => !v)}
-          aria-label="Toggle random order"
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-            randomOrder ? 'bg-[#860119]' : 'bg-[#69584E40]'
-          }`}
-        >
-          <span
-            className={`inline-block h-4 w-4 transform rounded-full bg-[#D2AF9C] transition-transform ${
-              randomOrder ? 'translate-x-6' : 'translate-x-1'
+      <div className="flex flex-col py-4 border-b border-[#69584E40] mb-4 gap-2">
+        <div className="flex items-center justify-between">
+          <span className="font-normal text-[16px] leading-[100%] text-[#D2AF9C]">Random order</span>
+          <button
+            onClick={() => setRandomOrder((v) => !v)}
+            aria-label="Toggle random order"
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              randomOrder ? 'bg-[#860119]' : 'bg-[#69584E40]'
             }`}
-          />
-        </button>
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-[#D2AF9C] transition-transform ${
+                randomOrder ? 'translate-x-6' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
+        <p className="font-normal text-[13px] leading-[18px] text-[#D2AF9C] opacity-60">
+          {randomOrder
+            ? 'Cards are shuffled inside each category when you start.'
+            : 'Drag cards inside each category to set the play order.'}
+        </p>
       </div>
 
-      {/* Grouped cards */}
+      {/* Grouped sortable cards */}
       <div className="flex flex-col gap-6 pb-36">
-        {(() => {
-          let counterOffset = 0
-          return groups.map(({ cat, cards: groupCards }) => {
-            const theme = getCategoryTheme(cat)
-            const groupStart = counterOffset
-            counterOffset += groupCards.length
-            return (
-              <div key={cat}>
-                <h2 className="font-['Baskervville'] font-normal text-[20px] leading-[26px] text-[#D2AF9C] mb-3">
-                  {CATEGORY_LABELS[cat]}
-                </h2>
-                <div className="flex flex-wrap mx-[-3px]">
-                  {groupCards.map((card, idx) => {
-                    const counter = groupStart + idx + 1
-                    return (
-                      <div key={card.id} className="w-[33.3%] p-[3px]">
-                        <div
-                          className="relative cursor-pointer h-[100%]"
-                          onClick={() => setPreviewCard(card)}
-                        >
-                          <Card className={`${theme.singleCardClassName} border-1 border-[#D2AF9C]`}>
-                            <div className="cat-card-head flex flex-grow-1 items-start justify-between mb-[10px]">
-                              <h2 className="text-[8px] text-[#D2AF9C] pr-[3px] pt-[3px]">
-                                {card.title}
-                              </h2>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  setPreviewCard(card)
-                                }}
-                                aria-label="Card details"
-                                className="flex flex-none basis-[16px] items-center justify-center"
-                              >
-                                <ExpandIcon className="h-4 w-4" />
-                              </button>
-                            </div>
-                            {card.imageUrl && (
-                              <img
-                                src={card.imageUrl}
-                                alt={card.title}
-                                className="h-[136px] w-full rounded-[5px] object-cover"
-                              />
-                            )}
-                          </Card>
-                          {/* Global counter badge */}
-                          <div className="absolute top-[6px] left-[6px] h-5 w-5 rounded-full bg-[#860119] flex items-center justify-center pointer-events-none">
-                            <span className="text-[#D2AF9C] text-[9px] font-semibold leading-none">{counter}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )
-          })
-        })()}
+        {groupsWithOffset.map(({ cat, ids, offset }) => (
+          <SortableCategoryGroup
+            key={cat}
+            cat={cat}
+            ids={ids}
+            cardMap={cardMap}
+            counterOffset={offset}
+            onReorder={handleReorder}
+            onOpenPreview={setPreviewCard}
+          />
+        ))}
       </div>
 
       {/* Bottom buttons */}
       <div className="fixed bottom-0 left-0 right-0 px-4 py-6 bg-[#000000] flex flex-col gap-2">
-        <Button onClick={handleStartPlaying}>
-          Start playing
-        </Button>
+        <Button onClick={handleStartPlaying}>Start playing</Button>
         <Button variant="secondary" onClick={() => router.push('/game?mode=journey')}>
           Change cards
         </Button>
@@ -264,9 +402,7 @@ export function JourneyPreview({ cards }: Props) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-3">
-              <h2 className="text-[20px] text-[#D2AF9C] pr-2">
-                {previewCard.title}
-              </h2>
+              <h2 className="text-[20px] text-[#D2AF9C] pr-2">{previewCard.title}</h2>
               <div className="h-6 w-6 flex-none basis-[24px]" onClick={() => setPreviewCard(null)}>
                 <CollapseIcon />
               </div>
@@ -279,7 +415,10 @@ export function JourneyPreview({ cards }: Props) {
               />
             )}
             {previewCard.description && (
-              <HtmlContent html={previewCard.description} className="mb-6 text-[14px] leading-[140%] text-[#D2AF9C]" />
+              <HtmlContent
+                html={previewCard.description}
+                className="mb-6 text-[14px] leading-[140%] text-[#D2AF9C]"
+              />
             )}
             <Button
               disabled={!previewCard.additional}
@@ -306,7 +445,10 @@ export function JourneyPreview({ cards }: Props) {
             <h2 className="mb-4 font-semibold text-[20px] leading-[120%] text-[#D2AF9C]">
               Appreciative Words
             </h2>
-            <HtmlContent html={learnMoreCard.additional} className="text-[16px] leading-[150%] text-[#D2AF9C]/70" />
+            <HtmlContent
+              html={learnMoreCard.additional}
+              className="text-[16px] leading-[150%] text-[#D2AF9C]/70"
+            />
             <div onClick={() => setLearnMoreCard(null)} className="absolute right-[24px] top-[24px]">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
                 <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
@@ -316,7 +458,7 @@ export function JourneyPreview({ cards }: Props) {
         </div>
       )}
 
-      {/* Intro modal — Tune into the play */}
+      {/* Intro modal */}
       {introOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black px-4"
@@ -326,9 +468,7 @@ export function JourneyPreview({ cards }: Props) {
             className="w-full max-w-sm h-[100vh] py-6 overflow-auto bg-black text-[#D2AF9C]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="my-4 text-[20px] font-semibold">
-              Tune into the play
-            </h2>
+            <h2 className="my-4 text-[20px] font-semibold">Tune into the play</h2>
             <div className="mb-8 text-[16px] leading-[150%] modal-html-content">
               <p>When starting the game, guidelines are presented before start of play:</p>
               <h5>Consent</h5>
@@ -349,9 +489,7 @@ export function JourneyPreview({ cards }: Props) {
               </ul>
             </div>
             <div>
-              <Button className="flex-1 mb-1" onClick={handleOK}>
-                OK
-              </Button>
+              <Button className="flex-1 mb-1" onClick={handleOK}>OK</Button>
               <Button variant="link" className="flex-1" onClick={() => setMoreSuggestionsOpen(true)}>
                 More suggestions
               </Button>
@@ -379,9 +517,7 @@ export function JourneyPreview({ cards }: Props) {
                 <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
               </svg>
             </button>
-            <h2 className="mb-4 text-[20px] font-semibold">
-              More suggestions
-            </h2>
+            <h2 className="mb-4 text-[20px] font-semibold">More suggestions</h2>
             <div className="text-sm leading-relaxed modal-html-content">
               <h5>Spontaneity</h5>
               <p>Creating a shared pleasure space is what is important, not necessarily following all rules and guidelines for their own sake. If you lose track of time, trust your instincts and continue in a spontaneous manner.</p>
