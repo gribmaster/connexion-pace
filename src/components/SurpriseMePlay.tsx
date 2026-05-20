@@ -8,13 +8,24 @@ import { Container } from '@/components/ui/Container'
 import { TimerBlock } from '@/components/TimerBlock'
 import { getCategoryTheme } from '@/lib/categoryThemes'
 import { HtmlContent } from '@/components/HtmlContent'
+import { useLocale } from '@/lib/i18n/useLocale'
+import { resolveCardTranslation } from '@/lib/i18n/resolveCardTranslation'
+
+type Translation = {
+  locale: string
+  title: string
+  description: string | null
+  additional: string | null
+}
 
 type CardData = {
   id: string
   title: string
-  description: string
+  description: string | null
   imageUrl: string | null
+  additional?: string | null
   category: string
+  translations: Translation[]
 }
 
 type QueueEntry = {
@@ -108,6 +119,8 @@ export function SurpriseMePlay({ cards }: Props) {
   )
   const stopSoundRef = useRef<() => void>(() => {})
   const [isNextLoading, setIsNextLoading] = useState(false)
+  const { locale, dict } = useLocale()
+  const dg = dict.gameplay
 
   useEffect(() => {
     if (initResult.status === 'redirect') {
@@ -148,9 +161,11 @@ export function SurpriseMePlay({ cards }: Props) {
   if (!queue) return null
 
   const entry = queue.cards[queue.currentIndex]
-  const card = cards.find((c) => c.id === entry?.id)
+  const rawCard = cards.find((c) => c.id === entry?.id)
 
-  if (!card) return null
+  if (!rawCard) return null
+
+  const card = { ...rawCard, ...resolveCardTranslation(rawCard, locale) }
 
   const progress = `${queue.currentIndex + 1} / ${queue.cards.length}`
   const theme = getCategoryTheme(card.category)
@@ -190,10 +205,10 @@ export function SurpriseMePlay({ cards }: Props) {
           <TimerBlock resetKey={entry.id} storageKey="connexion_timer_surprise" stopSoundRef={stopSoundRef} />
           <div className="flex gap-3">
             <Button variant="secondary" onClick={handleChangeCards} className="border-none">
-              Change cards
+              {dg.changeCards}
             </Button>
             <Button variant="secondary" onClick={handleNext} disabled={isNextLoading} className="border-none">
-              {isNextLoading ? 'Loading...' : queue.currentIndex + 1 >= queue.cards.length ? 'Finish' : 'Next card'}
+              {isNextLoading ? dict.common.loading : queue.currentIndex + 1 >= queue.cards.length ? dg.finish : dg.nextCard}
             </Button>
           </div>
         </div>

@@ -4,9 +4,13 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import Image from "next/image";
+import { useLocale } from '@/lib/i18n/useLocale'
+
 export function LoginForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { dict } = useLocale()
+  const d = dict.login
 
   async function handleGoogleLogin() {
     if (loading) return
@@ -24,7 +28,7 @@ export function LoginForm() {
     })
     if (error) {
       setLoading(false)
-      setError('Something went wrong. Please try again.')
+      setError(d.errorDefault)
     }
     // On success the browser navigates away; keep loading state active.
   }
@@ -42,7 +46,7 @@ export function LoginForm() {
         </div>
 
         <h1 className="font-semibold text-[20px] leading-[100%] text-center mt-[85px]">
-          Sign in or Join now!
+          {d.heading}
         </h1>
 
         <div className="flex w-full flex-col gap-3">
@@ -54,7 +58,7 @@ export function LoginForm() {
             disabled={loading}
           >
             {loading ? (
-              'Redirecting...'
+              dict.common.redirecting
             ) : (
               <>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-[6px]">
@@ -71,7 +75,7 @@ export function LoginForm() {
                     d="M10.1794 4.63331C11.8559 4.63331 12.9868 5.34303 13.6317 5.93613L16.1516 3.525C14.604 2.11528 12.59 1.25 10.1794 1.25C6.68725 1.25 3.67137 3.21387 2.20312 6.07218L5.09002 8.26944C5.8143 6.15972 7.81825 4.63331 10.1794 4.63331Z"
                     fill="#D2AF9C"/>
                 </svg>
-                Continue with Gmail
+                {d.continueWithGmail}
               </>
             )}
           </Button>
@@ -97,18 +101,18 @@ export function LoginForm() {
                 </clipPath>
               </defs>
             </svg>
-            Continue with Apple
+            {d.continueWithApple}
           </Button>
         </div>
 
         <p className="text-center text-xs text-[#D2AF9C]/60 leading-relaxed">
-          By clicking continue, you agree our{' '} <br/>
+          {d.terms}{' '}<br/>
           <a href="#" className="underline underline-offset-2 hover:text-[#D2AF9C]">
-            Terms &amp; Conditions
+            {d.termsLink}
           </a>{' '}
-          and{' '}
+          {d.and}{' '}
           <a href="#" className="underline underline-offset-2 hover:text-[#D2AF9C]">
-            Privacy Policy
+            {d.privacyLink}
           </a>
           .
         </p>

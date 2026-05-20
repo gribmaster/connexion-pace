@@ -3,6 +3,7 @@
 import { useEffect, useReducer, useRef } from 'react'
 import { Button } from '@/components/ui/Button'
 import { playTimerSound, preloadTimerSounds, stopAllTimerSounds, unlockAudio } from '@/lib/audioCache'
+import { useLocale } from '@/lib/i18n/useLocale'
 
 type TimerState = {
   seconds: number
@@ -68,6 +69,8 @@ type Props = {
 }
 
 export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
+  const { dict } = useLocale()
+  const dt = dict.timer
   const [state, dispatch] = useReducer(timerReducer, undefined, () => {
     const { seconds, noLimit } = getStoredTimerValues(storageKey)
     return { seconds, noLimit, running: true, timeUp: false, resetKey, storageKey }
@@ -128,7 +131,7 @@ export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
   return (
     <div className="flex flex-col items-center gap-3">
       {noLimit ? (
-        <span className="text-3xl font-mono font-semibold text-[#D2AF9C]">No limit</span>
+        <span className="text-3xl font-mono font-semibold text-[#D2AF9C]">{dt.noLimit}</span>
       ) : (
         <div className="flex items-center gap-3">
           <button
@@ -156,7 +159,7 @@ export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
           disabled={timeUp}
           onClick={() => { unlockAudio(); dispatch({ type: 'TOGGLE_RUNNING' }) }}
         >
-          {running && !timeUp ? 'Stop' : 'Play'}
+          {running && !timeUp ? dt.stop : dt.play}
         </Button>
       )}
     </div>

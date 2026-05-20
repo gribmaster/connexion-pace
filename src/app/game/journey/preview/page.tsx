@@ -3,6 +3,7 @@ import { Container } from '@/components/ui/Container'
 import { JourneyPreview } from '@/components/JourneyPreview'
 
 export default async function JourneyPreviewPage() {
+  // TODO: pass selected locale to server card queries (currently defaulting to ET).
   const cards = await prisma.card.findMany({
     select: {
       id: true,
@@ -11,6 +12,7 @@ export default async function JourneyPreviewPage() {
       imageUrl: true,
       additional: true,
       category: true,
+      translations: { select: { locale: true, title: true, description: true, additional: true } },
     },
   })
 

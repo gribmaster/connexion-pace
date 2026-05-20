@@ -17,11 +17,21 @@ export default async function CardPage({ params }: Props) {
 
   const typedCategory = upperCategory as Category
 
+  // TODO: pass selected locale to server card queries (currently defaulting to ET).
   const [card, allCategoryCards] = await Promise.all([
-    prisma.card.findUnique({ where: { id: cardId } }),
+    prisma.card.findUnique({
+      where: { id: cardId },
+      include: { translations: true },
+    }),
     prisma.card.findMany({
       where: { category: typedCategory },
-      select: { id: true, title: true, description: true, imageUrl: true },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        imageUrl: true,
+        translations: { select: { locale: true, title: true, description: true, additional: true } },
+      },
     }),
   ])
 

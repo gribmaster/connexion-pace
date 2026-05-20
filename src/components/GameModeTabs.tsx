@@ -10,6 +10,7 @@ import { UserCircleIcon } from '@/components/icons/UserCircleIcon'
 import { IntuitiveInstruction } from '@/components/game/instructions/IntuitiveInstruction'
 import { SurpriseInstruction } from '@/components/game/instructions/SurpriseInstruction'
 import { JourneyInstruction } from '@/components/game/instructions/JourneyInstruction'
+import { useLocale } from '@/lib/i18n/useLocale'
 
 const JOURNEY_STORAGE_KEY = 'connexion_journey_selection'
 
@@ -88,23 +89,17 @@ function buildSurpriseQueue(
 
 type Tab = 'intuitive' | 'surprise' | 'journey'
 
-const modeInstructions: Record<Tab, { title: string; Content: () => React.ReactElement }> = {
-  intuitive: {
-    title: 'Dynamics of the game',
-    Content: IntuitiveInstruction,
-  },
-  surprise: {
-    title: 'Dynamics of the game',
-    Content: SurpriseInstruction,
-  },
-  journey: {
-    title: 'Dynamics of the game',
-    Content: JourneyInstruction,
-  },
+const modeInstructions: Record<Tab, { Content: () => React.ReactElement }> = {
+  intuitive: { Content: IntuitiveInstruction },
+  surprise: { Content: SurpriseInstruction },
+  journey: { Content: JourneyInstruction },
 }
 
 export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' }: Props) {
   const router = useRouter()
+  const { dict } = useLocale()
+  const dg = dict.game
+  const dm = dict.modal
   const [tab, setTab] = useState<Tab>(initialTab)
   const [selected, setSelected] = useState<Record<string, number>>(
     Object.fromEntries(categories.map((c) => [c.value, 0]))
@@ -130,7 +125,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
     journeySelection.CONNECTION.length +
     journeySelection.INTIMACY.length +
     journeySelection.LOVEMAKING.length
-  const ActiveInstruction = modeInstructions[tab].Content
+  const { Content: ActiveInstruction } = modeInstructions[tab]
 
   function increment(value: string, max: number) {
     setSelected((prev) => ({ ...prev, [value]: Math.min(prev[value] + 1, max) }))
@@ -158,7 +153,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="flex items-center font-semibold text-[20px] leading-[100%]">
-          <span>Choose your cards</span>
+          <span>{dg.chooseYourCards}</span>
           <button
             id="game-main-instruction"
             onClick={() => setInstructionOpen(true)}
@@ -174,7 +169,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
           </Link>
         </div>
       </div>
-      <div className="font-normal text-[16px] leading-[150%] mt-[10px] opacity-70">Choose the number of cards and set the time for each category before starting your session.</div>
+      <div className="font-normal text-[16px] leading-[150%] mt-[10px] opacity-70">{dg.chooseCardsSubtitle}</div>
 
       {/* Mode tabs */}
       <div className="flex mt-5">
@@ -186,7 +181,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
               : 'border-[#69584E80] text-[#D2AF9C80]'
           }`}
         >
-          Intuitive
+          {dg.intuitive}
         </button>
         <button
           onClick={() => setTab('journey')}
@@ -196,7 +191,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
               : 'border-[#69584E80] text-[#D2AF9C80]'
           }`}
         >
-          Journey
+          {dg.journey}
         </button>
         <button
           onClick={() => setTab('surprise')}
@@ -206,7 +201,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
               : 'border-[#69584E80] text-[#D2AF9C80]'
           }`}
         >
-          Surprise me
+          {dg.surpriseMe}
         </button>
       </div>
 
@@ -221,10 +216,10 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
               >
                 <div className="flex flex-col self-start p-2">
                   <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
-                  <span className="font-normal text-[16px] leading-[24px]">{count} cards</span>
+                  <span className="font-normal text-[16px] leading-[24px]">{count} {dg.cards}</span>
                 </div>
                 <Link href={`/game/intuitive/${value}`} className={`h-[154px] w-[96px] cat-card-${value} cat-card`}>
-                  <div className="font-semibold text-[12px] leading-[100%]">Choose</div>
+                  <div className="font-semibold text-[12px] leading-[100%]">{dg.choose}</div>
                 </Link>
               </div>
             ))}
@@ -244,10 +239,11 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
               >
                 <div className="flex flex-col self-start p-2">
                   <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
-                  <span className="font-normal text-[16px] leading-[24px]">{count} cards</span>
+                  <span className="font-normal text-[16px] leading-[24px]">{count} {dg.cards}</span>
                 </div>
                 <div className="flex items-center gap-3 pr-2">
                   <button
+                    type="button"
                     onClick={() => decrement(value)}
                     disabled={selected[value] === 0}
                     className="w-10 h-10"
@@ -258,6 +254,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
                     {selected[value]}
                   </span>
                   <button
+                    type="button"
                     onClick={() => increment(value, count)}
                     disabled={selected[value] === count}
                     className="w-10 h-10"
@@ -275,7 +272,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
             disabled={total === 0}
             className="disabled:opacity-40 disabled:cursor-not-allowed mb-[28px]"
           >
-            Start game
+            {dg.startGame}
           </Button>
         </div>
       )}
@@ -288,10 +285,10 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
               const selectedCount = journeySelection[value as keyof JourneySelection]?.length ?? 0
               const selectedLabel =
                 selectedCount === 0
-                  ? '0 cards selected'
+                  ? dg.cardsSelectedZero
                   : selectedCount === 1
-                  ? '1 card selected'
-                  : `${selectedCount} cards selected`
+                  ? `1 ${dg.cardSelectedOne}`
+                  : `${selectedCount} ${dg.cardsSelectedMany}`
               return (
                 <div
                   key={value}
@@ -299,11 +296,11 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
                 >
                   <div className="flex flex-col self-start p-2">
                     <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
-                    <span className="font-normal text-[16px] leading-[24px]">{count} cards</span>
+                    <span className="font-normal text-[16px] leading-[24px]">{count} {dg.cards}</span>
                     <span className="font-normal text-[13px] leading-[20px] opacity-70 mt-[2px]">{selectedLabel}</span>
                   </div>
                   <Link href={`/game/journey/${value}`} className={`h-[154px] w-[96px] cat-card-${value} cat-card`}>
-                    <div className="font-semibold text-[12px] leading-[100%]">Choose</div>
+                    <div className="font-semibold text-[12px] leading-[100%]">{dg.choose}</div>
                   </Link>
                 </div>
               )
@@ -315,7 +312,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
             disabled={journeyTotal === 0}
             className="disabled:opacity-40 disabled:cursor-not-allowed mb-[28px]"
           >
-            Preview selected cards
+            {dg.previewSelectedCards}
           </Button>
         </div>
       )}
@@ -330,7 +327,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="my-4 text-[20px] font-semibold">
-              Tune into the play
+              {dm.tuneIntoPlay}
             </h2>
             <div className="mb-8 text-[16px] leading-[150%] modal-html-content">
               <p>When starting the game, guidelines are presented before start of play:</p>
@@ -353,10 +350,10 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
             </div>
             <div>
               <Button className="flex-1 mb-1" onClick={handleOK}>
-                OK
+                {dict.common.ok}
               </Button>
               <Button variant="link" className="flex-1" onClick={() => setMoreSuggestionsOpen(true)}>
-                More suggestions
+                {dict.common.moreSuggestions}
               </Button>
             </div>
           </div>
@@ -382,7 +379,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
               </svg>
             </button>
             <h2 className="mb-6 text-lg font-semibold text-[#D2AF9C]">
-              {modeInstructions[tab].title}
+              {dm.dynamicsOfGame}
             </h2>
             <ActiveInstruction />
           </div>
@@ -408,7 +405,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
               </svg>
             </button>
             <h2 className="mb-4 text-[20px] font-semibold">
-              More suggestions
+              {dm.moreSuggestions}
             </h2>
             <div className="text-sm leading-relaxed modal-html-content">
               <h5>Spontaneity</h5>

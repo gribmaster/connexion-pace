@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { useLocale } from '@/lib/i18n/useLocale'
+import { resolveCardTranslation } from '@/lib/i18n/resolveCardTranslation'
 import {
   DndContext,
   PointerSensor,
@@ -43,6 +45,13 @@ type JourneySelection = {
   LOVEMAKING: string[]
 }
 
+type Translation = {
+  locale: string
+  title: string
+  description: string | null
+  additional: string | null
+}
+
 type CardData = {
   id: string
   title: string
@@ -50,6 +59,7 @@ type CardData = {
   imageUrl: string | null
   additional: string | null
   category: string
+  translations: Translation[]
 }
 
 type QueueEntry = {
@@ -168,7 +178,7 @@ function SortableCard({ card, counter, theme, onOpenPreview }: SortableCardProps
         </Card>
 
         {/* Global counter badge */}
-        <div className="absolute bottom-3 right-3 h-5 w-5 rounded-[8px] border border-[#D2AF9C4D] bg-[#D2AF9C1A] flex items-center justify-center pointer-events-none">
+        <div className="absolute bottom-[12px] right-[12px] h-5 w-5 rounded-[8px] border border-[#D2AF9C4D] bg-[#D2AF9C1A] flex items-center justify-center pointer-events-none">
           <span className="text-[#000000] text-[12px] font-semibold leading-none">{counter}</span>
         </div>
 
@@ -264,7 +274,14 @@ function SortableCategoryGroup({
 
 export function JourneyPreview({ cards }: Props) {
   const router = useRouter()
-  const cardMap = new Map(cards.map((c) => [c.id, c]))
+  const { locale, dict } = useLocale()
+  const dj = dict.journey
+  const dm = dict.modal
+  const dc = dict.common
+
+  const cardMap = new Map(
+    cards.map((c) => [c.id, { ...c, ...resolveCardTranslation(c, locale) }])
+  )
 
   const [selection, setSelection] = useState<JourneySelection | null>(null)
   const [randomOrder, setRandomOrder] = useState(false)
@@ -338,7 +355,7 @@ export function JourneyPreview({ cards }: Props) {
           </svg>
         </button>
         <h1 className="font-semibold text-[20px] leading-[30px] text-[#D2AF9C]">
-          Selected cards
+          {dj.selectedCards}
         </h1>
         <div className="w-6" />
       </div>
@@ -346,7 +363,7 @@ export function JourneyPreview({ cards }: Props) {
       {/* Random order toggle */}
       <div className="flex flex-col py-4 border-b border-[#69584E40] mb-4 gap-2">
         <div className="flex items-center justify-between">
-          <span className="font-normal text-[16px] leading-[100%] text-[#D2AF9C]">Random order</span>
+          <span className="font-normal text-[16px] leading-[100%] text-[#D2AF9C]">{dj.randomOrder}</span>
           <button
             onClick={() => setRandomOrder((v) => !v)}
             aria-label="Toggle random order"
@@ -362,9 +379,7 @@ export function JourneyPreview({ cards }: Props) {
           </button>
         </div>
         <p className="font-normal text-[13px] leading-[18px] text-[#D2AF9C] opacity-60">
-          {randomOrder
-            ? 'Cards are shuffled inside each category when you start.'
-            : 'Drag cards inside each category to set the play order.'}
+          {randomOrder ? dj.randomOrderHelp : dj.manualOrderHelp}
         </p>
       </div>
 
@@ -385,9 +400,9 @@ export function JourneyPreview({ cards }: Props) {
 
       {/* Bottom buttons */}
       <div className="fixed bottom-0 left-0 right-0 px-4 py-6 bg-[#000000] flex flex-col gap-2">
-        <Button onClick={handleStartPlaying}>Start playing</Button>
+        <Button onClick={handleStartPlaying}>{dj.startPlaying}</Button>
         <Button variant="secondary" onClick={() => router.push('/game?mode=journey')}>
-          Change cards
+          {dj.changeCards}
         </Button>
       </div>
 
@@ -426,7 +441,7 @@ export function JourneyPreview({ cards }: Props) {
               className={!previewCard.additional ? 'opacity-40 bg-[#D2AF9C1A]' : ''}
               onClick={() => setLearnMoreCard(previewCard)}
             >
-              Learn more
+              {dc.learnMore}
             </Button>
           </div>
         </div>
@@ -468,7 +483,7 @@ export function JourneyPreview({ cards }: Props) {
             className="w-full max-w-sm h-[100vh] py-6 overflow-auto bg-black text-[#D2AF9C]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="my-4 text-[20px] font-semibold">Tune into the play</h2>
+            <h2 className="my-4 text-[20px] font-semibold">{dm.tuneIntoPlay}</h2>
             <div className="mb-8 text-[16px] leading-[150%] modal-html-content">
               <p>When starting the game, guidelines are presented before start of play:</p>
               <h5>Consent</h5>
@@ -489,9 +504,9 @@ export function JourneyPreview({ cards }: Props) {
               </ul>
             </div>
             <div>
-              <Button className="flex-1 mb-1" onClick={handleOK}>OK</Button>
+              <Button className="flex-1 mb-1" onClick={handleOK}>{dc.ok}</Button>
               <Button variant="link" className="flex-1" onClick={() => setMoreSuggestionsOpen(true)}>
-                More suggestions
+                {dc.moreSuggestions}
               </Button>
             </div>
           </div>
@@ -517,7 +532,7 @@ export function JourneyPreview({ cards }: Props) {
                 <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
               </svg>
             </button>
-            <h2 className="mb-4 text-[20px] font-semibold">More suggestions</h2>
+            <h2 className="mb-4 text-[20px] font-semibold">{dm.moreSuggestions}</h2>
             <div className="text-sm leading-relaxed modal-html-content">
               <h5>Spontaneity</h5>
               <p>Creating a shared pleasure space is what is important, not necessarily following all rules and guidelines for their own sake. If you lose track of time, trust your instincts and continue in a spontaneous manner.</p>

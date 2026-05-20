@@ -8,6 +8,8 @@ import { Container } from '@/components/ui/Container'
 import { TimerBlock } from '@/components/TimerBlock'
 import { getCategoryTheme } from '@/lib/categoryThemes'
 import { HtmlContent } from '@/components/HtmlContent'
+import { useLocale } from '@/lib/i18n/useLocale'
+import { resolveCardTranslation } from '@/lib/i18n/resolveCardTranslation'
 
 const QUEUE_KEY = 'connexion_journey_queue'
 
@@ -24,12 +26,21 @@ type Queue = {
   randomOrder: boolean
 }
 
+type Translation = {
+  locale: string
+  title: string
+  description: string | null
+  additional: string | null
+}
+
 type CardData = {
   id: string
   title: string
   description: string | null
   imageUrl: string | null
+  additional?: string | null
   category: string
+  translations: Translation[]
 }
 
 type Props = {
@@ -83,6 +94,8 @@ export function JourneyPlay({ cards }: Props) {
     initResult.status === 'ok' ? initResult.queue : null
   )
   const stopSoundRef = useRef<() => void>(() => {})
+  const { locale, dict } = useLocale()
+  const dg = dict.gameplay
 
   useEffect(() => {
     if (initResult.status === 'redirect') {
@@ -126,8 +139,9 @@ export function JourneyPlay({ cards }: Props) {
   if (!queue) return null
 
   const entry = queue.cards[queue.currentIndex]
-  const card = cards.find((c) => c.id === entry?.id)
-  if (!card) return null
+  const rawCard = cards.find((c) => c.id === entry?.id)
+  if (!rawCard) return null
+  const card = { ...rawCard, ...resolveCardTranslation(rawCard, locale) }
 
   const isLast = (() => {
     for (let i = queue.currentIndex + 1; i < queue.cards.length; i++) {
@@ -178,15 +192,15 @@ export function JourneyPlay({ cards }: Props) {
           />
           <div className="flex gap-3">
             <Button variant="secondary" onClick={handleChangeCards} className="border-none">
-              Change cards
+              {dg.changeCards}
             </Button>
             {isLast ? (
               <Button variant="secondary" onClick={handleFinish} className="border-none">
-                Finish
+                {dg.finish}
               </Button>
             ) : (
               <Button variant="secondary" onClick={handleNext} className="border-none">
-                Next card
+                {dg.nextCard}
               </Button>
             )}
           </div>

@@ -4,8 +4,9 @@ import { useState, useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { acceptPrivacy } from './actions'
 import { Button } from '@/components/ui/Button'
+import { useLocale } from '@/lib/i18n/useLocale'
 
-function SubmitButton({ checked }: { checked: boolean }) {
+function SubmitButton({ checked, labels }: { checked: boolean; labels: { startNow: string; loading: string } }) {
   const { pending } = useFormStatus()
   const disabled = !checked || pending
 
@@ -16,20 +17,23 @@ function SubmitButton({ checked }: { checked: boolean }) {
       disabled={disabled}
       className={disabled ? 'opacity-40 cursor-not-allowed' : ''}
     >
-      {pending ? 'Loading...' : 'Start now'}
+      {pending ? labels.loading : labels.startNow}
     </Button>
   )
 }
 
 export function PrivacyAcceptForm() {
   const [checked, setChecked] = useState(false)
+  const { dict } = useLocale()
+  const d = dict.privacy
+
   const [error, dispatch] = useActionState(async () => {
     try {
       await acceptPrivacy()
       return null
     } catch (e: unknown) {
       if (e instanceof Error && (e as { digest?: string }).digest?.startsWith('NEXT_REDIRECT')) throw e
-      return 'Something went wrong. Please try again.'
+      return d.errorDefault
     }
   }, null)
 
@@ -39,7 +43,7 @@ export function PrivacyAcceptForm() {
         className="pb-23 overflow-y-auto rounded-xl text-sm text-[#D2AF9C] leading-relaxed privacy-block"
       >
         <p className="font-semibold text-[20px] leading-[120%] mb-5">
-          Game information and Privacy Policy
+          {d.title}
         </p>
         <p className="mb-5">
           <strong>1. About Connexion Space</strong><br/>
@@ -98,7 +102,7 @@ export function PrivacyAcceptForm() {
             <i></i>
           </span>
           <span className="text-sm">
-            I have read and agree to the Privacy Policy and Terms of Use
+            {d.checkboxLabel}
           </span>
         </label>
       </div>
@@ -107,7 +111,7 @@ export function PrivacyAcceptForm() {
         {error && (
           <p className="text-red-400 text-sm text-center mb-3">{error}</p>
         )}
-        <SubmitButton checked={checked} />
+        <SubmitButton checked={checked} labels={{ startNow: d.startNow, loading: d.loading }} />
       </div>
     </form>
   )

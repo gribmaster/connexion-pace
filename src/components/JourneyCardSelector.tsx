@@ -8,6 +8,8 @@ import { ExpandIcon } from '@/components/icons/ExpandIcon'
 import { CollapseIcon } from '@/components/icons/CollapseIcon'
 import { HtmlContent } from '@/components/HtmlContent'
 import type { CategoryTheme } from '@/lib/categoryThemes'
+import { useLocale } from '@/lib/i18n/useLocale'
+import { resolveCardTranslation } from '@/lib/i18n/resolveCardTranslation'
 
 // TODO: enforce free/premium Journey card selection limits here.
 const JOURNEY_FREE_CARD_LIMIT = 5
@@ -21,12 +23,20 @@ type JourneySelection = {
   LOVEMAKING: string[]
 }
 
+type Translation = {
+  locale: string
+  title: string
+  description: string | null
+  additional: string | null
+}
+
 type CardItem = {
   id: string
   title: string
   description: string | null
   imageUrl: string | null
   additional: string | null
+  translations: Translation[]
 }
 
 type Props = {
@@ -56,6 +66,9 @@ export function JourneyCardSelector({ cards, category, theme }: Props) {
   const [mounted, setMounted] = useState(false)
   const [previewCard, setPreviewCard] = useState<CardItem | null>(null)
   const [learnMoreCard, setLearnMoreCard] = useState<CardItem | null>(null)
+  const { locale, dict } = useLocale()
+  const dj = dict.journey
+  const dc = dict.common
 
   useEffect(() => {
     const stored = readJourneySelection()
@@ -63,6 +76,11 @@ export function JourneyCardSelector({ cards, category, theme }: Props) {
     setSelectedIds(stored[cat] ?? [])
     setMounted(true)
   }, [category])
+
+  const translatedCards = cards.map((card) => ({
+    ...card,
+    ...resolveCardTranslation(card, locale),
+  }))
 
   function toggleCard(id: string) {
     setSelectedIds((prev) =>
@@ -83,10 +101,10 @@ export function JourneyCardSelector({ cards, category, theme }: Props) {
   const count = selectedIds.length
   const buttonLabel =
     count === 0
-      ? 'Select cards'
+      ? dj.selectCards
       : count === 1
-      ? 'Select 1 card'
-      : `Select ${count} cards`
+      ? dj.cardSelectedSingle
+      : dj.cardsSelectedMultiple.replace('{n}', String(count))
 
   const categoryLabel =
     category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()
@@ -117,7 +135,7 @@ export function JourneyCardSelector({ cards, category, theme }: Props) {
       </h1>
 
       <div className="flex flex-wrap pb-28 mx-[-3px]">
-        {cards.map((card) => {
+        {translatedCards.map((card) => {
           const selected = mounted && selectedIds.includes(card.id)
           return (
             <div key={card.id} className="w-[33.3%] p-[3px]">
@@ -209,7 +227,7 @@ export function JourneyCardSelector({ cards, category, theme }: Props) {
               className={!previewCard.additional ? 'opacity-40 bg-[#D2AF9C1A]' : ''}
               onClick={() => setLearnMoreCard(previewCard)}
             >
-              Learn more
+              {dc.learnMore}
             </Button>
           </div>
         </div>

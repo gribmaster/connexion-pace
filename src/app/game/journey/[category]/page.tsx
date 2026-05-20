@@ -17,10 +17,18 @@ export default async function JourneyCategoryPage({ params }: Props) {
 
   if (!VALID_CATEGORIES.includes(upperCategory)) notFound()
 
+  // TODO: pass selected locale to server card queries (currently defaulting to ET).
   const cards = await prisma.card.findMany({
     where: { category: upperCategory as Category },
     orderBy: { createdAt: 'asc' },
-    select: { id: true, title: true, description: true, imageUrl: true, additional: true },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      imageUrl: true,
+      additional: true,
+      translations: { select: { locale: true, title: true, description: true, additional: true } },
+    },
   })
 
   const theme = getCategoryTheme(upperCategory)

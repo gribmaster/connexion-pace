@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
@@ -10,6 +10,15 @@ import type { CategoryTheme } from '@/lib/categoryThemes'
 import {InfoCircleIcon} from "@/components/icons/InfoCircleIcon";
 import {CollapseIcon} from "@/components/icons/CollapseIcon";
 import { HtmlContent } from '@/components/HtmlContent'
+import { useLocale } from '@/lib/i18n/useLocale'
+import { resolveCardTranslation } from '@/lib/i18n/resolveCardTranslation'
+
+type Translation = {
+  locale: string
+  title: string
+  description: string | null
+  additional: string | null
+}
 
 type CardItem = {
   id: string
@@ -17,6 +26,7 @@ type CardItem = {
   description: string | null
   imageUrl: string | null
   additional: string | null
+  translations: Translation[]
 }
 
 type Props = {
@@ -33,7 +43,15 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
   const [infoOpen, setInfoOpen] = useState(false)
   const [introOpen, setIntroOpen] = useState(false)
   const [moreSuggestionsOpen, setMoreSuggestionsOpen] = useState(false)
+  const { locale, dict } = useLocale()
+  const dc = dict.common
+  const dm = dict.modal
   const router = useRouter()
+
+  const translatedCards = cards.map((card) => ({
+    ...card,
+    ...resolveCardTranslation(card, locale),
+  }))
 
   function handleStart() {
     if (!selectedId) return
@@ -73,7 +91,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
       </h1>
 
       <div className="flex flex-wrap pb-28 mx-[-3px]">
-        {cards.map((card) => {
+        {translatedCards.map((card) => {
           const selected = card.id === selectedId
           return (
             <div
@@ -124,7 +142,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
 
       <div className="fixed bottom-0 left-0 right-0 px-4 py-6">
         <Button onClick={handleStart} disabled={!selectedId}>
-          Start playing
+          {dict.journey.startPlaying}
         </Button>
       </div>
 
@@ -182,7 +200,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
               className={!previewCard.additional ? 'opacity-40 bg-[#D2AF9C1A]' : ''}
               onClick={() => setLearnMoreCard(previewCard)}
             >
-              Learn more
+              {dc.learnMore}
             </Button>
           </div>
         </div>
@@ -198,7 +216,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="my-4 text-[20px] font-semibold">
-              Tune into the play
+              {dm.tuneIntoPlay}
             </h2>
             <div className="mb-8 text-[16px] leading-[150%] modal-html-content">
               <p>When starting the game, guidelines are presented before start of play:</p>
@@ -221,10 +239,10 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
             </div>
             <div>
               <Button className="flex-1 mb-1" onClick={handleConfirmStart}>
-                OK
+                {dc.ok}
               </Button>
               <Button variant="link" className="flex-1" onClick={() => setMoreSuggestionsOpen(true)}>
-                More suggestions
+                {dc.moreSuggestions}
               </Button>
             </div>
           </div>
@@ -251,7 +269,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
               </svg>
             </button>
             <h2 className="mb-4 text-[20px] font-semibold">
-              More suggestions
+              {dm.moreSuggestions}
             </h2>
             <div className="text-sm leading-relaxed modal-html-content">
               <h5>Spontaneity</h5>

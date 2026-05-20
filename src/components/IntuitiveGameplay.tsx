@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
@@ -8,12 +8,23 @@ import { Container } from '@/components/ui/Container'
 import { TimerBlock } from '@/components/TimerBlock'
 import { getCategoryTheme } from '@/lib/categoryThemes'
 import { HtmlContent } from '@/components/HtmlContent'
+import { useLocale } from '@/lib/i18n/useLocale'
+import { resolveCardTranslation } from '@/lib/i18n/resolveCardTranslation'
+
+type Translation = {
+  locale: string
+  title: string
+  description: string | null
+  additional: string | null
+}
 
 type CardData = {
   id: string
   title: string
-  description: string
+  description: string | null
   imageUrl: string | null
+  additional?: string | null
+  translations: Translation[]
 }
 
 type Props = {
@@ -41,9 +52,12 @@ export function IntuitiveGameplay({ category, initialCardId, allCards }: Props) 
   const stopSoundRef = useRef<() => void>(() => {})
   const [currentCardId, setCurrentCardId] = useState(initialCardId)
   const [isNextLoading, setIsNextLoading] = useState(false)
+  const { locale, dict } = useLocale()
+  const dg = dict.gameplay
 
   const theme = getCategoryTheme(category)
-  const card = allCards.find((c) => c.id === currentCardId) ?? allCards.find((c) => c.id === initialCardId)
+  const rawCard = allCards.find((c) => c.id === currentCardId) ?? allCards.find((c) => c.id === initialCardId)
+  const card = rawCard ? { ...rawCard, ...resolveCardTranslation(rawCard, locale) } : undefined
 
   const handleNext = () => {
     if (isNextLoading) return
@@ -110,10 +124,10 @@ export function IntuitiveGameplay({ category, initialCardId, allCards }: Props) 
           <TimerBlock resetKey={currentCardId} storageKey="connexion_timer_intuitive" stopSoundRef={stopSoundRef} />
           <div className="flex gap-3">
             <Button variant="secondary" onClick={handleFinish} className="border-none">
-              Finish game
+              {dg.finishGame}
             </Button>
             <Button variant="secondary" onClick={handleNext} disabled={isNextLoading} className="border-none">
-              {isNextLoading ? 'Loading...' : 'Next card'}
+              {isNextLoading ? dict.common.loading : dg.nextCard}
             </Button>
           </div>
         </div>

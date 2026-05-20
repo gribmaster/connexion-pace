@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { getTimerSoundAudio, preloadTimerSounds, stopAllTimerSounds, stopTimerSound } from '@/lib/audioCache'
+import { useLocale } from '@/lib/i18n/useLocale'
 
 type Modal = 'help' | 'language' | 'timer_sound' | null
 
@@ -22,10 +23,18 @@ const VOLUME_KEY = 'connexion_timer_volume'
 const DEFAULT_SOUND = 'beep1.wav'
 const DEFAULT_VOLUME = 70
 
+const LOCALE_TO_LANG: Record<string, 'Eesti' | 'English'> = {
+  et: 'Eesti',
+  en: 'English',
+}
+
 export function ProfileClient() {
   const router = useRouter()
+  const { locale, setLocale, dict } = useLocale()
+  const dp = dict.profile
+  const dc = dict.common
   const [modal, setModal] = useState<Modal>(null)
-  const [language, setLanguage] = useState('English')
+  const [language, setLanguage] = useState<'Eesti' | 'English'>('Eesti')
   const [dailyConnection] = useState(false)
 
   const [selectedSound, setSelectedSound] = useState<string>(() => {
@@ -39,6 +48,10 @@ export function ProfileClient() {
   })
   const playingFileRef = useRef<string | null>(null)
   const [playingFile, setPlayingFile] = useState<string | null>(null)
+
+  useEffect(() => {
+    setLanguage(LOCALE_TO_LANG[locale])
+  }, [locale])
 
   useEffect(() => {
     preloadTimerSounds()
@@ -96,7 +109,7 @@ export function ProfileClient() {
       <div className="flex flex-col gap-0 text-[#D2AF9C]">
         {/* Daily connection */}
         <div className="flex items-center justify-between p-2">
-          <span className="text-[16px] leading-[24px] font-medium ">Daily connection</span>
+          <span className="text-[16px] leading-[24px] font-medium ">{dp.dailyConnection}</span>
           <button
             role="switch"
             aria-checked={dailyConnection}
@@ -112,7 +125,7 @@ export function ProfileClient() {
           onClick={() => setModal('help')}
           className="flex items-center justify-between p-2"
         >
-          <span className="text-[16px] leading-[24px] font-medium">Help &amp; Support</span>
+          <span className="text-[16px] leading-[24px] font-medium">{dp.helpAndSupport}</span>
           <ChevronRight />
         </button>
 
@@ -121,9 +134,9 @@ export function ProfileClient() {
           onClick={() => setModal('language')}
           className="flex items-center justify-between p-2"
         >
-          <span className="text-[16px] leading-[24px] font-medium">Language</span>
+          <span className="text-[16px] leading-[24px] font-medium">{dp.language}</span>
           <div className="flex items-center gap-2">
-            <span className="text-xs">{language}</span>
+            <span className="text-xs">{language === 'Eesti' ? 'Eesti' : 'English'}</span>
             <ChevronRight />
           </div>
         </button>
@@ -133,7 +146,7 @@ export function ProfileClient() {
           onClick={() => setModal('timer_sound')}
           className="flex items-center justify-between p-2"
         >
-          <span className="text-[16px] leading-[24px] font-medium">Timer sound</span>
+          <span className="text-[16px] leading-[24px] font-medium">{dp.timerSound}</span>
           <ChevronRight />
         </button>
 
@@ -142,7 +155,7 @@ export function ProfileClient() {
           onClick={handleLogout}
           className="flex items-center justify-between p-2 text-left"
         >
-          <span className="text-[16px] leading-[24px] font-medium">Log out</span>
+          <span className="text-[16px] leading-[24px] font-medium">{dp.logOut}</span>
           <LogoutIcon />
         </button>
       </div>
@@ -150,13 +163,12 @@ export function ProfileClient() {
       {/* Help & Support modal */}
       {modal === 'help' && (
         <BottomModal onClose={() => setModal(null)}>
-          <h2 className="text-[20px] leading-[24px] font-semibold mb-6">Help &amp; Support</h2>
+          <h2 className="text-[20px] leading-[24px] font-semibold mb-6">{dp.helpAndSupport}</h2>
           <p className="text-[16px] leading-[24px] text-[#D2AF9C] mb-6">
-            For help and support, please contact our team via{' '}
-            <span>support@connexion.com</span>. We&apos;re here to assist you anytime.
+            {dp.helpText}
           </p>
           <a href="mailto:support@connexion.com">
-            <Button variant="primary">Contact us</Button>
+            <Button variant="primary">{dp.contactUs}</Button>
           </a>
         </BottomModal>
       )}
@@ -164,9 +176,9 @@ export function ProfileClient() {
       {/* Language modal */}
       {modal === 'language' && (
         <BottomModal onClose={() => setModal(null)}>
-          <h2 className="text-[20px] leading-[24px] font-semibold mb-6">Language</h2>
+          <h2 className="text-[20px] leading-[24px] font-semibold mb-6">{dp.language}</h2>
           <div className="flex flex-col gap-2 mb-6">
-            {(['English', 'Estonian'] as const).map((lang) => (
+            {(['Eesti', 'English'] as const).map((lang) => (
               <button
                 key={lang}
                 onClick={() => setLanguage(lang)}
@@ -182,14 +194,22 @@ export function ProfileClient() {
               </button>
             ))}
           </div>
-          <Button variant="primary" onClick={() => setModal(null)}>OK</Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setLocale(language === 'English' ? 'en' : 'et')
+              setModal(null)
+            }}
+          >
+            {dc.ok}
+          </Button>
         </BottomModal>
       )}
 
       {/* Timer sound modal */}
       {modal === 'timer_sound' && (
         <BottomModal onClose={handleCloseSoundModal}>
-          <h2 className="text-[20px] leading-[24px] font-semibold mb-6">Timer sound</h2>
+          <h2 className="text-[20px] leading-[24px] font-semibold mb-6">{dp.timerSound}</h2>
           <div className="flex flex-col gap-2 mb-5">
             {SOUND_OPTIONS.map((opt) => {
               const isPlaying = playingFile === opt.file
@@ -224,7 +244,7 @@ export function ProfileClient() {
           </div>
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Volume</span>
+              <span className="text-sm font-medium">{dp.volume}</span>
               <span className="text-sm">{volume}%</span>
             </div>
             <input
@@ -236,7 +256,7 @@ export function ProfileClient() {
               className="w-full accent-[#860119] input-range"
             />
           </div>
-          <Button variant="primary" onClick={handleSoundOk}>OK</Button>
+          <Button variant="primary" onClick={handleSoundOk}>{dc.ok}</Button>
         </BottomModal>
       )}
     </>
