@@ -48,7 +48,7 @@ function timerReducer(state: TimerState, action: TimerAction): TimerState {
     }
     case 'ADD_SECONDS': {
       const next = state.seconds + action.amount
-      return { ...state, seconds: next, timeUp: false, running: true }
+      return { ...state, seconds: next, timeUp: false }
     }
     case 'SUBTRACT_SECONDS': {
       const next = Math.max(0, state.seconds - action.amount)
