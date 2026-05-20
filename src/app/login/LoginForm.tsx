@@ -1,17 +1,29 @@
 'use client'
 
+import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import Image from "next/image";
 export function LoginForm() {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
   async function handleGoogleLogin() {
+    if (loading) return
+    setLoading(true)
+    setError(null)
     const supabase = createClient()
-    await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     })
+    if (error) {
+      setLoading(false)
+      setError('Something went wrong. Please try again.')
+    }
+    // On success the browser navigates away; keep loading state active.
   }
 
   return (
@@ -35,28 +47,40 @@ export function LoginForm() {
             onClick={handleGoogleLogin}
             variant="secondary"
             className="button-login"
+            type="button"
+            disabled={loading}
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-[6px]">
-              <path
-                d="M18.7511 10.1951C18.7511 9.47569 18.6915 8.95069 18.5626 8.40625H10.1797V11.6534H15.1003C15.0011 12.4604 14.4654 13.6757 13.2749 14.4923L13.2582 14.601L15.9087 16.6133L16.0924 16.6312C17.7788 15.1048 18.7511 12.859 18.7511 10.1951Z"
-                fill="#D2AF9C"/>
-              <path
-                d="M10.1793 18.75C12.59 18.75 14.6138 17.9722 16.092 16.6305L13.2745 14.4916C12.5206 15.0068 11.5086 15.3666 10.1793 15.3666C7.81822 15.3666 5.81428 13.8402 5.09992 11.7305L4.99522 11.7392L2.23917 13.8295L2.20312 13.9277C3.67136 16.786 6.68723 18.75 10.1793 18.75Z"
-                fill="#D2AF9C"/>
-              <path
-                d="M5.10112 11.7302C4.91263 11.1858 4.80354 10.6024 4.80354 9.99967C4.80354 9.39686 4.91263 8.81355 5.0912 8.26911L5.08621 8.15316L2.29561 6.0293L2.20431 6.07186C1.59918 7.25798 1.25195 8.58995 1.25195 9.99967C1.25195 11.4094 1.59918 12.7413 2.20431 13.9274L5.10112 11.7302Z"
-                fill="#D2AF9C"/>
-              <path
-                d="M10.1794 4.63331C11.8559 4.63331 12.9868 5.34303 13.6317 5.93613L16.1516 3.525C14.604 2.11528 12.59 1.25 10.1794 1.25C6.68725 1.25 3.67137 3.21387 2.20312 6.07218L5.09002 8.26944C5.8143 6.15972 7.81825 4.63331 10.1794 4.63331Z"
-                fill="#D2AF9C"/>
-            </svg>
-            Continue with Gmail
+            {loading ? (
+              'Redirecting...'
+            ) : (
+              <>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-[6px]">
+                  <path
+                    d="M18.7511 10.1951C18.7511 9.47569 18.6915 8.95069 18.5626 8.40625H10.1797V11.6534H15.1003C15.0011 12.4604 14.4654 13.6757 13.2749 14.4923L13.2582 14.601L15.9087 16.6133L16.0924 16.6312C17.7788 15.1048 18.7511 12.859 18.7511 10.1951Z"
+                    fill="#D2AF9C"/>
+                  <path
+                    d="M10.1793 18.75C12.59 18.75 14.6138 17.9722 16.092 16.6305L13.2745 14.4916C12.5206 15.0068 11.5086 15.3666 10.1793 15.3666C7.81822 15.3666 5.81428 13.8402 5.09992 11.7305L4.99522 11.7392L2.23917 13.8295L2.20312 13.9277C3.67136 16.786 6.68723 18.75 10.1793 18.75Z"
+                    fill="#D2AF9C"/>
+                  <path
+                    d="M5.10112 11.7302C4.91263 11.1858 4.80354 10.6024 4.80354 9.99967C4.80354 9.39686 4.91263 8.81355 5.0912 8.26911L5.08621 8.15316L2.29561 6.0293L2.20431 6.07186C1.59918 7.25798 1.25195 8.58995 1.25195 9.99967C1.25195 11.4094 1.59918 12.7413 2.20431 13.9274L5.10112 11.7302Z"
+                    fill="#D2AF9C"/>
+                  <path
+                    d="M10.1794 4.63331C11.8559 4.63331 12.9868 5.34303 13.6317 5.93613L16.1516 3.525C14.604 2.11528 12.59 1.25 10.1794 1.25C6.68725 1.25 3.67137 3.21387 2.20312 6.07218L5.09002 8.26944C5.8143 6.15972 7.81825 4.63331 10.1794 4.63331Z"
+                    fill="#D2AF9C"/>
+                </svg>
+                Continue with Gmail
+              </>
+            )}
           </Button>
+          {error && (
+            <p className="text-center text-xs text-red-400">{error}</p>
+          )}
 
           <Button
             variant="secondary"
             disabled
             className="flex items-center justify-center gap-3 opacity-40 cursor-not-allowed"
+            type="button"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <g clipPath="url(#clip0_5_105)">
