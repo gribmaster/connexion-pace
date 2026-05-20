@@ -2,6 +2,7 @@
 
 import { useEffect, useReducer, useRef } from 'react'
 import { Button } from '@/components/ui/Button'
+import { playTimerSound, preloadTimerSounds, stopAllTimerSounds, unlockAudio } from '@/lib/audioCache'
 
 type TimerState = {
   seconds: number
@@ -72,17 +73,18 @@ export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
     return { seconds, noLimit, running: true, timeUp: false, resetKey, storageKey }
   })
 
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const currentSoundRef = useRef<string | null>(null)
 
   const stopSound = () => {
-    const audio = audioRef.current
-    if (!audio) return
-    try {
-      audio.pause()
-      audio.currentTime = 0
-    } catch {}
-    audioRef.current = null
+    if (currentSoundRef.current) {
+      stopAllTimerSounds()
+      currentSoundRef.current = null
+    }
   }
+
+  useEffect(() => {
+    preloadTimerSounds()
+  }, [])
 
   useEffect(() => {
     if (stopSoundRef) stopSoundRef.current = stopSound
@@ -102,15 +104,12 @@ export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
   useEffect(() => {
     const wasTimeUp = !state.noLimit && state.seconds === 0 && state.timeUp
     if (wasTimeUp) {
-      try {
-        const file = localStorage.getItem('connexion_timer_sound') ?? 'beep1.wav'
-        const vol = localStorage.getItem('connexion_timer_volume')
-        const volume = vol !== null ? Number(vol) / 100 : 0.7
-        const audio = new Audio(`/sound/${file}`)
-        audio.volume = volume
-        audioRef.current = audio
-        audio.play()
-      } catch {}
+      const file = localStorage.getItem('connexion_timer_sound') ?? 'beep1.mp3'
+      const vol = localStorage.getItem('connexion_timer_volume')
+      const volume = vol !== null ? Number(vol) / 100 : 0.7
+      const src = `/sound/${file}`
+      currentSoundRef.current = src
+      playTimerSound(src, volume)
     }
   }, [state.noLimit, state.seconds, state.timeUp])
 
@@ -141,7 +140,7 @@ export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
             {`${mm}:${ss}`}
           </span>
           <button
-            onClick={() => { stopSound(); dispatch({ type: 'ADD_SECONDS', amount: 30 }) }}
+            onClick={() => { stopSound(); dispatch({ type: 'ADD_SECONDS', amount: 30 }); }}
           >
             <img src="/img/timer-plus.svg" width="32" height="32" alt=""/>
           </button>
@@ -155,7 +154,7 @@ export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
           variant="primary"
           className="w-auto px-8"
           disabled={timeUp}
-          onClick={() => dispatch({ type: 'TOGGLE_RUNNING' })}
+          onClick={() => { unlockAudio(); dispatch({ type: 'TOGGLE_RUNNING' }) }}
         >
           {running && !timeUp ? 'Stop' : 'Play'}
         </Button>

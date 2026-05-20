@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
+import { getTimerSoundAudio, preloadTimerSounds, stopAllTimerSounds, stopTimerSound } from '@/lib/audioCache'
 
 type Modal = 'help' | 'language' | 'timer_sound' | null
 
@@ -36,34 +37,39 @@ export function ProfileClient() {
     const v = localStorage.getItem(VOLUME_KEY)
     return v !== null ? Number(v) : DEFAULT_VOLUME
   })
-  const previewRef = useRef<HTMLAudioElement | null>(null)
+  const playingFileRef = useRef<string | null>(null)
   const [playingFile, setPlayingFile] = useState<string | null>(null)
 
   useEffect(() => {
-    return () => {
-      previewRef.current?.pause()
-    }
+    preloadTimerSounds()
+    return () => { stopAllTimerSounds() }
   }, [])
 
   function stopPreview() {
-    if (previewRef.current) {
-      previewRef.current.pause()
-      previewRef.current.currentTime = 0
-      previewRef.current = null
+    if (playingFileRef.current) {
+      stopTimerSound(`/sound/${playingFileRef.current}`)
+      playingFileRef.current = null
     }
     setPlayingFile(null)
   }
 
   function previewSound(file: string) {
-    try {
-      stopPreview()
-      const audio = new Audio(`/sound/${file}`)
-      audio.volume = volume / 100
-      audio.onended = () => setPlayingFile(null)
-      previewRef.current = audio
-      audio.play()
-      setPlayingFile(file)
-    } catch {}
+    stopPreview()
+    const src = `/sound/${file}`
+    const audio = getTimerSoundAudio(src)
+    if (!audio) return
+    audio.volume = Math.max(0, Math.min(1, volume / 100))
+    audio.currentTime = 0
+    audio.onended = () => {
+      if (playingFileRef.current === file) {
+        playingFileRef.current = null
+        setPlayingFile(null)
+      }
+    }
+    playingFileRef.current = file
+    setPlayingFile(file)
+    const result = audio.play()
+    if (result instanceof Promise) result.catch(() => {})
   }
 
   function handleSoundOk() {
