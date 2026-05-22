@@ -34,7 +34,11 @@ export function WelcomeContent() {
               {d.viewPremiumOptions}
             </Button>
 
-            <p className="font-medium text-[14px] leading-[20px] opacity-50">{d.chooseNextPlayTime}</p>
+            <Link href="/welcome/reminder/date" id="chooseNextPlayCall">
+              <p className="font-medium text-[14px] leading-[20px] underline underline-offset-2">
+                {d.chooseNextPlayTime}
+              </p>
+            </Link>
           </div>
         </div>
       </Container>

@@ -1,5 +1,21 @@
 const CACHE_NAME = 'connexion-static-v3';
 
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const targetUrl = (event.notification.data && event.notification.data.url) || '/welcome';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        const url = new URL(client.url);
+        if (url.pathname === targetUrl && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      return clients.openWindow(targetUrl);
+    })
+  );
+});
+
 // Only these specific paths are safe to cache
 const CACHEABLE_PATHS = [
   '/icons/icon-192.png',

@@ -441,3 +441,11 @@ div::-webkit-scrollbar-thumb {
   scrollbar-width: thin;
   scrollbar-color: #D2AF9C transparent;
 }
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

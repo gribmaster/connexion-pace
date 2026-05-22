@@ -46,7 +46,8 @@
       "Bash(Out-Null)",
       "Bash(Write-Output \"done\")",
       "Bash(node -e \"const p = require\\('./package.json'\\); const d = {...p.dependencies, ...p.devDependencies}; ['@dnd-kit/core','@dnd-kit/sortable','@dnd-kit/utilities'].forEach\\(k => console.log\\(k, d[k] ?? 'MISSING'\\)\\)\")",
-      "Bash(pnpm add *)"
+      "Bash(pnpm add *)",
+      "PowerShell(tree *)"
     ]
   }
 }
