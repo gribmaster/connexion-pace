@@ -1,3 +1,8 @@
+// Vercel Hobby only supports once-per-day cron jobs, so this endpoint is not
+// registered in vercel.json. Use an external scheduler to call this route on
+// your desired interval (e.g. every 1-5 min):
+//   GET /api/cron/send-play-reminders
+//   Authorization: Bearer CRON_SECRET
 import { NextResponse } from 'next/server'
 import { NotificationStatus } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
