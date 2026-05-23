@@ -47,7 +47,12 @@
       "Bash(Write-Output \"done\")",
       "Bash(node -e \"const p = require\\('./package.json'\\); const d = {...p.dependencies, ...p.devDependencies}; ['@dnd-kit/core','@dnd-kit/sortable','@dnd-kit/utilities'].forEach\\(k => console.log\\(k, d[k] ?? 'MISSING'\\)\\)\")",
       "Bash(pnpm add *)",
-      "PowerShell(tree *)"
+      "PowerShell(tree *)",
+      "Bash(pnpm prisma *)",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\({scripts:p.scripts,dependencies:p.dependencies,devDependencies:p.devDependencies},null,2\\)\\)\")",
+      "Bash(pnpm generate:vapid)",
+      "Bash(node -e \"const {NotificationStatus} = require\\('@prisma/client'\\); console.log\\(NotificationStatus\\)\")",
+      "Bash(npx next *)"
     ]
   }
 }

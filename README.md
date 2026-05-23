@@ -29,6 +29,30 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Environment setup
+
+Copy `.env.example` to `.env` and fill in the values.
+
+### Web Push / VAPID keys
+
+Generate a key pair (one-time, per environment):
+
+```bash
+pnpm generate:vapid
+```
+
+Copy the output into your `.env`:
+
+```
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=<Public Key from output>
+VAPID_PRIVATE_KEY=<Private Key from output>
+VAPID_SUBJECT=mailto:your-email@example.com
+```
+
+Set the same three variables in your Vercel project's Environment Variables dashboard.
+
+> **Never commit `VAPID_PRIVATE_KEY` to source control.** It is excluded from `.env.example` for this reason.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.

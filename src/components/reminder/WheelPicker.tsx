@@ -82,7 +82,7 @@ export function WheelPicker({ options, value, onChange, formatLabel }: WheelPick
       <div
         ref={containerRef}
         onScroll={handleScroll}
-        className="overflow-y-scroll no-scrollbar"
+        className="overflow-y-scroll no-scrollbar w-full"
         style={{
           height: ITEM_HEIGHT * 5,
           scrollSnapType: 'y mandatory',
