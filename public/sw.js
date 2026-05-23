@@ -11,7 +11,35 @@ self.addEventListener('notificationclick', (event) => {
           return client.focus();
         }
       }
-      return clients.openWindow(targetUrl);
+      if (clients.openWindow) return clients.openWindow(targetUrl);
+    })
+  );
+});
+
+self.addEventListener('push', (event) => {
+  let title = 'Connexion Space';
+  let body = 'Your play time is here. Take a moment to reconnect.';
+  let url = '/welcome';
+
+  if (event.data) {
+    try {
+      const payload = event.data.json();
+      if (payload.title) title = payload.title;
+      if (payload.body) body = payload.body;
+      if (payload.url) url = payload.url;
+    } catch {
+      // malformed JSON — use defaults above
+    }
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body,
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      data: { url },
+      tag: 'connexion-play-reminder',
+      renotify: true,
     })
   );
 });
