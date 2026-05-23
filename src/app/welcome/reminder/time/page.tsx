@@ -5,11 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 import { WheelPicker } from '@/components/reminder/WheelPicker'
-import {
-  savePlayReminder,
-  requestNotificationPermission,
-  schedulePlayReminder,
-} from '@/lib/notifications/playReminder'
+import { subscribeToPushNotifications } from '@/lib/notifications/subscribeToPush'
+import { REMINDER_KEY } from '@/lib/notifications/playReminder'
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -20,7 +17,7 @@ const HOURS = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'
 const MINUTES = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']
 const AMPM = ['AM', 'PM']
 
-type SaveStatus = 'idle' | 'saving' | 'trigger' | 'timeout' | 'saved-only' | 'denied' | 'past-error'
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'past-error' | 'sub-error' | 'api-error'
 
 // Returns { hour, minute, ampm } defaulting to the current local time with
 // minutes rounded UP to the next 5-minute step. If rounding overflows into
@@ -65,55 +62,98 @@ function TimePickerInner() {
   const [minute, setMinute] = useState(defaults.minute)
   const [ampm, setAmPm] = useState(defaults.ampm)
   const [status, setStatus] = useState<SaveStatus>('idle')
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [savedLocalTime, setSavedLocalTime] = useState<string | null>(null)
 
   // Any picker change after a terminal state resets to idle so Save reappears.
-  const TERMINAL: SaveStatus[] = ['trigger', 'timeout', 'saved-only', 'denied', 'past-error']
+  const TERMINAL: SaveStatus[] = ['saved', 'past-error', 'sub-error', 'api-error']
   function onPickerChange(setter: (v: string) => void) {
     return (v: string) => {
       setter(v)
-      if (TERMINAL.includes(status)) setStatus('idle')
+      if (TERMINAL.includes(status)) {
+        setStatus('idle')
+        setErrorMessage(null)
+        setSavedLocalTime(null)
+      }
     }
   }
 
   function buildScheduledDate(): Date {
     const monthIndex = MONTH_NAMES.indexOf(monthName)
-    const d = new Date()
-    d.setFullYear(parseInt(year, 10), monthIndex, parseInt(day, 10))
 
-    let h = parseInt(hour, 10)
-    if (ampm === 'PM' && h !== 12) h += 12
-    if (ampm === 'AM' && h === 12) h = 0
+    let h24 = parseInt(hour, 10)
+    if (ampm === 'PM' && h24 !== 12) h24 += 12
+    if (ampm === 'AM' && h24 === 12) h24 = 0
 
-    d.setHours(h, parseInt(minute, 10), 0, 0)
-    return d
+    // new Date(y, m, d, h, min, s, ms) always uses local browser time.
+    return new Date(parseInt(year, 10), monthIndex, parseInt(day, 10), h24, parseInt(minute, 10), 0, 0)
   }
 
   async function handleSave() {
-    const scheduledDate = buildScheduledDate()
+    const localDate = buildScheduledDate()
 
-    if (scheduledDate <= new Date()) {
+    if (localDate.getTime() <= Date.now()) {
       setStatus('past-error')
       return
     }
 
     setStatus('saving')
+    setErrorMessage(null)
 
-    const reminder = savePlayReminder(scheduledDate)
+    const subResult = await subscribeToPushNotifications()
 
-    const permission = await requestNotificationPermission()
-
-    if (permission === 'denied') {
-      setStatus('denied')
+    if (!subResult.ok) {
+      setStatus('sub-error')
+      setErrorMessage(subResult.error ?? 'Could not enable notifications. Please try again.')
       return
     }
 
-    if (permission === 'granted') {
-      const result = await schedulePlayReminder(reminder)
-      setStatus(result)
-    } else {
-      // null means Notifications API not available
-      setStatus('saved-only')
+    if (!subResult.subscriptionId) {
+      setStatus('sub-error')
+      setErrorMessage('Could not create notification subscription. Please try again.')
+      return
     }
+
+    const scheduledAt = localDate.toISOString()
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || undefined
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Reminder]', {
+        localSelected: localDate.toString(),
+        scheduledAt,
+        timezone,
+      })
+    }
+
+    let reminderId: string
+    try {
+      const res = await fetch('/api/notifications/play-reminders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscriptionId: subResult.subscriptionId, scheduledAt, timezone }),
+      })
+      const data = (await res.json()) as { ok?: boolean; reminderId?: string; error?: string }
+      if (!res.ok || !data.ok || !data.reminderId) {
+        setStatus('api-error')
+        setErrorMessage('Could not save reminder. Please try again.')
+        return
+      }
+      reminderId = data.reminderId
+    } catch {
+      setStatus('api-error')
+      setErrorMessage('Could not save reminder. Please try again.')
+      return
+    }
+
+    localStorage.setItem(
+      REMINDER_KEY,
+      JSON.stringify({ reminderId, scheduledAt, timezone: timezone ?? null, createdAt: new Date().toISOString() }),
+    )
+
+    setSavedLocalTime(
+      localDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    )
+    setStatus('saved')
   }
 
   function handleBack() {
@@ -162,35 +202,27 @@ function TimePickerInner() {
               Please choose a future time.
             </p>
           )}
-          {status === 'trigger' && (
-            <p className="text-center text-[13px] opacity-70">
-              Reminder saved. We&apos;ll remind you when it&apos;s time to play.
+          {(status === 'sub-error' || status === 'api-error') && errorMessage && (
+            <p className="text-center text-[13px] text-red-400">
+              {errorMessage}
             </p>
           )}
-          {status === 'timeout' && (
+          {status === 'saved' && (
             <p className="text-center text-[13px] opacity-70">
-              Reminder saved. Notifications may only work while the app is open until push reminders are enabled.
-            </p>
-          )}
-          {status === 'saved-only' && (
-            <p className="text-center text-[13px] opacity-70">
-              Reminder saved. Notifications may only work while the app is open until push reminders are enabled.
-            </p>
-          )}
-          {status === 'denied' && (
-            <p className="text-center text-[13px] opacity-70">
-              Reminder saved, but notifications are blocked in your browser settings.
+              {savedLocalTime
+                ? `Reminder saved for ${savedLocalTime}. We'll remind you when it's time to play.`
+                : "Reminder saved. We'll remind you when it's time to play."}
             </p>
           )}
 
           {/* Action buttons */}
-          {(status === 'idle' || status === 'past-error') && (
+          {(status === 'idle' || status === 'past-error' || status === 'sub-error' || status === 'api-error') && (
             <Button variant="primary" onClick={handleSave}>
               Save
             </Button>
           )}
 
-          {(status === 'trigger' || status === 'timeout' || status === 'saved-only' || status === 'denied') && (
+          {status === 'saved' && (
             <Button variant="primary" onClick={() => router.push('/welcome')}>
               Back to Connexion Space
             </Button>
