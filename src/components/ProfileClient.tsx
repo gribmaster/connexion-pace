@@ -6,8 +6,9 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { getTimerSoundAudio, preloadTimerSounds, stopAllTimerSounds, stopTimerSound } from '@/lib/audioCache'
 import { useLocale } from '@/lib/i18n/useLocale'
+import { WheelPicker } from '@/components/reminder/WheelPicker'
 
-type Modal = 'help' | 'language' | 'timer_sound' | null
+type Modal = 'help' | 'language' | 'timer_sound' | 'daily_connection' | null
 
 const SOUND_OPTIONS = [
   { label: 'Sound 1', file: 'beep1.mp3' },
@@ -28,6 +29,44 @@ const LOCALE_TO_LANG: Record<string, 'Eesti' | 'English'> = {
   en: 'English',
 }
 
+const DC_DRAFT_KEY = 'connexion_daily_connection_draft'
+const DC_HOURS = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'))
+const DC_MINUTES = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']
+const DC_AMPM = ['AM', 'PM']
+const DC_INTERVALS = [
+  { label: '1 day', value: 1 },
+  { label: '2 days', value: 2 },
+  { label: '3 days', value: 3 },
+  { label: '7 days', value: 7 },
+]
+
+function getDcDefaultTime(): { hour: string; minute: string; ampm: string } {
+  const now = new Date()
+  let h24 = now.getHours()
+  let rawMin = now.getMinutes()
+  const roundedMin = Math.ceil(rawMin / 5) * 5
+  if (roundedMin >= 60) {
+    h24 = (h24 + 1) % 24
+    rawMin = 0
+  } else {
+    rawMin = roundedMin
+  }
+  const ampm = h24 >= 12 ? 'PM' : 'AM'
+  const h12 = h24 % 12 || 12
+  return {
+    hour: String(h12).padStart(2, '0'),
+    minute: String(rawMin).padStart(2, '0'),
+    ampm,
+  }
+}
+
+function buildDcTimeOfDay(hour: string, minute: string, ampm: string): string {
+  let h24 = parseInt(hour, 10)
+  if (ampm === 'PM' && h24 !== 12) h24 += 12
+  if (ampm === 'AM' && h24 === 12) h24 = 0
+  return `${String(h24).padStart(2, '0')}:${minute}`
+}
+
 export function ProfileClient() {
   const router = useRouter()
   const { locale, setLocale, dict } = useLocale()
@@ -35,7 +74,18 @@ export function ProfileClient() {
   const dc = dict.common
   const [modal, setModal] = useState<Modal>(null)
   const [language, setLanguage] = useState<'Eesti' | 'English'>('Eesti')
-  const [dailyConnection] = useState(false)
+
+  // Switch reflects localStorage after mount to avoid hydration mismatch
+  const [dcEnabled, setDcEnabled] = useState(false)
+  // Whether DC was enabled before the current modal open (for cancel revert)
+  const dcWasEnabledRef = useRef(false)
+
+  // Daily Connection draft state — initialised lazily on modal open
+  const [dcHour, setDcHour] = useState('')
+  const [dcMinute, setDcMinute] = useState('')
+  const [dcAmPm, setDcAmPm] = useState('')
+  const [dcInterval, setDcInterval] = useState(1)
+  const [dcSaved, setDcSaved] = useState(false)
 
   const [selectedSound, setSelectedSound] = useState<string>(() => {
     if (typeof window === 'undefined') return DEFAULT_SOUND
@@ -52,6 +102,16 @@ export function ProfileClient() {
   useEffect(() => {
     setLanguage(LOCALE_TO_LANG[locale])
   }, [locale])
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(DC_DRAFT_KEY)
+      if (raw) {
+        const draft = JSON.parse(raw)
+        if (draft.enabled === true) setDcEnabled(true)
+      }
+    } catch {}
+  }, [])
 
   useEffect(() => {
     preloadTimerSounds()
@@ -97,6 +157,91 @@ export function ProfileClient() {
     setModal(null)
   }
 
+  function openDailyConnection() {
+    dcWasEnabledRef.current = dcEnabled
+
+    // Seed picker from existing draft if present, otherwise use current time
+    let seededHour = ''
+    let seededMinute = ''
+    let seededAmPm = ''
+    let seededInterval = 1
+    try {
+      const raw = localStorage.getItem(DC_DRAFT_KEY)
+      if (raw) {
+        const draft = JSON.parse(raw)
+        if (draft.hour) seededHour = String(draft.hour).padStart(2, '0')
+        if (draft.minute !== undefined) seededMinute = String(draft.minute).padStart(2, '0')
+        if (draft.period) seededAmPm = draft.period
+        if (draft.intervalDays) seededInterval = draft.intervalDays
+      }
+    } catch {}
+
+    if (!seededHour || !seededMinute || !seededAmPm) {
+      const defaults = getDcDefaultTime()
+      seededHour = defaults.hour
+      seededMinute = defaults.minute
+      seededAmPm = defaults.ampm
+    }
+
+    setDcHour(seededHour)
+    setDcMinute(seededMinute)
+    setDcAmPm(seededAmPm)
+    setDcInterval(seededInterval)
+    setDcSaved(false)
+    setModal('daily_connection')
+  }
+
+  function handleDcToggle() {
+    if (dcEnabled) {
+      // Turn OFF: update localStorage, flip switch
+      try {
+        const raw = localStorage.getItem(DC_DRAFT_KEY)
+        const existing = raw ? JSON.parse(raw) : {}
+        localStorage.setItem(DC_DRAFT_KEY, JSON.stringify({ ...existing, enabled: false }))
+      } catch {}
+      setDcEnabled(false)
+    } else {
+      // Turn ON: open setup modal
+      openDailyConnection()
+    }
+  }
+
+  function handleDcModalClose() {
+    // Revert switch to what it was before opening if user didn't save
+    if (!dcSaved) setDcEnabled(dcWasEnabledRef.current)
+    setModal(null)
+  }
+
+  function onDcPickerChange(setter: (v: string) => void) {
+    return (v: string) => {
+      setter(v)
+      setDcSaved(false)
+    }
+  }
+
+  function onDcIntervalChange(value: number) {
+    setDcInterval(value)
+    setDcSaved(false)
+  }
+
+  function handleDcSave() {
+    const timeOfDay = buildDcTimeOfDay(dcHour, dcMinute, dcAmPm)
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const draft = {
+      enabled: true,
+      timeOfDay,
+      hour: parseInt(dcHour, 10),
+      minute: parseInt(dcMinute, 10),
+      period: dcAmPm as 'AM' | 'PM',
+      intervalDays: dcInterval,
+      timezone,
+      savedAt: new Date().toISOString(),
+    }
+    localStorage.setItem(DC_DRAFT_KEY, JSON.stringify(draft))
+    setDcEnabled(true)
+    setDcSaved(true)
+  }
+
   async function handleLogout() {
     const supabase = createClient()
     await supabase.auth.signOut()
@@ -109,14 +254,20 @@ export function ProfileClient() {
       <div className="flex flex-col gap-0 text-[#D2AF9C]">
         {/* Daily connection */}
         <div className="flex items-center justify-between p-2">
-          <span className="text-[16px] leading-[24px] font-medium ">{dp.dailyConnection}</span>
+          <span className="text-[16px] leading-[24px] font-medium">{dp.dailyConnection}</span>
           <button
             role="switch"
-            aria-checked={dailyConnection}
-            disabled
-            className="relative inline-flex h-6 w-11 items-center rounded-full bg-[#D2AF9C]/30 cursor-not-allowed opacity-50"
+            aria-checked={dcEnabled}
+            onClick={handleDcToggle}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              dcEnabled ? 'bg-[#860119]' : 'bg-[#D2AF9C]/30'
+            }`}
           >
-            <span className="inline-block h-4 w-4 translate-x-1 rounded-full bg-white shadow transition" />
+            <span
+              className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
+                dcEnabled ? 'translate-x-6' : 'translate-x-1'
+              }`}
+            />
           </button>
         </div>
 
@@ -203,6 +354,61 @@ export function ProfileClient() {
           >
             {dc.ok}
           </Button>
+        </BottomModal>
+      )}
+
+      {/* Daily Connection modal */}
+      {modal === 'daily_connection' && (
+        <BottomModal onClose={handleDcModalClose}>
+          <h2 className="text-[20px] leading-[24px] font-semibold mb-2">Daily Connection</h2>
+          <p className="text-[14px] leading-[22px] opacity-60 mb-6">
+            Choose when you want to receive your connection reminder.
+          </p>
+
+          {/* Wheel time picker */}
+          <div className="flex items-center justify-center gap-2 py-2 mb-6">
+            <WheelPicker options={DC_HOURS} value={dcHour} onChange={onDcPickerChange(setDcHour)} />
+            <span className="text-[20px] font-semibold opacity-40 pb-1">:</span>
+            <WheelPicker options={DC_MINUTES} value={dcMinute} onChange={onDcPickerChange(setDcMinute)} />
+            <div className="w-2" />
+            <WheelPicker options={DC_AMPM} value={dcAmPm} onChange={onDcPickerChange(setDcAmPm)} />
+          </div>
+
+          {/* Interval selection */}
+          <div className="mb-6">
+            <p className="text-[14px] font-medium mb-3 opacity-80">Repeat every</p>
+            <div className="flex gap-2 flex-wrap">
+              {DC_INTERVALS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => onDcIntervalChange(opt.value)}
+                  className={`px-4 py-2 rounded-xl text-[14px] font-medium transition-colors border ${
+                    dcInterval === opt.value
+                      ? 'border-[#D2AF9C]/60 bg-[#69584E33] text-[#D2AF9C]'
+                      : 'border-[#D2AF9C]/20 text-[#D2AF9C]/50'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Status / success */}
+          {dcSaved && (
+            <div className="mb-4 text-center">
+              <p className="text-[14px] font-medium text-[#D2AF9C]">Daily Connection time saved.</p>
+              <p className="text-[12px] opacity-50 mt-1">Recurring reminders will be enabled in the next step.</p>
+            </div>
+          )}
+
+          {/* Buttons */}
+          <div className="flex flex-col gap-3">
+            {!dcSaved && (
+              <Button variant="primary" onClick={handleDcSave}>Save</Button>
+            )}
+            <Button variant="secondary" onClick={handleDcModalClose}>Cancel</Button>
+          </div>
         </BottomModal>
       )}
 
