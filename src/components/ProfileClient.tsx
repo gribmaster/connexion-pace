@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/Button'
 import { getTimerSoundAudio, preloadTimerSounds, stopAllTimerSounds, stopTimerSound } from '@/lib/audioCache'
 import { useLocale } from '@/lib/i18n/useLocale'
 import { WheelPicker } from '@/components/reminder/WheelPicker'
+import { resetAppCache } from '@/lib/resetAppCache'
 
-type Modal = 'help' | 'language' | 'timer_sound' | 'daily_connection' | null
+type Modal = 'help' | 'language' | 'timer_sound' | 'daily_connection' | 'reset_cache' | null
 
 const SOUND_OPTIONS = [
   { label: 'Sound 1', file: 'beep1.mp3' },
@@ -242,6 +243,20 @@ export function ProfileClient() {
     setDcSaved(true)
   }
 
+  const [resetting, setResetting] = useState(false)
+  const [resetError, setResetError] = useState(false)
+
+  async function handleReset() {
+    setResetting(true)
+    setResetError(false)
+    try {
+      await resetAppCache()
+    } catch {
+      setResetting(false)
+      setResetError(true)
+    }
+  }
+
   async function handleLogout() {
     const supabase = createClient()
     await supabase.auth.signOut()
@@ -298,6 +313,15 @@ export function ProfileClient() {
           className="flex items-center justify-between p-2"
         >
           <span className="text-[16px] leading-[24px] font-medium">{dp.timerSound}</span>
+          <ChevronRight />
+        </button>
+
+        {/* Reset app cache */}
+        <button
+          onClick={() => { setResetError(false); setModal('reset_cache') }}
+          className="flex items-center justify-between p-2"
+        >
+          <span className="text-[16px] leading-[24px] font-medium">Reset app cache</span>
           <ChevronRight />
         </button>
 
@@ -408,6 +432,29 @@ export function ProfileClient() {
               <Button variant="primary" onClick={handleDcSave}>Save</Button>
             )}
             <Button variant="secondary" onClick={handleDcModalClose}>Cancel</Button>
+          </div>
+        </BottomModal>
+      )}
+
+      {/* Reset app cache confirmation modal */}
+      {modal === 'reset_cache' && (
+        <BottomModal onClose={() => !resetting && setModal(null)}>
+          <h2 className="text-[20px] leading-[24px] font-semibold mb-4">Reset app cache?</h2>
+          <p className="text-[14px] leading-[22px] opacity-60 mb-6">
+            This will clear local app data, cached files, saved settings, and reload the app. You may need to sign in again.
+          </p>
+          {resetError && (
+            <p className="text-[13px] text-red-400 mb-4 text-center">
+              Could not fully reset app cache. Please try again.
+            </p>
+          )}
+          <div className="flex flex-col gap-3">
+            <Button variant="primary" onClick={handleReset} disabled={resetting}>
+              {resetting ? 'Resetting…' : 'Reset'}
+            </Button>
+            <Button variant="secondary" onClick={() => setModal(null)} disabled={resetting}>
+              Cancel
+            </Button>
           </div>
         </BottomModal>
       )}
