@@ -292,11 +292,11 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
               return (
                 <div
                   key={value}
-                  className={`flex items-center justify-between p-3 bg-${value} rounded-[24px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000]`}
+                  className={`flex justify-between p-3 bg-${value} rounded-[24px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000]`}
                 >
-                  <div className="flex flex-col self-start p-2">
+                  <div className="flex flex-col p-2">
                     <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
-                    <span className="font-normal text-[16px] leading-[24px]">{count} {dg.cards}</span>
+                    <span className="font-normal flex-grow-1 text-[16px] leading-[24px]">{count} {dg.cards}</span>
                     <span className="font-normal text-[13px] leading-[20px] opacity-70 mt-[2px]">{selectedLabel}</span>
                   </div>
                   <Link href={`/game/journey/${value}`} className={`h-[154px] w-[96px] cat-card-${value} cat-card`}>
