@@ -8,6 +8,7 @@ import { getTimerSoundAudio, preloadTimerSounds, stopAllTimerSounds, stopTimerSo
 import { useLocale } from '@/lib/i18n/useLocale'
 import { WheelPicker } from '@/components/reminder/WheelPicker'
 import { resetAppCache } from '@/lib/resetAppCache'
+import { subscribeToPushNotifications } from '@/lib/notifications/subscribeToPush'
 
 type Modal = 'help' | 'language' | 'timer_sound' | 'daily_connection' | 'reset_cache' | null
 
@@ -87,6 +88,8 @@ export function ProfileClient() {
   const [dcAmPm, setDcAmPm] = useState('')
   const [dcInterval, setDcInterval] = useState(1)
   const [dcSaved, setDcSaved] = useState(false)
+  const [dcLoading, setDcLoading] = useState(false)
+  const [dcError, setDcError] = useState<string | null>(null)
 
   const [selectedSound, setSelectedSound] = useState<string>(() => {
     if (typeof window === 'undefined') return DEFAULT_SOUND
@@ -189,12 +192,13 @@ export function ProfileClient() {
     setDcAmPm(seededAmPm)
     setDcInterval(seededInterval)
     setDcSaved(false)
+    setDcError(null)
     setModal('daily_connection')
   }
 
   function handleDcToggle() {
     if (dcEnabled) {
-      // Turn OFF: update localStorage, flip switch
+      // TODO: call backend to pause/cancel DailyConnectionReminder.
       try {
         const raw = localStorage.getItem(DC_DRAFT_KEY)
         const existing = raw ? JSON.parse(raw) : {}
@@ -217,30 +221,79 @@ export function ProfileClient() {
     return (v: string) => {
       setter(v)
       setDcSaved(false)
+      setDcError(null)
     }
   }
 
   function onDcIntervalChange(value: number) {
     setDcInterval(value)
     setDcSaved(false)
+    setDcError(null)
   }
 
-  function handleDcSave() {
+  async function handleDcSave() {
+    setDcLoading(true)
+    setDcError(null)
+
     const timeOfDay = buildDcTimeOfDay(dcHour, dcMinute, dcAmPm)
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'UTC'
+
+    // Subscribe (or reuse existing subscription) — requests permission if needed
+    const subResult = await subscribeToPushNotifications()
+    if (!subResult.ok) {
+      setDcLoading(false)
+      setDcError(subResult.error ?? 'Could not create notification subscription. Please try again.')
+      return
+    }
+    if (!subResult.subscriptionId) {
+      setDcLoading(false)
+      setDcError('Could not create notification subscription. Please try again.')
+      return
+    }
+
+    // Save to backend
+    let apiResult: { ok: boolean; dailyConnectionReminderId?: string; nextRunAt?: string }
+    try {
+      const res = await fetch('/api/notifications/daily-connection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subscriptionId: subResult.subscriptionId,
+          timeOfDay,
+          intervalDays: dcInterval,
+          timezone,
+        }),
+      })
+      apiResult = await res.json()
+    } catch {
+      setDcLoading(false)
+      setDcError('Could not save Daily Connection. Please try again.')
+      return
+    }
+
+    if (!apiResult.ok) {
+      setDcLoading(false)
+      setDcError('Could not save Daily Connection. Please try again.')
+      return
+    }
+
+    // Persist full draft including backend ids
     const draft = {
       enabled: true,
+      dailyConnectionReminderId: apiResult.dailyConnectionReminderId,
       timeOfDay,
       hour: parseInt(dcHour, 10),
       minute: parseInt(dcMinute, 10),
       period: dcAmPm as 'AM' | 'PM',
       intervalDays: dcInterval,
       timezone,
+      nextRunAt: apiResult.nextRunAt,
       savedAt: new Date().toISOString(),
     }
     localStorage.setItem(DC_DRAFT_KEY, JSON.stringify(draft))
     setDcEnabled(true)
     setDcSaved(true)
+    setDcLoading(false)
   }
 
   const [resetting, setResetting] = useState(false)
@@ -421,17 +474,24 @@ export function ProfileClient() {
           {/* Status / success */}
           {dcSaved && (
             <div className="mb-4 text-center">
-              <p className="text-[14px] font-medium text-[#D2AF9C]">Daily Connection time saved.</p>
-              <p className="text-[12px] opacity-50 mt-1">Recurring reminders will be enabled in the next step.</p>
+              <p className="text-[14px] font-medium text-[#D2AF9C]">Daily Connection saved.</p>
+              <p className="text-[12px] opacity-50 mt-1">Your next reminder is scheduled.</p>
             </div>
+          )}
+
+          {/* Error */}
+          {dcError && (
+            <p className="mb-4 text-center text-[13px] text-red-400">{dcError}</p>
           )}
 
           {/* Buttons */}
           <div className="flex flex-col gap-3">
             {!dcSaved && (
-              <Button variant="primary" onClick={handleDcSave}>Save</Button>
+              <Button variant="primary" onClick={handleDcSave} disabled={dcLoading}>
+                {dcLoading ? 'Saving…' : 'Save'}
+              </Button>
             )}
-            <Button variant="secondary" onClick={handleDcModalClose}>Cancel</Button>
+            <Button variant="secondary" onClick={handleDcModalClose} disabled={dcLoading}>Cancel</Button>
           </div>
         </BottomModal>
       )}
