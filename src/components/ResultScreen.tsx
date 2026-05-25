@@ -30,9 +30,9 @@ export function ResultScreen() {
           </div>
 
           <div className="flex flex-col gap-5 mt-2">
-            <Button variant="secondary" disabled>
-              {d.chooseNextPlayTime}
-            </Button>
+            <Link href="/welcome/reminder/date" id="chooseNextPlayCallResult">
+              <Button variant="secondary">{d.chooseNextPlayTime}</Button>
+            </Link>
 
             <Link href="/game">
               <Button variant="primary">{d.backToConnexion}</Button>
