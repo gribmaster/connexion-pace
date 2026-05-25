@@ -82,54 +82,54 @@ export async function POST(request: Request) {
   // --- Calculate nextRunAt ---
   const nextRunAt = calculateNextDailyConnectionRun({ timeOfDay, timezone, intervalDays })
 
+  // Shared update payload for reuse across branches below.
+  const updateData = {
+    userId,
+    timeOfDay,
+    timezone,
+    intervalDays,
+    nextRunAt,
+    title: NOTIF_TITLE,
+    body: NOTIF_BODY,
+    status: DailyConnectionStatus.ACTIVE,
+  }
+
+  // Matching priority for same subscription:
+  //   1. Existing ACTIVE reminder  — update in place
+  //   2. Existing PAUSED reminder  — reactivate in place (normal switch off→on flow)
+  //   3. No match                  — create new row
+  // CANCELLED is reserved for explicit deletion/removal, not the normal switch off/on cycle.
+  // TODO: cleanup duplicate DailyConnectionReminder rows if needed.
   try {
-    // --- Upsert: update existing ACTIVE rule or create new one ---
-    const existing = await prisma.dailyConnectionReminder.findFirst({
-      where: {
-        pushSubscriptionId: subscriptionId,
-        status: DailyConnectionStatus.ACTIVE,
-      },
-      orderBy: { createdAt: 'desc' },
+    const baseWhere = { pushSubscriptionId: subscriptionId }
+
+    const activeReminder = await prisma.dailyConnectionReminder.findFirst({
+      where: { ...baseWhere, status: DailyConnectionStatus.ACTIVE },
+      orderBy: { updatedAt: 'desc' },
     })
 
     let reminder
-    if (existing) {
+    if (activeReminder) {
       reminder = await prisma.dailyConnectionReminder.update({
-        where: { id: existing.id },
-        data: {
-          userId,
-          timeOfDay,
-          timezone,
-          intervalDays,
-          nextRunAt,
-          title: NOTIF_TITLE,
-          body: NOTIF_BODY,
-          status: DailyConnectionStatus.ACTIVE,
-        },
+        where: { id: activeReminder.id },
+        data: updateData,
       })
     } else {
-      // Also deactivate any PAUSED/CANCELLED leftovers to keep things clean
-      await prisma.dailyConnectionReminder.updateMany({
-        where: {
-          pushSubscriptionId: subscriptionId,
-          status: { in: [DailyConnectionStatus.PAUSED, DailyConnectionStatus.CANCELLED] },
-        },
-        data: { status: DailyConnectionStatus.CANCELLED },
+      const pausedReminder = await prisma.dailyConnectionReminder.findFirst({
+        where: { ...baseWhere, status: DailyConnectionStatus.PAUSED },
+        orderBy: { updatedAt: 'desc' },
       })
 
-      reminder = await prisma.dailyConnectionReminder.create({
-        data: {
-          userId,
-          pushSubscriptionId: subscriptionId,
-          timeOfDay,
-          timezone,
-          intervalDays,
-          nextRunAt,
-          title: NOTIF_TITLE,
-          body: NOTIF_BODY,
-          status: DailyConnectionStatus.ACTIVE,
-        },
-      })
+      if (pausedReminder) {
+        reminder = await prisma.dailyConnectionReminder.update({
+          where: { id: pausedReminder.id },
+          data: updateData,
+        })
+      } else {
+        reminder = await prisma.dailyConnectionReminder.create({
+          data: { pushSubscriptionId: subscriptionId, ...updateData },
+        })
+      }
     }
 
     return NextResponse.json({
@@ -139,5 +139,79 @@ export async function POST(request: Request) {
     })
   } catch {
     return NextResponse.json({ error: 'Failed to save Daily Connection reminder' }, { status: 500 })
+  }
+}
+
+export async function PATCH(request: Request) {
+  // --- Parse body ---
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid Daily Connection update' }, { status: 400 })
+  }
+
+  const b = body as Record<string, unknown>
+
+  // --- Validate shape ---
+  if (
+    !body ||
+    typeof body !== 'object' ||
+    typeof b.dailyConnectionReminderId !== 'string' ||
+    b.enabled !== false
+  ) {
+    return NextResponse.json({ error: 'Invalid Daily Connection update' }, { status: 400 })
+  }
+
+  const { dailyConnectionReminderId } = b as { dailyConnectionReminderId: string }
+
+  // --- Resolve userId from session ---
+  let userId: string | null = null
+
+  const devUser = getDevUser()
+  if (devUser) {
+    const prismaUser = await prisma.user.findUnique({ where: { email: devUser.email } })
+    userId = prismaUser?.id ?? null
+  } else {
+    try {
+      const supabase = await createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user?.email) {
+        const prismaUser = await prisma.user.findUnique({ where: { email: user.email } })
+        userId = prismaUser?.id ?? null
+      }
+    } catch {
+      // Could not resolve session — proceed with userId null
+    }
+  }
+
+  try {
+    // --- Find reminder ---
+    const reminder = await prisma.dailyConnectionReminder.findUnique({
+      where: { id: dailyConnectionReminderId },
+    })
+
+    if (!reminder) {
+      return NextResponse.json({ error: 'Daily Connection reminder not found' }, { status: 404 })
+    }
+
+    // --- Ownership check ---
+    if (reminder.userId && userId && reminder.userId !== userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    // --- Pause ---
+    const updated = await prisma.dailyConnectionReminder.update({
+      where: { id: dailyConnectionReminderId },
+      data: { status: DailyConnectionStatus.PAUSED },
+    })
+
+    return NextResponse.json({
+      ok: true,
+      dailyConnectionReminderId: updated.id,
+      status: 'PAUSED',
+    })
+  } catch {
+    return NextResponse.json({ error: 'Failed to update Daily Connection reminder' }, { status: 500 })
   }
 }

@@ -90,6 +90,8 @@ export function ProfileClient() {
   const [dcSaved, setDcSaved] = useState(false)
   const [dcLoading, setDcLoading] = useState(false)
   const [dcError, setDcError] = useState<string | null>(null)
+  const [dcToggleError, setDcToggleError] = useState<string | null>(null)
+  const [dcToggling, setDcToggling] = useState(false)
 
   const [selectedSound, setSelectedSound] = useState<string>(() => {
     if (typeof window === 'undefined') return DEFAULT_SOUND
@@ -196,17 +198,56 @@ export function ProfileClient() {
     setModal('daily_connection')
   }
 
-  function handleDcToggle() {
+  async function handleDcToggle() {
+    if (dcToggling) return
+
     if (dcEnabled) {
-      // TODO: call backend to pause/cancel DailyConnectionReminder.
+      setDcToggleError(null)
+
+      // Read reminder id from localStorage before flipping switch
+      let reminderId: string | null = null
+      let existingDraft: Record<string, unknown> = {}
       try {
         const raw = localStorage.getItem(DC_DRAFT_KEY)
-        const existing = raw ? JSON.parse(raw) : {}
-        localStorage.setItem(DC_DRAFT_KEY, JSON.stringify({ ...existing, enabled: false }))
+        if (raw) {
+          existingDraft = JSON.parse(raw)
+          if (typeof existingDraft.dailyConnectionReminderId === 'string') {
+            reminderId = existingDraft.dailyConnectionReminderId
+          }
+        }
       } catch {}
-      setDcEnabled(false)
+
+      if (reminderId) {
+        // Optimistically flip switch, call backend, revert on failure
+        setDcEnabled(false)
+        setDcToggling(true)
+        try {
+          const res = await fetch('/api/notifications/daily-connection', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dailyConnectionReminderId: reminderId, enabled: false }),
+          })
+          const result = await res.json()
+          if (result.ok) {
+            localStorage.setItem(DC_DRAFT_KEY, JSON.stringify({ ...existingDraft, enabled: false }))
+          } else {
+            // Revert switch — backend remains ACTIVE
+            setDcEnabled(true)
+            setDcToggleError('Could not disable Daily Connection. Please try again.')
+          }
+        } catch {
+          setDcEnabled(true)
+          setDcToggleError('Could not disable Daily Connection. Please try again.')
+        }
+        setDcToggling(false)
+      } else {
+        // No backend record yet — just update localStorage
+        localStorage.setItem(DC_DRAFT_KEY, JSON.stringify({ ...existingDraft, enabled: false }))
+        setDcEnabled(false)
+      }
     } else {
       // Turn ON: open setup modal
+      setDcToggleError(null)
       openDailyConnection()
     }
   }
@@ -321,22 +362,28 @@ export function ProfileClient() {
       {/* Settings section */}
       <div className="flex flex-col gap-0 text-[#D2AF9C]">
         {/* Daily connection */}
-        <div className="flex items-center justify-between p-2">
-          <span className="text-[16px] leading-[24px] font-medium">{dp.dailyConnection}</span>
-          <button
-            role="switch"
-            aria-checked={dcEnabled}
-            onClick={handleDcToggle}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              dcEnabled ? 'bg-[#860119]' : 'bg-[#D2AF9C]/30'
-            }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
-                dcEnabled ? 'translate-x-6' : 'translate-x-1'
+        <div className="flex flex-col p-2 gap-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[16px] leading-[24px] font-medium">{dp.dailyConnection}</span>
+            <button
+              role="switch"
+              aria-checked={dcEnabled}
+              onClick={handleDcToggle}
+              disabled={dcToggling}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50 ${
+                dcEnabled ? 'bg-[#860119]' : 'bg-[#D2AF9C]/30'
               }`}
-            />
-          </button>
+            >
+              <span
+                className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
+                  dcEnabled ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+          {dcToggleError && (
+            <p className="text-[12px] text-red-400">{dcToggleError}</p>
+          )}
         </div>
 
         {/* Help & Support */}
