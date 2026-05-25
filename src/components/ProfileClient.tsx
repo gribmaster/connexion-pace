@@ -17,8 +17,6 @@ const SOUND_OPTIONS = [
   { label: 'Sound 2', file: 'beep2.mp3' },
   { label: 'Sound 3', file: 'beep3.mp3' },
   { label: 'Sound 4', file: 'beep4.mp3' },
-  { label: 'Sound 5', file: 'beep5.mp3' },
-  { label: 'Sound 6', file: 'beep6.mp3' },
 ]
 
 const SOUND_KEY = 'connexion_timer_sound'

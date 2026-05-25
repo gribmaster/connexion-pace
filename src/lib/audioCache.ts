@@ -3,8 +3,6 @@ const SOUND_FILES = [
   '/sound/beep2.mp3',
   '/sound/beep3.mp3',
   '/sound/beep4.mp3',
-  '/sound/beep5.mp3',
-  '/sound/beep6.mp3',
 ]
 
 const cache = new Map<string, HTMLAudioElement>()
