@@ -42,6 +42,33 @@ const DC_INTERVALS = [
   { label: '7 days', value: 7 },
 ]
 
+interface DcDraft {
+  enabled?: boolean
+  timeOfDay?: string
+  intervalDays?: number
+  hour?: number
+  minute?: number
+  period?: 'AM' | 'PM'
+}
+
+function readDcDraft(): DcDraft | null {
+  try {
+    const raw = localStorage.getItem(DC_DRAFT_KEY)
+    if (!raw) return null
+    return JSON.parse(raw) as DcDraft
+  } catch {
+    return null
+  }
+}
+
+function buildDcSummary(draft: DcDraft | null): string | null {
+  if (!draft?.timeOfDay || !draft.intervalDays) return null
+  const interval = draft.intervalDays === 1 ? 'Every day' : `Every ${draft.intervalDays} days`
+  const time = draft.timeOfDay
+  if (draft.enabled === false) return `Paused · ${interval} at ${time}`
+  return `${interval} at ${time}`
+}
+
 function getDcDefaultTime(): { hour: string; minute: string; ampm: string } {
   const now = new Date()
   let h24 = now.getHours()
@@ -92,6 +119,7 @@ export function ProfileClient() {
   const [dcError, setDcError] = useState<string | null>(null)
   const [dcToggleError, setDcToggleError] = useState<string | null>(null)
   const [dcToggling, setDcToggling] = useState(false)
+  const [dcDraft, setDcDraft] = useState<DcDraft | null>(null)
 
   const [selectedSound, setSelectedSound] = useState<string>(() => {
     if (typeof window === 'undefined') return DEFAULT_SOUND
@@ -110,13 +138,9 @@ export function ProfileClient() {
   }, [locale])
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(DC_DRAFT_KEY)
-      if (raw) {
-        const draft = JSON.parse(raw)
-        if (draft.enabled === true) setDcEnabled(true)
-      }
-    } catch {}
+    const draft = readDcDraft()
+    if (draft?.enabled === true) setDcEnabled(true)
+    setDcDraft(draft)
   }, [])
 
   useEffect(() => {
@@ -229,7 +253,9 @@ export function ProfileClient() {
           })
           const result = await res.json()
           if (result.ok) {
-            localStorage.setItem(DC_DRAFT_KEY, JSON.stringify({ ...existingDraft, enabled: false }))
+            const updated = { ...existingDraft, enabled: false }
+            localStorage.setItem(DC_DRAFT_KEY, JSON.stringify(updated))
+            setDcDraft(updated as DcDraft)
           } else {
             // Revert switch — backend remains ACTIVE
             setDcEnabled(true)
@@ -242,7 +268,9 @@ export function ProfileClient() {
         setDcToggling(false)
       } else {
         // No backend record yet — just update localStorage
-        localStorage.setItem(DC_DRAFT_KEY, JSON.stringify({ ...existingDraft, enabled: false }))
+        const updated = { ...existingDraft, enabled: false }
+        localStorage.setItem(DC_DRAFT_KEY, JSON.stringify(updated))
+        setDcDraft(updated as DcDraft)
         setDcEnabled(false)
       }
     } else {
@@ -332,6 +360,7 @@ export function ProfileClient() {
       savedAt: new Date().toISOString(),
     }
     localStorage.setItem(DC_DRAFT_KEY, JSON.stringify(draft))
+    setDcDraft(draft)
     setDcEnabled(true)
     setDcSaved(true)
     setDcLoading(false)
@@ -381,6 +410,17 @@ export function ProfileClient() {
               />
             </button>
           </div>
+          {buildDcSummary(dcDraft) && (
+            <div className="flex items-center gap-2">
+              <span className="text-[12px] opacity-50">{buildDcSummary(dcDraft)}</span>
+              <button
+                onClick={openDailyConnection}
+                className="text-[12px] text-[#D2AF9C]/70 underline underline-offset-2 hover:text-[#D2AF9C] transition-colors"
+              >
+                Edit
+              </button>
+            </div>
+          )}
           {dcToggleError && (
             <p className="text-[12px] text-red-400">{dcToggleError}</p>
           )}
