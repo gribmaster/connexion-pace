@@ -31,11 +31,11 @@ export function ResultScreen() {
 
           <div className="flex flex-col gap-5 mt-2">
             <Link href="/welcome/reminder/date" id="chooseNextPlayCallResult">
-              <Button variant="secondary">{d.chooseNextPlayTime}</Button>
+              <Button variant="primary">{d.chooseNextPlayTime}</Button>
             </Link>
 
             <Link href="/game">
-              <Button variant="primary">{d.backToConnexion}</Button>
+              <Button variant="secondary">{d.backToConnexion}</Button>
             </Link>
           </div>
         </div>
