@@ -48,4 +48,4 @@ status
 .claude
 CLAUDE.md
 .idea
-prisma
+prisma/migrations
