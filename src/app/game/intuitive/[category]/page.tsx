@@ -37,6 +37,7 @@ export default async function CategoryPage({ params }: Props) {
         description: true,
         imageUrl: true,
         additional: true,
+        category: true,
         isFree: true,
         translations: { select: { locale: true, title: true, description: true, additional: true } },
       },
