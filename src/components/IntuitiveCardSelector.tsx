@@ -12,6 +12,7 @@ import {CollapseIcon} from "@/components/icons/CollapseIcon";
 import { HtmlContent } from '@/components/HtmlContent'
 import { useLocale } from '@/lib/i18n/useLocale'
 import { resolveCardTranslation } from '@/lib/i18n/resolveCardTranslation'
+import { canAccessCard } from '@/lib/premium/cardAccess'
 
 type Translation = {
   locale: string
@@ -26,6 +27,7 @@ type CardItem = {
   description: string | null
   imageUrl: string | null
   additional: string | null
+  isFree: boolean
   translations: Translation[]
 }
 
@@ -34,9 +36,10 @@ type Props = {
   category: string
   categoryInfo: string
   theme: CategoryTheme
+  isPremium: boolean
 }
 
-export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: Props) {
+export function IntuitiveCardSelector({ cards, category, categoryInfo, theme, isPremium }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [previewCard, setPreviewCard] = useState<CardItem | null>(null)
   const [learnMoreCard, setLearnMoreCard] = useState<CardItem | null>(null)
@@ -92,15 +95,22 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
 
       <div className="flex flex-wrap pb-28 mx-[-3px]">
         {translatedCards.map((card) => {
-          const selected = card.id === selectedId
+          const accessible = canAccessCard({ category: category.toUpperCase(), isFree: card.isFree }, isPremium)
+          const selected = card.id === selectedId && accessible
           return (
             <div
               key={card.id}
               className="w-[33.3%] p-[3px]"
             >
               <div
-                onClick={() => setSelectedId(card.id)}
-                className="relative cursor-pointer h-[100%]"
+                onClick={() => {
+                  if (!accessible) {
+                    window.location.href = '/premium'
+                    return
+                  }
+                  setSelectedId(card.id)
+                }}
+                className={`relative h-[100%] ${accessible ? 'cursor-pointer' : 'cursor-not-allowed buy-premium-card'}`}
               >
                 <Card
                   className={`${theme.singleCardClassName} ${
@@ -122,7 +132,6 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
                       aria-label="Card details"
                       className="flex flex-none basis-[16px] items-center justify-center"
                     >
-
                       <ExpandIcon className="h-4 w-4"/>
                     </button>
                   </div>
@@ -132,6 +141,11 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme }: 
                       alt={card.title}
                       className="h-[136px] w-full rounded-[5px] object-cover"
                     />
+                  )}
+                  {!accessible && (
+                    <div className="absolute bottom-[6px] left-0 right-0 flex justify-center">
+                      <span className="text-[8px] text-[#D2AF9C80] bg-black/60 rounded px-1">Premium</span>
+                    </div>
                   )}
                 </Card>
               </div>

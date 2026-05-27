@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { Container } from '@/components/ui/Container'
 import { GameModeTabs } from '@/components/GameModeTabs'
+import { getUserPremiumStatus } from '@/lib/premium/getUserPremiumStatus'
 
 const categories = [
   { label: 'Connection', value: 'CONNECTION' },
@@ -16,9 +17,12 @@ export default async function GamePage({
   const { mode } = await searchParams
   const initialTab = mode === 'surprise' ? 'surprise' : mode === 'journey' ? 'journey' : 'intuitive'
 
-  const cardsRaw = await prisma.card.findMany({
-    select: { id: true, category: true },
-  })
+  const [cardsRaw, isPremium] = await Promise.all([
+    prisma.card.findMany({
+      select: { id: true, category: true, isFree: true },
+    }),
+    getUserPremiumStatus(),
+  ])
 
   const categoriesWithCounts = categories.map((cat) => ({
     ...cat,
@@ -28,7 +32,12 @@ export default async function GamePage({
   return (
     <div className="max-w-[525px] mx-auto h-[800px] overflow-y-auto bg-[#000000]">
       <Container className="flex flex-col">
-        <GameModeTabs categories={categoriesWithCounts} cards={cardsRaw} initialTab={initialTab} />
+        <GameModeTabs
+          categories={categoriesWithCounts}
+          cards={cardsRaw}
+          initialTab={initialTab}
+          isPremium={isPremium}
+        />
       </Container>
     </div>
   )

@@ -10,6 +10,7 @@ import { HtmlContent } from '@/components/HtmlContent'
 import type { CategoryTheme } from '@/lib/categoryThemes'
 import { useLocale } from '@/lib/i18n/useLocale'
 import { resolveCardTranslation } from '@/lib/i18n/resolveCardTranslation'
+import { canAccessCard } from '@/lib/premium/cardAccess'
 
 // TODO: enforce free/premium Journey card selection limits here.
 const JOURNEY_FREE_CARD_LIMIT = 5
@@ -36,6 +37,7 @@ type CardItem = {
   description: string | null
   imageUrl: string | null
   additional: string | null
+  isFree: boolean
   translations: Translation[]
 }
 
@@ -43,6 +45,7 @@ type Props = {
   cards: CardItem[]
   category: string
   theme: CategoryTheme
+  isPremium: boolean
 }
 
 function readJourneySelection(): JourneySelection {
@@ -60,7 +63,7 @@ function readJourneySelection(): JourneySelection {
   }
 }
 
-export function JourneyCardSelector({ cards, category, theme }: Props) {
+export function JourneyCardSelector({ cards, category, theme, isPremium }: Props) {
   const router = useRouter()
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [mounted, setMounted] = useState(false)
@@ -73,16 +76,26 @@ export function JourneyCardSelector({ cards, category, theme }: Props) {
   useEffect(() => {
     const stored = readJourneySelection()
     const cat = category as keyof JourneySelection
-    setSelectedIds(stored[cat] ?? [])
+    const accessibleIds = new Set(
+      cards
+        .filter((c) => canAccessCard({ category, isFree: c.isFree }, isPremium))
+        .map((c) => c.id)
+    )
+    const filtered = (stored[cat] ?? []).filter((id) => accessibleIds.has(id))
+    setSelectedIds(filtered)
     setMounted(true)
-  }, [category])
+  }, [category, isPremium, cards])
 
   const translatedCards = cards.map((card) => ({
     ...card,
     ...resolveCardTranslation(card, locale),
   }))
 
-  function toggleCard(id: string) {
+  function toggleCard(id: string, accessible: boolean) {
+    if (!accessible) {
+      window.location.href = '/premium'
+      return
+    }
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     )
@@ -136,12 +149,13 @@ export function JourneyCardSelector({ cards, category, theme }: Props) {
 
       <div className="flex flex-wrap pb-28 mx-[-3px]">
         {translatedCards.map((card) => {
-          const selected = mounted && selectedIds.includes(card.id)
+          const accessible = canAccessCard({ category, isFree: card.isFree }, isPremium)
+          const selected = mounted && accessible && selectedIds.includes(card.id)
           return (
             <div key={card.id} className="w-[33.3%] p-[3px]">
               <div
-                onClick={() => toggleCard(card.id)}
-                className="relative cursor-pointer h-[100%]"
+                onClick={() => toggleCard(card.id, accessible)}
+                className={`relative h-[100%] ${accessible ? 'cursor-pointer' : 'cursor-not-allowed buy-premium-card'}`}
               >
                 <Card
                   className={`${theme.singleCardClassName} ${
@@ -174,6 +188,11 @@ export function JourneyCardSelector({ cards, category, theme }: Props) {
                   )}
                   {selected && (
                     <div className="absolute inset-0 rounded-[10px] border-2 border-[#D2AF9C] pointer-events-none" />
+                  )}
+                  {!accessible && (
+                    <div className="absolute bottom-[6px] left-0 right-0 flex justify-center">
+                      <span className="text-[8px] text-[#D2AF9C80] bg-black/60 rounded px-1">Premium</span>
+                    </div>
                   )}
                 </Card>
               </div>

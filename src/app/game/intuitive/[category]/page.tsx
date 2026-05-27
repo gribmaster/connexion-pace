@@ -5,6 +5,7 @@ import { Category } from '@prisma/client'
 import { Container } from '@/components/ui/Container'
 import { IntuitiveCardSelector } from '@/components/IntuitiveCardSelector'
 import { getCategoryTheme } from '@/lib/categoryThemes'
+import { getUserPremiumStatus } from '@/lib/premium/getUserPremiumStatus'
 
 const VALID_CATEGORIES = ['CONNECTION', 'INTIMACY', 'LOVEMAKING']
 
@@ -25,18 +26,22 @@ export default async function CategoryPage({ params }: Props) {
   if (!VALID_CATEGORIES.includes(upperCategory)) notFound()
 
   // TODO: pass selected locale to server card queries (currently defaulting to ET).
-  const cards = await prisma.card.findMany({
-    where: { category: upperCategory as Category },
-    orderBy: { createdAt: 'asc' },
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      imageUrl: true,
-      additional: true,
-      translations: { select: { locale: true, title: true, description: true, additional: true } },
-    },
-  })
+  const [cards, isPremium] = await Promise.all([
+    prisma.card.findMany({
+      where: { category: upperCategory as Category },
+      orderBy: { createdAt: 'asc' },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        imageUrl: true,
+        additional: true,
+        isFree: true,
+        translations: { select: { locale: true, title: true, description: true, additional: true } },
+      },
+    }),
+    getUserPremiumStatus(),
+  ])
 
   const theme = getCategoryTheme(upperCategory)
 
@@ -61,6 +66,7 @@ export default async function CategoryPage({ params }: Props) {
           category={category}
           categoryInfo={categoryInfo[upperCategory] ?? ''}
           theme={theme}
+          isPremium={isPremium}
         />
       </Container>
     </div>

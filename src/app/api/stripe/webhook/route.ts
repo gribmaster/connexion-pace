@@ -136,7 +136,7 @@ async function upsertSubscription(rawSub: unknown): Promise<void> {
   const endedAt = fields.ended_at ? new Date(fields.ended_at * 1000) : null
 
   await prisma.userSubscription.upsert({
-    where: { stripeSubscriptionId: fields.id },
+    where: { userId: prismaUserId },
     create: {
       userId: prismaUserId,
       stripeSubscriptionId: fields.id,
@@ -149,6 +149,7 @@ async function upsertSubscription(rawSub: unknown): Promise<void> {
       endedAt,
     },
     update: {
+      stripeSubscriptionId: fields.id,
       stripePriceId: fields.priceId ?? '',
       status: toSubscriptionStatus(fields.status),
       currentPeriodEnd,

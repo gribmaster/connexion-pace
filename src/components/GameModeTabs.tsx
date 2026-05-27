@@ -11,6 +11,7 @@ import { IntuitiveInstruction } from '@/components/game/instructions/IntuitiveIn
 import { SurpriseInstruction } from '@/components/game/instructions/SurpriseInstruction'
 import { JourneyInstruction } from '@/components/game/instructions/JourneyInstruction'
 import { useLocale } from '@/lib/i18n/useLocale'
+import { canAccessCard } from '@/lib/premium/cardAccess'
 
 const JOURNEY_STORAGE_KEY = 'connexion_journey_selection'
 
@@ -50,12 +51,14 @@ type CategoryBlock = {
 type CardData = {
   id: string
   category: string
+  isFree: boolean
 }
 
 type Props = {
   categories: CategoryBlock[]
   cards?: CardData[]
   initialTab?: Tab
+  isPremium?: boolean
 }
 
 const CATEGORY_ORDER = ['CONNECTION', 'INTIMACY', 'LOVEMAKING'] as const
@@ -71,13 +74,16 @@ function shuffleArray<T>(arr: T[]): T[] {
 
 function buildSurpriseQueue(
   cards: CardData[],
-  selected: Record<string, number>
+  selected: Record<string, number>,
+  isPremium: boolean
 ): { id: string; category: string }[] {
   const queue: { id: string; category: string }[] = []
   for (const cat of CATEGORY_ORDER) {
     const amount = selected[cat] ?? 0
     if (amount === 0) continue
-    const pool = cards.filter((c) => c.category === cat)
+    const pool = cards.filter(
+      (c) => c.category === cat && canAccessCard({ category: cat, isFree: c.isFree }, isPremium)
+    )
     const shuffled = shuffleArray(pool)
     const slice = shuffled.slice(0, amount)
     for (const c of slice) {
@@ -95,7 +101,7 @@ const modeInstructions: Record<Tab, { Content: () => React.ReactElement }> = {
   journey: { Content: JourneyInstruction },
 }
 
-export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' }: Props) {
+export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive', isPremium = false }: Props) {
   const router = useRouter()
   const { dict } = useLocale()
   const dg = dict.game
@@ -140,7 +146,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
   }
 
   function handleOK() {
-    const queue = buildSurpriseQueue(cards, selected)
+    const queue = buildSurpriseQueue(cards, selected, isPremium)
     localStorage.setItem(
       'connexion_surprise_queue',
       JSON.stringify({ cards: queue, currentIndex: 0 })
@@ -232,14 +238,23 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
       {tab === 'surprise' && (
         <div className="flex flex-col mt-5">
           <div className="flex flex-col gap-3 p-0">
-            {categories.map(({ label, value, count }) => (
+            {categories.map(({ label, value, count }) => {
+              const accessibleCount = cards.filter(
+                (c) => c.category === value && canAccessCard({ category: value, isFree: c.isFree }, isPremium)
+              ).length
+              return (
               <div
                 key={value}
                 className={`flex flex-col justify-between p-3 bg-surprised-${value} rounded-[24px] h-[180px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000]`}
               >
                 <div className="flex flex-col self-start p-2">
                   <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
-                  <span className="font-normal text-[16px] leading-[24px]">{count} {dg.cards}</span>
+                  <span className="font-normal text-[16px] leading-[24px]">
+                    {accessibleCount} {dg.cards}
+                    {!isPremium && accessibleCount < count && (
+                      <span className="ml-1 text-[12px] opacity-50">({count - accessibleCount} Premium)</span>
+                    )}
+                  </span>
                 </div>
                 <div className="flex items-center gap-3 pr-2">
                   <button
@@ -255,15 +270,16 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive' 
                   </span>
                   <button
                     type="button"
-                    onClick={() => increment(value, count)}
-                    disabled={selected[value] === count}
+                    onClick={() => increment(value, accessibleCount)}
+                    disabled={selected[value] === accessibleCount}
                     className="w-10 h-10"
                   >
                     <img src="/img/timer-plus.svg" width="40" alt=""/>
                   </button>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
 
           <TimerSettings mode={tab} />

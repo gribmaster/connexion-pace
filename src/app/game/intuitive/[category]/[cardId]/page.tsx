@@ -1,7 +1,9 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { Category } from '@prisma/client'
 import { IntuitiveGameplay } from '@/components/IntuitiveGameplay'
+import { getUserPremiumStatus } from '@/lib/premium/getUserPremiumStatus'
+import { canAccessCard } from '@/lib/premium/cardAccess'
 
 const VALID_CATEGORIES = ['CONNECTION', 'INTIMACY', 'LOVEMAKING']
 
@@ -18,7 +20,7 @@ export default async function CardPage({ params }: Props) {
   const typedCategory = upperCategory as Category
 
   // TODO: pass selected locale to server card queries (currently defaulting to ET).
-  const [card, allCategoryCards] = await Promise.all([
+  const [card, allCategoryCards, isPremium] = await Promise.all([
     prisma.card.findUnique({
       where: { id: cardId },
       include: { translations: true },
@@ -30,12 +32,18 @@ export default async function CardPage({ params }: Props) {
         title: true,
         description: true,
         imageUrl: true,
+        isFree: true,
         translations: { select: { locale: true, title: true, description: true, additional: true } },
       },
     }),
+    getUserPremiumStatus(),
   ])
 
   if (!card || card.category !== typedCategory) notFound()
+
+  if (!canAccessCard({ category: card.category, isFree: card.isFree }, isPremium)) {
+    redirect('/premium')
+  }
 
   return (
     <IntuitiveGameplay

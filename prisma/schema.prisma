@@ -64,6 +64,7 @@ model Card {
   additional  String?
   imageUrl    String?
   category    Category
+  isFree      Boolean  @default(false)
   createdAt   DateTime @default(now())
   translations CardTranslation[]
 }
