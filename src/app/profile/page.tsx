@@ -82,7 +82,13 @@ export default async function ProfilePage() {
           <h2 className="text-sm font-semibold text-[#D2AF9C]">Your plan information</h2>
 
           <div className="p-5 border border-[#69584E] rounded-[24px] info-plan-bg">
-            <PlanInfo isPremium={isPremium} hasCustomer={!!prismaUser?.stripeCustomerId} />
+            <PlanInfo
+              isPremium={isPremium}
+              hasCustomer={!!prismaUser?.stripeCustomerId}
+              cancelEndDate={cancelEndDate?.toISOString() ?? null}
+              currentPeriodEnd={sub?.currentPeriodEnd?.toISOString() ?? null}
+              isCancelling={isCancelling}
+            />
           </div>
         </div>
 

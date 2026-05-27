@@ -6,6 +6,7 @@ import { Container } from '@/components/ui/Container'
 import { IntuitiveCardSelector } from '@/components/IntuitiveCardSelector'
 import { getCategoryTheme } from '@/lib/categoryThemes'
 import { getUserPremiumStatus } from '@/lib/premium/getUserPremiumStatus'
+import { canAccessCard } from '@/lib/premium/cardAccess'
 
 const VALID_CATEGORIES = ['CONNECTION', 'INTIMACY', 'LOVEMAKING']
 
@@ -45,6 +46,12 @@ export default async function CategoryPage({ params }: Props) {
 
   const theme = getCategoryTheme(upperCategory)
 
+  const sortedCards = isPremium || upperCategory === 'CONNECTION'
+    ? cards
+    : [...cards].sort((a, b) =>
+        Number(canAccessCard(b, isPremium)) - Number(canAccessCard(a, isPremium))
+      )
+
   if (cards.length === 0) {
     return (
       <div className={`min-h-screen py-10 ${theme.screenClassName}`}>
@@ -62,7 +69,7 @@ export default async function CategoryPage({ params }: Props) {
     <div className={`min-h-screen py-10 ${theme.screenClassName}`}>
       <Container className="flex flex-col">
         <IntuitiveCardSelector
-          cards={cards}
+          cards={sortedCards}
           category={category}
           categoryInfo={categoryInfo[upperCategory] ?? ''}
           theme={theme}

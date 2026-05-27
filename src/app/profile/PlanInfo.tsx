@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import {ItmIcon} from "@/components/icons/ItmIcon";
 
@@ -23,12 +23,29 @@ const FEATURES = ['Unlimited Cards', 'Extend Time', 'Flexible Game Duration']
 interface Props {
   isPremium: boolean
   hasCustomer: boolean
+  cancelEndDate: string | null
+  currentPeriodEnd: string | null
+  isCancelling: boolean
 }
 
-export function PlanInfo({ isPremium, hasCustomer }: Props) {
+function formatSubDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+export function PlanInfo({ isPremium, hasCustomer, cancelEndDate, currentPeriodEnd, isCancelling }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('monthly')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [subDateLine, setSubDateLine] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!isPremium) { setSubDateLine(null); return }
+    if (isCancelling && cancelEndDate) {
+      setSubDateLine(`Active until ${formatSubDate(cancelEndDate)}`)
+    } else if (currentPeriodEnd) {
+      setSubDateLine(`Renews on ${formatSubDate(currentPeriodEnd)}`)
+    }
+  }, [isPremium, isCancelling, cancelEndDate, currentPeriodEnd])
 
   const isMonthly = activeTab === 'monthly'
   const price = PLAN_PRICE[activeTab]
@@ -104,9 +121,15 @@ export function PlanInfo({ isPremium, hasCustomer }: Props) {
         </div>
 
         {/* Price */}
-        <p className="text-[36px] font-bold leading-[48px] text-[#D2AF9C] mb-[7px]">
+        <p className="text-[36px] font-bold leading-[48px] text-[#D2AF9C] mb-[2px]">
           {price}
         </p>
+
+        {/* Subscription date */}
+        {isPremium && isMonthly && subDateLine && (
+          <p className="text-[13px] text-[#D2AF9C]/60 mb-[7px]">{subDateLine}</p>
+        )}
+        {(!isPremium || !isMonthly || !subDateLine) && <div className="mb-[7px]" />}
 
         {/* Action button */}
         {isMonthly ? (

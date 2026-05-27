@@ -42,7 +42,7 @@ export default async function CardPage({ params }: Props) {
   if (!card || card.category !== typedCategory) notFound()
 
   if (!canAccessCard({ category: card.category, isFree: card.isFree }, isPremium)) {
-    redirect('/premium')
+    redirect('/profile')
   }
 
   return (

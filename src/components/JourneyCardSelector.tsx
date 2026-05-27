@@ -93,7 +93,7 @@ export function JourneyCardSelector({ cards, category, theme, isPremium }: Props
 
   function toggleCard(id: string, accessible: boolean) {
     if (!accessible) {
-      window.location.href = '/premium'
+      window.location.href = '/profile'
       return
     }
     setSelectedIds((prev) =>

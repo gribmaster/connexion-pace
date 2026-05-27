@@ -105,7 +105,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme, is
               <div
                 onClick={() => {
                   if (!accessible) {
-                    window.location.href = '/premium'
+                    window.location.href = '/profile'
                     return
                   }
                   setSelectedId(card.id)
