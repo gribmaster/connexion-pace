@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getDevUser } from '@/lib/devAuth'
+import { prisma } from '@/lib/prisma'
 import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -34,6 +35,32 @@ export default async function ProfilePage() {
     email = user.email ?? ''
   }
 
+  // Resolve plan from DB
+  const prismaUser = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      stripeCustomerId: true,
+      subscription: {
+        select: {
+          status: true,
+          currentPeriodEnd: true,
+          cancelAtPeriodEnd: true,
+          cancelAt: true,
+          endedAt: true,
+        },
+      },
+    },
+  })
+
+  const sub = prismaUser?.subscription
+  const isActiveSub = (sub?.status === 'active' || sub?.status === 'trialing')
+    && !sub?.endedAt
+    && (!sub?.currentPeriodEnd || sub.currentPeriodEnd > new Date())
+  const isPremium = isActiveSub
+  // cancelAt is how Stripe signals a portal cancellation (cancel_at_period_end stays false)
+  const cancelEndDate = sub?.cancelAt ?? (sub?.cancelAtPeriodEnd ? sub.currentPeriodEnd : null)
+  const isCancelling = isPremium && cancelEndDate !== null
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-start gap-4 bg-[#000000] py-5">
       <Container className="flex flex-col gap-4">
@@ -56,49 +83,33 @@ export default async function ProfilePage() {
         </Card>
 
         {/* Plan section */}
-        <div className="flex flex-col">
-          <h2 className="text-sm font-semibold text-[#D2AF9C] mb-5">Your plan information</h2>
+        <div className="flex flex-col gap-3">
+          <h2 className="text-sm font-semibold text-[#D2AF9C]">Your plan information</h2>
 
-          {/* Plan tabs */}
-          <div className="flex gap-2 hidden">
-            <button className="rounded-full border border-[#860119] bg-[#860119] px-4 py-2 text-sm font-medium text-[#D2AF9C]">
-              Monthly
-            </button>
-            <button
-              disabled
-              className="rounded-full border border-[#D2AF9C]/20 px-4 py-2 text-sm font-medium text-[#D2AF9C]/30 cursor-not-allowed"
-            >
-              Quarterly
-            </button>
-            <button
-              disabled
-              className="rounded-full border border-[#D2AF9C]/20 px-4 py-2 text-sm font-medium text-[#D2AF9C]/30 cursor-not-allowed"
-            >
-              Yearly
-            </button>
-          </div>
-
-          {/* Monthly plan card */}
-          <Card className="hidden">
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-base font-semibold text-[#1a0a0e]">Monthly</span>
-                <span className="text-2xl font-bold text-[#860119]">$9.99</span>
-              </div>
-              <Button disabled variant="primary" className="w-auto px-5 py-2 opacity-50 cursor-not-allowed">
-                Try now
-              </Button>
+          <div className="flex items-center justify-between rounded-2xl border border-[#69584E]/40 bg-[#69584E]/10 px-5 py-4">
+            <div className="flex flex-col gap-0.5">
+              <p className="text-[12px] text-[#D2AF9C]/50">Current plan</p>
+              <p className="text-[18px] font-semibold text-[#D2AF9C]">
+                {isPremium ? 'Premium' : 'Free'}
+              </p>
+              {isCancelling && cancelEndDate && (
+                <p className="text-[11px] text-[#D2AF9C]/40 mt-0.5">
+                  Active until{' '}
+                  {cancelEndDate.toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </p>
+              )}
             </div>
-            <ul className="flex flex-col gap-2">
-              {PLAN_BENEFITS.map((benefit) => (
-                <li key={benefit} className="flex items-center gap-2 text-sm text-[#5a3a3a]">
-                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#860119]" />
-                  {benefit}
-                </li>
-              ))}
-            </ul>
-          </Card>
-          <img src="/img/plan-placeholder.svg" alt=""/>
+            <Link
+              href="/premium"
+              className="rounded-full border border-[#860119] bg-[#860119]/20 px-4 py-2 text-[13px] font-medium text-[#D2AF9C] transition-colors hover:bg-[#860119]/40"
+            >
+              {isPremium ? 'Manage' : 'Upgrade'}
+            </Link>
+          </div>
         </div>
 
         {/* Settings / options — client component handles modals + logout */}
