@@ -471,3 +471,9 @@ div::-webkit-scrollbar-thumb {
   background-position: center;
   background-repeat: no-repeat;
 }
+.info-plan-bg {
+  background-image: url('/img/plan-bg.svg');
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: cover;
+}

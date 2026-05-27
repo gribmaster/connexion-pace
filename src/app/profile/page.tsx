@@ -4,15 +4,10 @@ import { getDevUser } from '@/lib/devAuth'
 import { prisma } from '@/lib/prisma'
 import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
 import { ProfileClient } from '@/components/ProfileClient'
+import { PlanInfo } from './PlanInfo'
 import Link from "next/link";
 
-const PLAN_BENEFITS = [
-  'Unlimited Cards',
-  'Extend Time',
-  'Flexible Game Duration',
-]
 
 export default async function ProfilePage() {
   const devUser = getDevUser()
@@ -62,8 +57,8 @@ export default async function ProfilePage() {
   const isCancelling = isPremium && cancelEndDate !== null
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-start gap-4 bg-[#000000] py-5">
-      <Container className="flex flex-col gap-4">
+    <div className="flex min-h-screen flex-col items-center justify-start gap-5 bg-[#000000] py-5">
+      <Container className="flex flex-col gap-5">
         <Link href="/game" className="flex items-center">
           <svg width="9" height="16" viewBox="0 0 9 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M8 0.5L0.5 8L8 15.5" stroke="#69584E" strokeLinecap="round" strokeLinejoin="round"/>
@@ -83,32 +78,11 @@ export default async function ProfilePage() {
         </Card>
 
         {/* Plan section */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-5">
           <h2 className="text-sm font-semibold text-[#D2AF9C]">Your plan information</h2>
 
-          <div className="flex items-center justify-between rounded-2xl border border-[#69584E]/40 bg-[#69584E]/10 px-5 py-4">
-            <div className="flex flex-col gap-0.5">
-              <p className="text-[12px] text-[#D2AF9C]/50">Current plan</p>
-              <p className="text-[18px] font-semibold text-[#D2AF9C]">
-                {isPremium ? 'Premium' : 'Free'}
-              </p>
-              {isCancelling && cancelEndDate && (
-                <p className="text-[11px] text-[#D2AF9C]/40 mt-0.5">
-                  Active until{' '}
-                  {cancelEndDate.toLocaleDateString(undefined, {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })}
-                </p>
-              )}
-            </div>
-            <Link
-              href="/premium"
-              className="rounded-full border border-[#860119] bg-[#860119]/20 px-4 py-2 text-[13px] font-medium text-[#D2AF9C] transition-colors hover:bg-[#860119]/40"
-            >
-              {isPremium ? 'Manage' : 'Upgrade'}
-            </Link>
+          <div className="p-5 border border-[#69584E] rounded-[24px] info-plan-bg">
+            <PlanInfo isPremium={isPremium} hasCustomer={!!prismaUser?.stripeCustomerId} />
           </div>
         </div>
 

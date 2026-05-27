@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
+import {ItmIcon} from "@/components/icons/ItmIcon";
 
 type Tab = 'monthly' | 'quarterly' | 'yearly'
 
@@ -20,17 +21,16 @@ const PLAN_PRICE: Record<Tab, string> = {
 const FEATURES = ['Unlimited Cards', 'Extend Time', 'Flexible Game Duration']
 
 interface Props {
-  isActive: boolean
+  isPremium: boolean
   hasCustomer: boolean
 }
 
-export function PremiumClient({ isActive, hasCustomer }: Props) {
+export function PlanInfo({ isPremium, hasCustomer }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('monthly')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const isMonthly = activeTab === 'monthly'
-  const canSubscribe = isMonthly
   const price = PLAN_PRICE[activeTab]
 
   async function handleSubscribe() {
@@ -70,18 +70,18 @@ export function PremiumClient({ isActive, hasCustomer }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Segmented tab control */}
-      <div className="flex rounded-[12px] bg-[#D2AF9C1A] p-1">
+    <div id="plan-info" className="flex flex-col gap-6">
+      {/* Segmented tabs */}
+      <div className="flex p-1">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={[
-              'flex-1 rounded-[9px] py-2 text-[14px] font-medium transition-all duration-200',
+              'flex-1 py-2 text-[14px] font-semibold transition-all duration-200 border-b',
               activeTab === tab.id
-                ? 'bg-[#860119] text-[#D2AF9C]'
-                : 'text-[#D2AF9C]/60',
+                ? 'text-[#D2AF9C] border-[#D2AF9C]'
+                : 'text-[#69584E] border-[#69584E]',
             ].join(' ')}
           >
             {tab.label}
@@ -90,28 +90,28 @@ export function PremiumClient({ isActive, hasCustomer }: Props) {
       </div>
 
       {/* Plan card */}
-      <div className="rounded-2xl border border-[#69584E]/40 bg-[#69584E]/10 px-5 py-5 flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         {/* Title row */}
         <div className="flex items-center justify-between">
-          <span className="text-[18px] font-semibold text-[#D2AF9C] capitalize">
+          <span className="text-[24px] text-[#D2AF9C] capitalize">
             {activeTab}
           </span>
-          {isActive && isMonthly && (
-            <span className="rounded-full bg-[#860119]/80 px-3 py-[2px] text-[12px] font-medium text-[#D2AF9C]">
+          {isPremium && isMonthly && (
+            <span className="rounded-full bg-[#69584E4D] border border-[#69584E] px-3 py-[6px] text-[14px] font-semibold text-[#D2AF9C]">
               Current plan
             </span>
           )}
         </div>
 
         {/* Price */}
-        <p className="text-[36px] font-bold leading-none text-[#D2AF9C]">
+        <p className="text-[36px] font-bold leading-[48px] text-[#D2AF9C] mb-[7px]">
           {price}
         </p>
 
         {/* Action button */}
         {isMonthly ? (
-          isActive || hasCustomer ? (
-            <Button variant="secondary" onClick={handleManage} disabled={loading}>
+          isPremium || hasCustomer ? (
+            <Button variant="primary" onClick={handleManage} disabled={loading}>
               {loading ? 'Redirecting…' : 'Manage'}
             </Button>
           ) : (
@@ -126,12 +126,10 @@ export function PremiumClient({ isActive, hasCustomer }: Props) {
         )}
 
         {/* Feature list */}
-        <ul className="flex flex-col gap-2 pt-1">
+        <ul className="flex flex-col gap-1 pt-2">
           {FEATURES.map((feature) => (
             <li key={feature} className="flex items-center gap-2 text-[14px] text-[#D2AF9C]/80">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 8L6.5 11.5L13 4.5" stroke="#D2AF9C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <ItmIcon />
               {feature}
             </li>
           ))}
