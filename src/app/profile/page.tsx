@@ -34,7 +34,6 @@ export default async function ProfilePage() {
   const prismaUser = await prisma.user.findUnique({
     where: { email },
     select: {
-      stripeCustomerId: true,
       subscription: {
         select: {
           status: true,
@@ -84,7 +83,6 @@ export default async function ProfilePage() {
           <div className="p-5 border border-[#69584E] rounded-[24px] info-plan-bg">
             <PlanInfo
               isPremium={isPremium}
-              hasCustomer={!!prismaUser?.stripeCustomerId}
               cancelEndDate={cancelEndDate?.toISOString() ?? null}
               currentPeriodEnd={sub?.currentPeriodEnd?.toISOString() ?? null}
               isCancelling={isCancelling}

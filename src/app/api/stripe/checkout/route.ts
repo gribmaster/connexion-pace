@@ -55,8 +55,8 @@ export async function POST() {
     customer: customerId,
     mode: 'subscription',
     line_items: [{ price: process.env.STRIPE_PREMIUM_PRICE_ID!, quantity: 1 }],
-    success_url: `${siteUrl}/premium?success=1`,
-    cancel_url: `${siteUrl}/premium?canceled=1`,
+    success_url: `${siteUrl}/profile?checkout=success`,
+    cancel_url: `${siteUrl}/profile?checkout=cancelled`,
     subscription_data: {
       metadata: { prismaUserId: prismaUser.id },
     },

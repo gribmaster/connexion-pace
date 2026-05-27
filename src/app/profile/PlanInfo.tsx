@@ -22,7 +22,6 @@ const FEATURES = ['Unlimited Cards', 'Extend Time', 'Flexible Game Duration']
 
 interface Props {
   isPremium: boolean
-  hasCustomer: boolean
   cancelEndDate: string | null
   currentPeriodEnd: string | null
   isCancelling: boolean
@@ -32,7 +31,7 @@ function formatSubDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-export function PlanInfo({ isPremium, hasCustomer, cancelEndDate, currentPeriodEnd, isCancelling }: Props) {
+export function PlanInfo({ isPremium, cancelEndDate, currentPeriodEnd, isCancelling }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('monthly')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -133,7 +132,7 @@ export function PlanInfo({ isPremium, hasCustomer, cancelEndDate, currentPeriodE
 
         {/* Action button */}
         {isMonthly ? (
-          isPremium || hasCustomer ? (
+          isPremium ? (
             <Button variant="primary" onClick={handleManage} disabled={loading}>
               {loading ? 'Redirecting…' : 'Manage'}
             </Button>

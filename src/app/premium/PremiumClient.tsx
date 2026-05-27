@@ -21,10 +21,9 @@ const FEATURES = ['Unlimited Cards', 'Extend Time', 'Flexible Game Duration']
 
 interface Props {
   isActive: boolean
-  hasCustomer: boolean
 }
 
-export function PremiumClient({ isActive, hasCustomer }: Props) {
+export function PremiumClient({ isActive }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('monthly')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -110,7 +109,7 @@ export function PremiumClient({ isActive, hasCustomer }: Props) {
 
         {/* Action button */}
         {isMonthly ? (
-          isActive || hasCustomer ? (
+          isActive ? (
             <Button variant="secondary" onClick={handleManage} disabled={loading}>
               {loading ? 'Redirecting…' : 'Manage'}
             </Button>
