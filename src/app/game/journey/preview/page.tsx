@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { prisma } from '@/lib/prisma'
 import { Container } from '@/components/ui/Container'
 import { JourneyPreview } from '@/components/JourneyPreview'

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { prisma } from '@/lib/prisma'
 import { SurpriseMePlay } from '@/components/SurpriseMePlay'
 import { getUserPremiumStatus } from '@/lib/premium/getUserPremiumStatus'
