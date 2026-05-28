@@ -85,6 +85,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme, is
           </svg>
         </Link>
         <div
+          className="hidden"
           //onClick={() => setInfoOpen(true)}
           aria-label="Category info"
         >

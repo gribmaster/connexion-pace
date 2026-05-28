@@ -103,7 +103,7 @@ export function IntuitiveGameplay({ category, initialCardId, allCards }: Props) 
           <div className={`h-[582px] overflow-auto border border-[#69584E] p-4 ${theme.cardContainerClassName} rounded-[24px]`}>
             <div className="flex justify-between items-start">
               <h1 className="text-[20px] leading-[26px] mb-4 font-semibold">{card.title}</h1>
-              <img src="/img/x-plhldr.svg" width="48" alt="" />
+              <img src="/img/x-plhldr.svg" width="48" className="hidden" alt="" />
             </div>
 
             {card.imageUrl && (

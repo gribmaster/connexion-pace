@@ -166,7 +166,7 @@ export function JourneyPlay({ cards }: Props) {
           >
             <div className="flex justify-between items-start">
               <h1 className="text-[20px] leading-[26px] mb-4 font-semibold">{card.title}</h1>
-              <img src="/img/x-plhldr.svg" width="48" alt="" />
+              <img src="/img/x-plhldr.svg" width="48" className="hidden" alt="" />
             </div>
 
             {card.imageUrl && (
