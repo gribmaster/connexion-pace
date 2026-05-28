@@ -17,7 +17,7 @@ export function PremiumCardModal({ onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 px-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 px-4"
       onClick={onClose}
     >
       <div
