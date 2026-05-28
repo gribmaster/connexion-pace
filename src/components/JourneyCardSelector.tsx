@@ -11,6 +11,7 @@ import type { CategoryTheme } from '@/lib/categoryThemes'
 import { useLocale } from '@/lib/i18n/useLocale'
 import { resolveCardTranslation } from '@/lib/i18n/resolveCardTranslation'
 import { canAccessCard } from '@/lib/premium/cardAccess'
+import { PremiumCardModal } from '@/components/PremiumCardModal'
 
 // TODO: enforce free/premium Journey card selection limits here.
 const JOURNEY_FREE_CARD_LIMIT = 5
@@ -69,6 +70,7 @@ export function JourneyCardSelector({ cards, category, theme, isPremium }: Props
   const [mounted, setMounted] = useState(false)
   const [previewCard, setPreviewCard] = useState<CardItem | null>(null)
   const [learnMoreCard, setLearnMoreCard] = useState<CardItem | null>(null)
+  const [premiumOpen, setPremiumOpen] = useState(false)
   const { locale, dict } = useLocale()
   const dj = dict.journey
   const dc = dict.common
@@ -93,7 +95,7 @@ export function JourneyCardSelector({ cards, category, theme, isPremium }: Props
 
   function toggleCard(id: string, accessible: boolean) {
     if (!accessible) {
-      window.location.href = '/profile'
+      setPremiumOpen(true)
       return
     }
     setSelectedIds((prev) =>
@@ -250,6 +252,10 @@ export function JourneyCardSelector({ cards, category, theme, isPremium }: Props
             </Button>
           </div>
         </div>
+      )}
+
+      {premiumOpen && (
+        <PremiumCardModal onClose={() => setPremiumOpen(false)} />
       )}
 
       {learnMoreCard && (

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
-import {ItmIcon} from "@/components/icons/ItmIcon";
+import { ItmIcon } from '@/components/icons/ItmIcon'
 
 type Tab = 'monthly' | 'quarterly' | 'yearly'
 
@@ -12,16 +12,18 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'yearly', label: 'Yearly' },
 ]
 
-const PLAN_PRICE: Record<Tab, string> = {
-  monthly: '$9.99',
-  quarterly: 'Coming soon',
-  yearly: 'Coming soon',
+// Update price text once actual Stripe prices are confirmed
+const PLAN_CONFIG: Record<Tab, { priceText: string; intervalLabel: string }> = {
+  monthly: { priceText: '$9.99', intervalLabel: 'per month' },
+  quarterly: { priceText: '$24.99', intervalLabel: 'per 3 months' },
+  yearly: { priceText: '$79.99', intervalLabel: 'per year' },
 }
 
 const FEATURES = ['Unlimited Cards', 'Extend Time', 'Flexible Game Duration']
 
 interface Props {
   isPremium: boolean
+  currentPlan: Tab | null
   cancelEndDate: string | null
   currentPeriodEnd: string | null
   isCancelling: boolean
@@ -31,37 +33,49 @@ function formatSubDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-export function PlanInfo({ isPremium, cancelEndDate, currentPeriodEnd, isCancelling }: Props) {
+export function PlanInfo({ isPremium, currentPlan, cancelEndDate, currentPeriodEnd, isCancelling }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('monthly')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [subDateLine, setSubDateLine] = useState<string | null>(null)
 
+  const isCurrentTab = isPremium && activeTab === currentPlan
+
   useEffect(() => {
-    if (!isPremium) { setSubDateLine(null); return }
+    if (!isPremium || !isCurrentTab) { setSubDateLine(null); return }
     if (isCancelling && cancelEndDate) {
       setSubDateLine(`Active until ${formatSubDate(cancelEndDate)}`)
     } else if (currentPeriodEnd) {
       setSubDateLine(`Renews on ${formatSubDate(currentPeriodEnd)}`)
     }
-  }, [isPremium, isCancelling, cancelEndDate, currentPeriodEnd])
+  }, [isPremium, isCurrentTab, isCancelling, cancelEndDate, currentPeriodEnd])
 
-  const isMonthly = activeTab === 'monthly'
-  const price = PLAN_PRICE[activeTab]
+  const { priceText, intervalLabel } = PLAN_CONFIG[activeTab]
 
   async function handleSubscribe() {
     setLoading(true)
     setError(null)
+    const stripeWindow = window.open('', '_blank', 'noopener,noreferrer')
     try {
-      const res = await fetch('/api/stripe/checkout', { method: 'POST' })
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: activeTab }),
+      })
       const data = await res.json()
       if (data.url) {
-        window.location.href = data.url
+        if (stripeWindow) {
+          stripeWindow.location.href = data.url
+        } else {
+          window.location.href = data.url
+        }
       } else {
+        stripeWindow?.close()
         setError('Could not start checkout. Please try again.')
         setLoading(false)
       }
     } catch {
+      stripeWindow?.close()
       setError('Could not start checkout. Please try again.')
       setLoading(false)
     }
@@ -70,16 +84,23 @@ export function PlanInfo({ isPremium, cancelEndDate, currentPeriodEnd, isCancell
   async function handleManage() {
     setLoading(true)
     setError(null)
+    const stripeWindow = window.open('', '_blank', 'noopener,noreferrer')
     try {
       const res = await fetch('/api/stripe/portal', { method: 'POST' })
       const data = await res.json()
       if (data.url) {
-        window.location.href = data.url
+        if (stripeWindow) {
+          stripeWindow.location.href = data.url
+        } else {
+          window.location.href = data.url
+        }
       } else {
+        stripeWindow?.close()
         setError('Could not open customer portal. Please try again.')
         setLoading(false)
       }
     } catch {
+      stripeWindow?.close()
       setError('Could not open customer portal. Please try again.')
       setLoading(false)
     }
@@ -112,7 +133,7 @@ export function PlanInfo({ isPremium, cancelEndDate, currentPeriodEnd, isCancell
           <span className="text-[24px] text-[#D2AF9C] capitalize">
             {activeTab}
           </span>
-          {isPremium && isMonthly && (
+          {isCurrentTab && (
             <span className="rounded-full bg-[#69584E4D] border border-[#69584E] px-3 py-[6px] text-[14px] font-semibold text-[#D2AF9C]">
               Current plan
             </span>
@@ -121,29 +142,25 @@ export function PlanInfo({ isPremium, cancelEndDate, currentPeriodEnd, isCancell
 
         {/* Price */}
         <p className="text-[36px] font-bold leading-[48px] text-[#D2AF9C] mb-[2px]">
-          {price}
+          {priceText}
         </p>
+        <p className="text-[13px] text-[#D2AF9C]/60 -mt-2">{intervalLabel}</p>
 
         {/* Subscription date */}
-        {isPremium && isMonthly && subDateLine && (
+        {isCurrentTab && subDateLine ? (
           <p className="text-[13px] text-[#D2AF9C]/60 mb-[7px]">{subDateLine}</p>
+        ) : (
+          <div className="mb-[7px]" />
         )}
-        {(!isPremium || !isMonthly || !subDateLine) && <div className="mb-[7px]" />}
 
         {/* Action button */}
-        {isMonthly ? (
-          isPremium ? (
-            <Button variant="primary" onClick={handleManage} disabled={loading}>
-              {loading ? 'Redirecting…' : 'Manage'}
-            </Button>
-          ) : (
-            <Button variant="primary" onClick={handleSubscribe} disabled={loading}>
-              {loading ? 'Redirecting…' : 'Subscribe'}
-            </Button>
-          )
+        {isPremium ? (
+          <Button variant="primary" onClick={handleManage} disabled={loading}>
+            {loading ? 'Redirecting…' : 'Manage'}
+          </Button>
         ) : (
-          <Button variant="secondary" disabled>
-            Coming soon
+          <Button variant="primary" onClick={handleSubscribe} disabled={loading}>
+            {loading ? 'Redirecting…' : 'Subscribe'}
           </Button>
         )}
 

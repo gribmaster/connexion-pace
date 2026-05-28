@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { PremiumCardModal } from '@/components/PremiumCardModal'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { ExpandIcon } from '@/components/icons/ExpandIcon'
@@ -46,6 +47,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme, is
   const [infoOpen, setInfoOpen] = useState(false)
   const [introOpen, setIntroOpen] = useState(false)
   const [moreSuggestionsOpen, setMoreSuggestionsOpen] = useState(false)
+  const [premiumOpen, setPremiumOpen] = useState(false)
   const { locale, dict } = useLocale()
   const dc = dict.common
   const dm = dict.modal
@@ -105,7 +107,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme, is
               <div
                 onClick={() => {
                   if (!accessible) {
-                    window.location.href = '/profile'
+                    setPremiumOpen(true)
                     return
                   }
                   setSelectedId(card.id)
@@ -303,6 +305,10 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme, is
             </div>
           </div>
         </div>
+      )}
+
+      {premiumOpen && (
+        <PremiumCardModal onClose={() => setPremiumOpen(false)} />
       )}
 
       {learnMoreCard && (

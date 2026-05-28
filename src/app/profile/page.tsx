@@ -37,6 +37,7 @@ export default async function ProfilePage() {
       subscription: {
         select: {
           status: true,
+          stripePriceId: true,
           currentPeriodEnd: true,
           cancelAtPeriodEnd: true,
           cancelAt: true,
@@ -54,6 +55,23 @@ export default async function ProfilePage() {
   // cancelAt is how Stripe signals a portal cancellation (cancel_at_period_end stays false)
   const cancelEndDate = sub?.cancelAt ?? (sub?.cancelAtPeriodEnd ? sub.currentPeriodEnd : null)
   const isCancelling = isPremium && cancelEndDate !== null
+
+  // Detect current plan server-side — never expose price IDs to the browser
+  type PlanKey = 'monthly' | 'quarterly' | 'yearly'
+  const PLAN_PRICE_MAP: Record<PlanKey, string | undefined> = {
+    monthly: process.env.STRIPE_MONTHLY_PRICE_ID,
+    quarterly: process.env.STRIPE_QUARTERLY_PRICE_ID,
+    yearly: process.env.STRIPE_YEARLY_PRICE_ID,
+  }
+  let currentPlan: PlanKey | null = null
+  if (sub?.stripePriceId) {
+    for (const [key, id] of Object.entries(PLAN_PRICE_MAP)) {
+      if (id && id === sub.stripePriceId) {
+        currentPlan = key as PlanKey
+        break
+      }
+    }
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-start gap-5 bg-[#000000] py-5">
@@ -83,6 +101,7 @@ export default async function ProfilePage() {
           <div className="p-5 border border-[#69584E] rounded-[24px] info-plan-bg">
             <PlanInfo
               isPremium={isPremium}
+              currentPlan={currentPlan}
               cancelEndDate={cancelEndDate?.toISOString() ?? null}
               currentPeriodEnd={sub?.currentPeriodEnd?.toISOString() ?? null}
               isCancelling={isCancelling}

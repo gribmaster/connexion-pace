@@ -6,7 +6,29 @@ import { getDevUser } from '@/lib/devAuth'
 
 export const runtime = 'nodejs'
 
-export async function POST() {
+type Plan = 'monthly' | 'quarterly' | 'yearly'
+
+const PLAN_PRICE_IDS: Record<Plan, string | undefined> = {
+  monthly: process.env.STRIPE_MONTHLY_PRICE_ID ?? process.env.STRIPE_PREMIUM_PRICE_ID,
+  quarterly: process.env.STRIPE_QUARTERLY_PRICE_ID,
+  yearly: process.env.STRIPE_YEARLY_PRICE_ID,
+}
+
+export async function POST(request: Request) {
+  let plan: Plan = 'monthly'
+  try {
+    const body = await request.json()
+    if (body?.plan === 'quarterly' || body?.plan === 'yearly' || body?.plan === 'monthly') {
+      plan = body.plan
+    }
+  } catch {
+    // no body or invalid JSON — default to monthly
+  }
+
+  const priceId = PLAN_PRICE_IDS[plan]
+  if (!priceId) {
+    return NextResponse.json({ error: `Price not configured for plan: ${plan}` }, { status: 500 })
+  }
   // Resolve Prisma user
   let prismaUser: { id: string; email: string | null; stripeCustomerId: string | null } | null = null
 
@@ -54,7 +76,7 @@ export async function POST() {
   const session = await getStripe().checkout.sessions.create({
     customer: customerId,
     mode: 'subscription',
-    line_items: [{ price: process.env.STRIPE_PREMIUM_PRICE_ID!, quantity: 1 }],
+    line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${siteUrl}/profile?checkout=success`,
     cancel_url: `${siteUrl}/profile?checkout=cancelled`,
     subscription_data: {
