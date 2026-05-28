@@ -55,7 +55,6 @@ export function PlanInfo({ isPremium, currentPlan, cancelEndDate, currentPeriodE
   async function handleSubscribe() {
     setLoading(true)
     setError(null)
-    const stripeWindow = window.open('', '_blank', 'noopener,noreferrer')
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
@@ -64,18 +63,12 @@ export function PlanInfo({ isPremium, currentPlan, cancelEndDate, currentPeriodE
       })
       const data = await res.json()
       if (data.url) {
-        if (stripeWindow) {
-          stripeWindow.location.href = data.url
-        } else {
-          window.location.href = data.url
-        }
+        window.location.href = data.url
       } else {
-        stripeWindow?.close()
         setError('Could not start checkout. Please try again.')
         setLoading(false)
       }
     } catch {
-      stripeWindow?.close()
       setError('Could not start checkout. Please try again.')
       setLoading(false)
     }
@@ -84,23 +77,16 @@ export function PlanInfo({ isPremium, currentPlan, cancelEndDate, currentPeriodE
   async function handleManage() {
     setLoading(true)
     setError(null)
-    const stripeWindow = window.open('', '_blank', 'noopener,noreferrer')
     try {
       const res = await fetch('/api/stripe/portal', { method: 'POST' })
       const data = await res.json()
       if (data.url) {
-        if (stripeWindow) {
-          stripeWindow.location.href = data.url
-        } else {
-          window.location.href = data.url
-        }
+        window.location.href = data.url
       } else {
-        stripeWindow?.close()
         setError('Could not open customer portal. Please try again.')
         setLoading(false)
       }
     } catch {
-      stripeWindow?.close()
       setError('Could not open customer portal. Please try again.')
       setLoading(false)
     }
