@@ -54,6 +54,7 @@ export const dictionary = {
       cardsSelectedZero: '0 kaarti valitud',
       cardSelectedOne: 'kaart valitud',
       cardsSelectedMany: 'kaarti valitud',
+      chooseNextPlayTime: 'Vali järgmine mänguaeg',
     },
     journey: {
       selectedCards: 'Valitud kaardid',
@@ -162,6 +163,7 @@ export const dictionary = {
       cardsSelectedZero: '0 cards selected',
       cardSelectedOne: 'card selected',
       cardsSelectedMany: 'cards selected',
+      chooseNextPlayTime: 'Choose next play time',
     },
     journey: {
       selectedCards: 'Selected cards',

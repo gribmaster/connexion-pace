@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import {prisma} from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
+import { hasPremiumAccess } from '@/lib/premium/cardAccess'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -16,7 +17,16 @@ export async function GET(request: Request) {
       user?.user_metadata?.full_name ?? user?.user_metadata?.name
 
     if (email) {
-      const existing = await prisma.user.findUnique({ where: { email } })
+      const existing = await prisma.user.findUnique({
+        where: { email },
+        select: {
+          privacyAcceptedAt: true,
+          name: true,
+          subscription: {
+            select: { status: true, currentPeriodEnd: true, endedAt: true },
+          },
+        },
+      })
       if (!existing) {
         await prisma.user.create({ data: { email, name: name ?? null } })
         return NextResponse.redirect(`${origin}/privacy`)
@@ -26,6 +36,8 @@ export async function GET(request: Request) {
       if (!existing?.privacyAcceptedAt) {
         return NextResponse.redirect(`${origin}/privacy`)
       }
+      const isPremium = hasPremiumAccess(existing.subscription ?? null)
+      return NextResponse.redirect(`${origin}${isPremium ? '/game' : '/welcome'}`)
     }
   }
 

@@ -92,8 +92,37 @@ export function PlanInfo({ isPremium, currentPlan, cancelEndDate, currentPeriodE
     }
   }
 
+  const planLabel = currentPlan
+    ? currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)
+    : null
+
+  const summaryDateLine = isPremium
+    ? isCancelling && cancelEndDate
+      ? `Active until ${formatSubDate(cancelEndDate)}`
+      : currentPeriodEnd
+      ? `Renews on ${formatSubDate(currentPeriodEnd)}`
+      : null
+    : null
+
   return (
     <div id="plan-info" className="flex flex-col gap-6">
+      {/* Current plan summary */}
+      {isPremium && planLabel ? (
+        <div className="flex flex-col gap-1 pb-2 border-b border-[#69584E40]">
+          <p className="text-[12px] text-[#69584E] uppercase tracking-wide">Current plan</p>
+          <p className="text-[20px] font-semibold text-[#D2AF9C]">{planLabel}</p>
+          {summaryDateLine && (
+            <p className="text-[13px] text-[#D2AF9C]/60">{summaryDateLine}</p>
+          )}
+        </div>
+      ) : !isPremium ? (
+        <div className="flex flex-col gap-1 pb-2 border-b border-[#69584E40]">
+          <p className="text-[12px] text-[#69584E] uppercase tracking-wide">Current plan</p>
+          <p className="text-[20px] font-semibold text-[#D2AF9C]">Free</p>
+          <p className="text-[13px] text-[#D2AF9C]/60">Subscribe to unlock all cards and features</p>
+        </div>
+      ) : null}
+
       {/* Segmented tabs */}
       <div className="flex p-1">
         {TABS.map((tab) => (

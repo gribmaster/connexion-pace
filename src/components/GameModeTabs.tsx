@@ -177,6 +177,16 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive',
       </div>
       <div className="font-normal text-[16px] leading-[150%] mt-[10px] opacity-70">{dg.chooseCardsSubtitle}</div>
 
+      {/* Subtle reminder shortcut */}
+      <div className="flex justify-end mt-2">
+        <Link
+          href="/welcome/reminder/date"
+          className="text-[12px] text-[#D2AF9C]/50 hover:text-[#D2AF9C]/80 underline underline-offset-2 transition-colors"
+        >
+          {dg.chooseNextPlayTime}
+        </Link>
+      </div>
+
       {/* Mode tabs */}
       <div className="flex mt-5">
         <button

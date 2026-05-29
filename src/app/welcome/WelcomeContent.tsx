@@ -30,9 +30,11 @@ export function WelcomeContent() {
               <Button variant="primary">{d.startFreeSession}</Button>
             </Link>
 
-            <Button variant="secondary" disabled>
-              {d.viewPremiumOptions}
-            </Button>
+            <Link href="/profile">
+              <Button variant="secondary">
+                {d.viewPremiumOptions}
+              </Button>
+            </Link>
 
             <Link href="/welcome/reminder/date" id="chooseNextPlayCall">
               <p className="font-medium text-[14px] leading-[20px] underline underline-offset-2">
