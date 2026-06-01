@@ -34,7 +34,7 @@ export function LoginForm() {
   }
 
   return (
-    <main className="flex flex-col items-center px-4 max-w-[525px] mx-auto h-[800px] main-container">
+    <main className="flex flex-col items-center px-4 max-w-[525px] mx-auto h-screen main-container">
       <div className="flex w-full max-w-sm flex-col items-center gap-8">
         <div className="text-center logo">
           <Image

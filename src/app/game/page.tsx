@@ -32,7 +32,7 @@ export default async function GamePage({
   }))
 
   return (
-    <div className="max-w-[525px] mx-auto h-[800px] overflow-y-auto bg-[#000000]">
+    <div className="max-w-[525px] mx-auto h-screen overflow-y-auto bg-[#000000]">
       <Container className="flex flex-col">
         <GameModeTabs
           categories={categoriesWithCounts}

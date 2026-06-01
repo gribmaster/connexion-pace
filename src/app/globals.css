@@ -197,8 +197,6 @@ button[disabled] {
 }
 
 .cat-card {
-  background-size: contain;
-  background-repeat: no-repeat;
   position: relative;
   display: flex;
   align-items: center;
@@ -224,8 +222,64 @@ button[disabled] {
   background-size: cover;
 }
 .cat-card-CONNECTION {
-  background-image: url('/img/card-container-connection.svg');
-  background-size: cover;
+  /*background-image: url('/img/card-container-connection.svg');*/
+  /*background-size: cover;*/
+}
+.card-journey-cat {
+
+}
+.cat-card-intuitive {
+  position: relative;
+}
+.cat-card-intuitive .cat-img {
+
+}
+.card-cat-surprise {
+
+}
+.cat-card-intuitive .cat-img,
+.cat-card-journey .cat-img
+{
+  position: relative;
+}
+.cat-card-intuitive .cat-label,
+.cat-card-journey .cat-label {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%);
+}
+@media (min-height: 400px) {
+  .cat-card-intuitive .cat-img {
+    flex: 0 0 50px;
+  }
+  .cat-card-journey .cat-card {
+    flex: 0 0 70px;
+  }
+}
+@media (min-height: 660px) {
+  .cat-card-intuitive .cat-img {
+    flex: 0 0 75px;
+  }
+}
+@media (min-height: 720px) {
+  .cat-card-intuitive .cat-img {
+    flex: 0 0 85px;
+  }
+  .cat-card-journey .cat-card {
+    flex: 0 0 65px;
+  }
+}
+@media (min-height: 800px) {
+  .cat-card-intuitive .cat-img {
+    flex: 0 0 95px;
+  }
+  .cat-card-journey .cat-card {
+    flex: 0 0 80px;
+  }
+}
+.card-cat-surprise {
+  height: 150px;
 }
 .cat-card-INTIMACY {
   background-image: url('/img/card-container-intimacy.svg');

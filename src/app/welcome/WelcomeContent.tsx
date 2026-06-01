@@ -10,7 +10,7 @@ export function WelcomeContent() {
   const d = dict.welcome
 
   return (
-    <main className="flex flex-col items-center max-w-[525px] mx-auto h-[800px] main-container">
+    <main className="flex flex-col items-center max-w-[525px] mx-auto h-screen main-container">
       <Container>
         <div className="flex flex-col gap-5 text-center">
           <div className="flex flex-col gap-2">

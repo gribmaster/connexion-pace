@@ -178,7 +178,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive',
       <div className="font-normal text-[16px] leading-[150%] mt-[10px] opacity-70">{dg.chooseCardsSubtitle}</div>
 
       {/* Subtle reminder shortcut */}
-      <div className="flex justify-end mt-2">
+      <div className="flex justify-end mt-1">
         <Link
           href="/welcome/reminder/date"
           className="text-[12px] text-[#D2AF9C]/50 hover:text-[#D2AF9C]/80 underline underline-offset-2 transition-colors"
@@ -188,7 +188,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive',
       </div>
 
       {/* Mode tabs */}
-      <div className="flex mt-5">
+      <div className="flex mt-2">
         <button
           onClick={() => setTab('intuitive')}
           className={`font-semibold text-[14px] leading-[20px] p-2 border-b flex-1 transition-colors ${
@@ -224,18 +224,19 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive',
       {/* Intuitive tab content */}
       {tab === 'intuitive' && (
         <>
-          <div className="flex flex-col mt-5 gap-3">
+          <div className="flex flex-col mt-5 gap-3 flex-1 basis-0">
             {categories.map(({ label, value, count }) => (
               <div
                 key={value}
-                className={`flex items-center justify-between p-3 bg-${value} rounded-[24px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000]`}
+                className={`flex items-center justify-between p-3 bg-${value} rounded-[24px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000] cat-card-intuitive`}
               >
                 <div className="flex flex-col self-start p-2">
                   <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
                   <span className="font-normal text-[16px] leading-[24px]">{count} {dg.cards}</span>
                 </div>
-                <Link href={`/game/intuitive/${value}`} className={`h-[154px] w-[96px] cat-card-${value} cat-card`}>
-                  <div className="font-semibold text-[12px] leading-[100%]">{dg.choose}</div>
+                <Link href={`/game/intuitive/${value}`} className={`cat-card-${value} cat-img`}>
+                  <img src={`/img/card-container-${value}.svg`} alt=""/>
+                  <div className="font-semibold text-[12px] leading-[100%] absolute cat-label">{dg.choose}</div>
                 </Link>
               </div>
             ))}
@@ -246,8 +247,8 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive',
 
       {/* Surprise me tab content */}
       {tab === 'surprise' && (
-        <div className="flex flex-col mt-5">
-          <div className="flex flex-col gap-3 p-0">
+        <div className="flex flex-col mt-5 flex-1 basis-0">
+          <div className="flex flex-col gap-3 p-0 flex-1 basis-0">
             {categories.map(({ label, value, count }) => {
               const accessibleCount = cards.filter(
                 (c) => c.category === value && canAccessCard({ category: value, isFree: c.isFree }, isPremium)
@@ -255,7 +256,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive',
               return (
               <div
                 key={value}
-                className={`flex flex-col justify-between p-3 bg-surprised-${value} rounded-[24px] h-[180px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000]`}
+                className={`flex flex-col justify-between p-3 bg-surprised-${value} rounded-[24px] card-cat-surprise border border-[#69584E] shadow-[0px_0px_20px_0px_#000000]`}
               >
                 <div className="flex flex-col self-start p-2">
                   <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
@@ -296,7 +297,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive',
           <Button
             onClick={handleStartSurprise}
             disabled={total === 0}
-            className="disabled:opacity-40 disabled:cursor-not-allowed mb-[28px]"
+            className="disabled:opacity-40 disabled:cursor-not-allowed mt-3"
           >
             {dg.startGame}
           </Button>
@@ -305,8 +306,8 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive',
 
       {/* Journey tab content */}
       {tab === 'journey' && (
-        <div className="flex flex-col mt-5">
-          <div className="flex flex-col gap-3">
+        <div className="flex flex-col mt-5 flex-1 basis-0">
+          <div className="flex flex-col gap-3 flex-1 basis-0">
             {categories.map(({ label, value, count }) => {
               const selectedCount = journeySelection[value as keyof JourneySelection]?.length ?? 0
               const selectedLabel =
@@ -318,15 +319,16 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive',
               return (
                 <div
                   key={value}
-                  className={`flex justify-between p-3 bg-${value} rounded-[24px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000]`}
+                  className={`flex justify-between p-3 bg-${value} rounded-[24px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000] cat-card-journey`}
                 >
                   <div className="flex flex-col p-2">
                     <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
                     <span className="font-normal flex-grow-1 text-[16px] leading-[24px]">{count} {dg.cards}</span>
                     <span className="font-normal text-[13px] leading-[20px] opacity-70 mt-[2px]">{selectedLabel}</span>
                   </div>
-                  <Link href={`/game/journey/${value}`} className={`h-[154px] w-[96px] cat-card-${value} cat-card`}>
-                    <div className="font-semibold text-[12px] leading-[100%]">{dg.choose}</div>
+                  <Link href={`/game/journey/${value}`} className={`-cat-card-${value} cat-card`}>
+                    <img src={`/img/card-container-${value}.svg`} className="journey-card card-img" alt=""/>
+                    <div className="font-semibold text-[12px] leading-[100%] cat-label">{dg.choose}</div>
                   </Link>
                 </div>
               )
@@ -336,7 +338,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive',
           <Button
             onClick={() => router.push('/game/journey/preview')}
             disabled={journeyTotal === 0}
-            className="disabled:opacity-40 disabled:cursor-not-allowed mb-[28px]"
+            className="disabled:opacity-40 disabled:cursor-not-allowed mt-3"
           >
             {dg.previewSelectedCards}
           </Button>
