@@ -531,3 +531,41 @@ div::-webkit-scrollbar-thumb {
   background-position: right bottom;
   background-size: cover;
 }
+.learnMoreCardDescription {
+  color:#D2AF9C;
+}
+.learnMoreCardDescription p {
+  margin: 5px 0;
+  font-size: 16px;
+  line-height: 150%;
+  opacity: 0.7;
+}
+.card-full-description p {
+  font-size: 14px;
+  line-height: 140%;
+  margin: 6px 0;
+}
+.card-full-description ul {
+  list-style-type: disc;
+}
+.card-full-description ol {
+  list-style-type: decimal;
+}
+.card-full-description ol, .card-full-description ul {
+  margin-left: 18px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+.card-full-description li {
+  margin: 6px 0;
+}
+.card-full-description h5 {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  margin-bottom: 6px;
+  margin-top: 12px;
+}
+.card-full-description h5:first-child {
+  margin-top: 0;
+}

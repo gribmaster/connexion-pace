@@ -272,7 +272,7 @@ export function JourneyCardSelector({ cards, category, theme, isPremium }: Props
             </h2>
             <HtmlContent
               html={learnMoreCard.additional}
-              className="text-[16px] leading-[150%] text-[#D2AF9C]/70"
+              className="text-[16px] leading-[150%] text-[#D2AF9C]/70 learnMoreCardDescription"
             />
             <div
               onClick={() => setLearnMoreCard(null)}

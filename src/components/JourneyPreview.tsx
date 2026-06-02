@@ -462,7 +462,7 @@ export function JourneyPreview({ cards }: Props) {
             </h2>
             <HtmlContent
               html={learnMoreCard.additional}
-              className="text-[16px] leading-[150%] text-[#D2AF9C]/70"
+              className="text-[16px] leading-[150%] text-[#D2AF9C]/70 learnMoreCardDescription"
             />
             <div onClick={() => setLearnMoreCard(null)} className="absolute right-[24px] top-[24px]">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">

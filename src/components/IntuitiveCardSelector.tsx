@@ -324,7 +324,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme, is
             <h2 className="mb-4 font-semibold text-[20px] leading-[120%] text-[#D2AF9C]">
               {learnMoreCard.title}
             </h2>
-            <HtmlContent html={learnMoreCard.additional} className="text-[16px] leading-[150%] text-[#D2AF9C]/70" />
+            <HtmlContent html={learnMoreCard.additional} className="text-[16px] leading-[150%] text-[#D2AF9C]/70 learnMoreCardDescription" />
             <div
               onClick={() => setLearnMoreCard(null)}
               className="absolute right-[24px] top-[24px]"
