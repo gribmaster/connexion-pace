@@ -322,7 +322,7 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme, is
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="mb-4 font-semibold text-[20px] leading-[120%] text-[#D2AF9C]">
-              Appreciative Words
+              {learnMoreCard.title}
             </h2>
             <HtmlContent html={learnMoreCard.additional} className="text-[16px] leading-[150%] text-[#D2AF9C]/70" />
             <div

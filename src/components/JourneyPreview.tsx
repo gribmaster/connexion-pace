@@ -458,7 +458,7 @@ export function JourneyPreview({ cards }: Props) {
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="mb-4 font-semibold text-[20px] leading-[120%] text-[#D2AF9C]">
-              Appreciative Words
+              {learnMoreCard.title}
             </h2>
             <HtmlContent
               html={learnMoreCard.additional}

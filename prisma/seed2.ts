@@ -3107,7 +3107,7 @@ async function main() {
         additional: card.translations.ET.additional,
         imageUrl: card.imageUrl,
         category: card.category,
-        isFree: false,
+        isFree: card.isFree ?? false,
         translations: {
           create: [
             {
