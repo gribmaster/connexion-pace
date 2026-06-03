@@ -187,7 +187,7 @@ export function SurpriseMePlay({ cards }: Props) {
             </div>
 
             {card.imageUrl && (
-              <div className="relative h-[140px] w-full mb-4">
+              <div className="relative h-[190px] w-full mb-4">
                 <Image
                   src={card.imageUrl}
                   alt={card.title}

@@ -154,7 +154,7 @@ export function JourneyCardSelector({ cards, category, theme, isPremium }: Props
           const accessible = canAccessCard({ category, isFree: card.isFree }, isPremium)
           const selected = mounted && accessible && selectedIds.includes(card.id)
           return (
-            <div key={card.id} className="w-[33.3%] p-[3px]">
+            <div key={card.id} className="w-[50%] p-[3px]">
               <div
                 onClick={() => toggleCard(card.id, accessible)}
                 className={`relative h-[100%] ${accessible ? 'cursor-pointer' : 'cursor-not-allowed buy-premium-card'}`}
@@ -185,7 +185,7 @@ export function JourneyCardSelector({ cards, category, theme, isPremium }: Props
                     <img
                       src={card.imageUrl}
                       alt={card.title}
-                      className="h-[136px] w-full rounded-[5px] object-cover"
+                      className="h-auto w-full rounded-[5px] object-cover"
                     />
                   )}
                   {selected && (
@@ -233,7 +233,7 @@ export function JourneyCardSelector({ cards, category, theme, isPremium }: Props
               <img
                 src={previewCard.imageUrl}
                 alt={previewCard.title}
-                className="mb-4 h-48 w-full rounded-2xl object-cover"
+                className="mb-4 h-auto w-full rounded-2xl object-cover"
               />
             )}
             {previewCard.description && (

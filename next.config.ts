@@ -12,6 +12,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'connexion-pace.vercel.app',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };

@@ -153,7 +153,7 @@ function SortableCard({ card, counter, theme, onOpenPreview }: SortableCardProps
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="w-[33.3%] p-[3px]">
+    <div ref={setNodeRef} style={style} className="w-[50%] p-[3px]">
       <div className="relative h-[100%]" onClick={handleCardClick}>
         <Card className={`${theme.singleCardClassName} border-1 border-[#D2AF9C]`}>
           <div className="cat-card-head flex flex-grow-1 items-start justify-between mb-[10px]">
@@ -172,7 +172,7 @@ function SortableCard({ card, counter, theme, onOpenPreview }: SortableCardProps
             <img
               src={card.imageUrl}
               alt={card.title}
-              className="h-[136px] w-full rounded-[5px] object-cover"
+              className="h-auto w-full rounded-[5px] object-cover"
             />
           )}
         </Card>
@@ -426,7 +426,7 @@ export function JourneyPreview({ cards }: Props) {
               <img
                 src={previewCard.imageUrl}
                 alt={previewCard.title}
-                className="mb-4 h-48 w-full rounded-2xl object-cover"
+                className="mb-4 h-auto w-full rounded-2xl object-cover"
               />
             )}
             {previewCard.description && (
