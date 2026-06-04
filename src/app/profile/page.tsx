@@ -7,6 +7,7 @@ import { getUserSubscription } from '@/lib/premium/getUserSubscription'
 import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
 import { ProfileClient } from '@/components/ProfileClient'
+import { ProfilePageTitle, ProfilePlanHeading } from '@/components/ProfileStrings'
 import { PlanInfo } from './PlanInfo'
 import Link from "next/link";
 
@@ -66,7 +67,7 @@ export default async function ProfilePage() {
           <svg width="9" height="16" viewBox="0 0 9 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M8 0.5L0.5 8L8 15.5" stroke="#69584E" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <span className="ml-4 text-[20px] leading-[30px]">Profile page</span>
+          <span className="ml-4 text-[20px] leading-[30px]"><ProfilePageTitle /></span>
         </Link>
         {/* User info */}
         <Card className="flex flex-col border-b border-[#69584E80] rounded-none">
@@ -82,7 +83,7 @@ export default async function ProfilePage() {
 
         {/* Plan section */}
         <div className="flex flex-col gap-5">
-          <h2 className="text-sm font-semibold text-[#D2AF9C]">Your plan information</h2>
+          <h2 className="text-sm font-semibold text-[#D2AF9C]"><ProfilePlanHeading /></h2>
 
           <div className="p-5 border border-[#69584E] rounded-[24px] info-plan-bg">
             <PlanInfo

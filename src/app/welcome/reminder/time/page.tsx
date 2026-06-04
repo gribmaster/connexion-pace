@@ -7,7 +7,9 @@ import { Button } from '@/components/ui/Button'
 import { WheelPicker } from '@/components/reminder/WheelPicker'
 import { subscribeToPushNotifications } from '@/lib/notifications/subscribeToPush'
 import { REMINDER_KEY } from '@/lib/notifications/playReminder'
+import { useLocale } from '@/lib/i18n/useLocale'
 
+// Month names used only for date parsing — always English from query params
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
@@ -51,6 +53,7 @@ function getDefaultTime(): { hour: string; minute: string; ampm: string } {
 function TimePickerInner() {
   const router = useRouter()
   const params = useSearchParams()
+  const { dict } = useLocale()
 
   const monthName = params.get('month') ?? 'January'
   const day = params.get('day') ?? '01'
@@ -172,13 +175,13 @@ function TimePickerInner() {
             onClick={handleBack}
             className="self-start text-[14px] opacity-60 hover:opacity-100 transition-opacity"
           >
-            ← Back
+            ← {dict.common.back}
           </button>
 
           <div className="flex flex-col gap-2 text-center">
-            <h1 className="font-semibold text-[24px] leading-[130%]">Choose play time</h1>
+            <h1 className="font-semibold text-[24px] leading-[130%]">{dict.reminder.choosePlayDate}</h1>
             <p className="font-normal text-[14px] leading-[150%] opacity-60">
-              Select when you want to play and we&apos;ll remind you.
+              {dict.reminder.choosePlayDateSubtitle}
             </p>
             <p className="font-medium text-[13px] opacity-40 mt-1">{dateLabel}</p>
           </div>
@@ -218,7 +221,7 @@ function TimePickerInner() {
           {/* Action buttons */}
           {(status === 'idle' || status === 'past-error' || status === 'sub-error' || status === 'api-error') && (
             <Button variant="primary" onClick={handleSave}>
-              Save
+              {dict.common.save}
             </Button>
           )}
 

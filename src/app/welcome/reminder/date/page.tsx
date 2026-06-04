@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 import { WheelPicker } from '@/components/reminder/WheelPicker'
+import { useLocale } from '@/lib/i18n/useLocale'
 
-const MONTH_NAMES = [
+const EN_MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ]
@@ -25,38 +26,50 @@ function buildYearOptions(): string[] {
   return Array.from({ length: 4 }, (_, i) => String(current + i))
 }
 
-function getDefaultDate() {
-  const tomorrow = new Date()
-  tomorrow.setDate(tomorrow.getDate() + 1)
-  return {
-    month: MONTH_NAMES[tomorrow.getMonth()],
-    day: String(tomorrow.getDate()).padStart(2, '0'),
-    year: String(tomorrow.getFullYear()),
-  }
-}
-
 export default function ReminderDatePage() {
   const router = useRouter()
-  const defaults = getDefaultDate()
+  const { dict } = useLocale()
+  const monthNames: string[] = [...dict.reminder.monthsFull]
 
-  const [month, setMonth] = useState(defaults.month)
-  const [year, setYear] = useState(defaults.year)
+  const [initialized, setInitialized] = useState(false)
+  const [month, setMonth] = useState('')
+  const [day, setDay] = useState('')
+  const [year, setYear] = useState('')
 
-  const monthIndex = MONTH_NAMES.indexOf(month)
-  const yearNum = parseInt(year, 10)
-  const dayOptions = buildDayOptions(monthIndex, yearNum)
+  // Initialize after mount to avoid hydration mismatch with locale-dependent month names
+  useEffect(() => {
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    const mi = tomorrow.getMonth()
+    const yi = tomorrow.getFullYear()
+    const di = tomorrow.getDate()
+    const count = daysInMonth(mi, yi)
+    setMonth(monthNames[mi])
+    setDay(String(Math.min(di, count)).padStart(2, '0'))
+    setYear(String(yi))
+    setInitialized(true)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  // Clamp day when month/year changes (e.g. Feb 31 → Feb 28)
-  const [day, setDay] = useState(() => {
-    const count = daysInMonth(monthIndex, yearNum)
-    const d = parseInt(defaults.day, 10)
-    return String(Math.min(d, count)).padStart(2, '0')
-  })
+  // Keep month label in sync when locale changes after initialization
+  useEffect(() => {
+    if (!initialized) return
+    // Find the current month's index by matching either the current locale label or the EN label
+    const currentIndex = EN_MONTH_NAMES.findIndex(
+      (enName, i) => monthNames[i] === month || enName === month
+    )
+    if (currentIndex !== -1) setMonth(monthNames[currentIndex])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [monthNames])
+
+  const monthIndex = monthNames.indexOf(month)
+  const yearNum = parseInt(year || '0', 10)
+  const dayOptions = buildDayOptions(monthIndex === -1 ? 0 : monthIndex, yearNum)
 
   function handleMonthChange(m: string) {
     setMonth(m)
-    const mi = MONTH_NAMES.indexOf(m)
-    const count = daysInMonth(mi, yearNum)
+    const mi = monthNames.indexOf(m)
+    const count = daysInMonth(mi === -1 ? 0 : mi, yearNum)
     const d = parseInt(day, 10)
     if (d > count) setDay(String(count).padStart(2, '0'))
   }
@@ -64,15 +77,19 @@ export default function ReminderDatePage() {
   function handleYearChange(y: string) {
     setYear(y)
     const yi = parseInt(y, 10)
-    const count = daysInMonth(monthIndex, yi)
+    const count = daysInMonth(monthIndex === -1 ? 0 : monthIndex, yi)
     const d = parseInt(day, 10)
     if (d > count) setDay(String(count).padStart(2, '0'))
   }
 
   function handleNext() {
-    const params = new URLSearchParams({ month, day, year })
+    // Pass the English month name so the time page can parse it locale-independently
+    const englishMonth = EN_MONTH_NAMES[monthIndex === -1 ? 0 : monthIndex]
+    const params = new URLSearchParams({ month: englishMonth, day, year })
     router.push(`/welcome/reminder/time?${params.toString()}`)
   }
+
+  if (!initialized) return null
 
   return (
     <main className="flex flex-col items-center max-w-[525px] mx-auto min-h-screen">
@@ -83,20 +100,20 @@ export default function ReminderDatePage() {
             onClick={() => router.push('/welcome')}
             className="self-start text-[14px] opacity-60 hover:opacity-100 transition-opacity"
           >
-            ← Back
+            ← {dict.common.back}
           </button>
 
           <div className="flex flex-col gap-2 text-center">
-            <h1 className="font-semibold text-[24px] leading-[130%]">Choose play date</h1>
+            <h1 className="font-semibold text-[24px] leading-[130%]">{dict.reminder.choosePlayDate}</h1>
             <p className="font-normal text-[14px] leading-[150%] opacity-60">
-              Select when you want to play and we&apos;ll remind you.
+              {dict.reminder.choosePlayDateSubtitle}
             </p>
           </div>
 
           {/* Wheel picker row */}
           <div className="flex items-center justify-center gap-3 py-4">
             <WheelPicker
-              options={MONTH_NAMES}
+              options={monthNames}
               value={month}
               onChange={handleMonthChange}
             />
@@ -119,7 +136,7 @@ export default function ReminderDatePage() {
           </div>
 
           <Button variant="primary" onClick={handleNext}>
-            Next
+            {dict.common.next}
           </Button>
         </div>
       </Container>

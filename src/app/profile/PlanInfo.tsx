@@ -3,14 +3,9 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { ItmIcon } from '@/components/icons/ItmIcon'
+import { useLocale } from '@/lib/i18n/useLocale'
 
 type Tab = 'monthly' | 'quarterly' | 'yearly'
-
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'monthly', label: 'Monthly' },
-  { id: 'quarterly', label: 'Quarterly' },
-  { id: 'yearly', label: 'Yearly' },
-]
 
 // Update price text once actual Stripe prices are confirmed
 const PLAN_CONFIG: Record<Tab, { priceText: string; intervalLabel: string }> = {
@@ -18,8 +13,6 @@ const PLAN_CONFIG: Record<Tab, { priceText: string; intervalLabel: string }> = {
   quarterly: { priceText: '$24.99', intervalLabel: 'per 3 months' },
   yearly: { priceText: '$79.99', intervalLabel: 'per year' },
 }
-
-const FEATURES = ['Unlimited Cards', 'Extend Time', 'Flexible Game Duration']
 
 interface Props {
   isPremium: boolean
@@ -34,6 +27,15 @@ function formatSubDate(iso: string): string {
 }
 
 export function PlanInfo({ isPremium, currentPlan, cancelEndDate, currentPeriodEnd, isCancelling }: Props) {
+  const { dict } = useLocale()
+  const dp = dict.profile
+  const TABS: { id: Tab; label: string }[] = [
+    { id: 'monthly', label: dp.monthly },
+    { id: 'quarterly', label: dp.quarterly },
+    { id: 'yearly', label: dp.yearly },
+  ]
+  const FEATURES = [dp.unlimitedCards, dp.extendTime]
+
   const [activeTab, setActiveTab] = useState<Tab>('monthly')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -109,7 +111,7 @@ export function PlanInfo({ isPremium, currentPlan, cancelEndDate, currentPeriodE
       {/* Current plan summary */}
       {isPremium && planLabel ? (
         <div className="flex flex-col gap-1 pb-2 border-b border-[#69584E40]">
-          <p className="text-[12px] text-[#69584E] uppercase tracking-wide">Current plan</p>
+          <p className="text-[12px] text-[#69584E] uppercase tracking-wide">{dp.currentPlan}</p>
           <p className="text-[20px] font-semibold text-[#D2AF9C]">{planLabel}</p>
           {summaryDateLine && (
             <p className="text-[13px] text-[#D2AF9C]/60">{summaryDateLine}</p>
@@ -117,9 +119,9 @@ export function PlanInfo({ isPremium, currentPlan, cancelEndDate, currentPeriodE
         </div>
       ) : !isPremium ? (
         <div className="flex flex-col gap-1 pb-2 border-b border-[#69584E40]">
-          <p className="text-[12px] text-[#69584E] uppercase tracking-wide">Current plan</p>
-          <p className="text-[20px] font-semibold text-[#D2AF9C]">Free</p>
-          <p className="text-[13px] text-[#D2AF9C]/60">Subscribe to unlock all cards and features</p>
+          <p className="text-[12px] text-[#69584E] uppercase tracking-wide">{dp.currentPlan}</p>
+          <p className="text-[20px] font-semibold text-[#D2AF9C]">{dp.free}</p>
+          <p className="text-[13px] text-[#D2AF9C]/60">{dp.subscribeToUnlock}</p>
         </div>
       ) : null}
 
@@ -150,7 +152,7 @@ export function PlanInfo({ isPremium, currentPlan, cancelEndDate, currentPeriodE
           </span>
           {isCurrentTab && (
             <span className="rounded-full bg-[#69584E4D] border border-[#69584E] px-3 py-[6px] text-[14px] font-semibold text-[#D2AF9C]">
-              Current plan
+              {dp.currentPlan}
             </span>
           )}
         </div>
@@ -171,11 +173,11 @@ export function PlanInfo({ isPremium, currentPlan, cancelEndDate, currentPeriodE
         {/* Action button */}
         {isPremium ? (
           <Button variant="primary" onClick={handleManage} disabled={loading}>
-            {loading ? 'Redirecting…' : 'Manage'}
+            {loading ? dict.common.redirecting : 'Manage'}
           </Button>
         ) : (
           <Button variant="primary" onClick={handleSubscribe} disabled={loading}>
-            {loading ? 'Redirecting…' : 'Subscribe'}
+            {loading ? dict.common.redirecting : dp.subscribe}
           </Button>
         )}
 

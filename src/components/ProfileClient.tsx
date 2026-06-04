@@ -33,12 +33,6 @@ const DC_DRAFT_KEY = 'connexion_daily_connection_draft'
 const DC_HOURS = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'))
 const DC_MINUTES = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']
 const DC_AMPM = ['AM', 'PM']
-const DC_INTERVALS = [
-  { label: '1 day', value: 1 },
-  { label: '2 days', value: 2 },
-  { label: '3 days', value: 3 },
-  { label: '7 days', value: 7 },
-]
 
 interface DcDraft {
   enabled?: boolean
@@ -99,6 +93,12 @@ export function ProfileClient() {
   const { locale, setLocale, dict } = useLocale()
   const dp = dict.profile
   const dc = dict.common
+  const DC_INTERVALS = [
+    { label: dp.interval1, value: 1 },
+    { label: dp.interval2, value: 2 },
+    { label: dp.interval3, value: 3 },
+    { label: dp.interval7, value: 7 },
+  ]
   const [modal, setModal] = useState<Modal>(null)
   const [language, setLanguage] = useState<'Eesti' | 'English'>('Eesti')
 
@@ -459,7 +459,7 @@ export function ProfileClient() {
           onClick={() => { setResetError(false); setModal('reset_cache') }}
           className="flex items-center justify-between p-2"
         >
-          <span className="text-[16px] leading-[24px] font-medium">Reset app cache</span>
+          <span className="text-[16px] leading-[24px] font-medium">{dp.resetAppCache}</span>
           <ChevronRight />
         </button>
 
@@ -522,9 +522,9 @@ export function ProfileClient() {
       {/* Daily Connection modal */}
       {modal === 'daily_connection' && (
         <BottomModal onClose={handleDcModalClose}>
-          <h2 className="text-[20px] leading-[24px] font-semibold mb-2">Daily Connection</h2>
+          <h2 className="text-[20px] leading-[24px] font-semibold mb-2">{dp.dailyConnection}</h2>
           <p className="text-[14px] leading-[22px] opacity-60 mb-6">
-            Choose when you want to receive your connection reminder.
+            {dp.dailyConnectionSubtitle}
           </p>
 
           {/* Wheel time picker */}
@@ -538,7 +538,7 @@ export function ProfileClient() {
 
           {/* Interval selection */}
           <div className="mb-6">
-            <p className="text-[14px] font-medium mb-3 opacity-80">Repeat every</p>
+            <p className="text-[14px] font-medium mb-3 opacity-80">{dp.repeatEvery}</p>
             <div className="flex gap-2 flex-wrap">
               {DC_INTERVALS.map((opt) => (
                 <button
@@ -573,10 +573,10 @@ export function ProfileClient() {
           <div className="flex flex-col gap-3">
             {!dcSaved && (
               <Button variant="primary" onClick={handleDcSave} disabled={dcLoading}>
-                {dcLoading ? 'Saving…' : 'Save'}
+                {dcLoading ? '…' : dc.save}
               </Button>
             )}
-            <Button variant="secondary" onClick={handleDcModalClose} disabled={dcLoading}>Cancel</Button>
+            <Button variant="secondary" onClick={handleDcModalClose} disabled={dcLoading}>{dc.cancel}</Button>
           </div>
         </BottomModal>
       )}
@@ -584,9 +584,9 @@ export function ProfileClient() {
       {/* Reset app cache confirmation modal */}
       {modal === 'reset_cache' && (
         <BottomModal onClose={() => !resetting && setModal(null)}>
-          <h2 className="text-[20px] leading-[24px] font-semibold mb-4">Reset app cache?</h2>
+          <h2 className="text-[20px] leading-[24px] font-semibold mb-4">{dp.resetAppCacheConfirm}</h2>
           <p className="text-[14px] leading-[22px] opacity-60 mb-6">
-            This will clear local app data, cached files, saved settings, and reload the app. You may need to sign in again.
+            {dp.resetAppCacheBody}
           </p>
           {resetError && (
             <p className="text-[13px] text-red-400 mb-4 text-center">
@@ -595,10 +595,10 @@ export function ProfileClient() {
           )}
           <div className="flex flex-col gap-3">
             <Button variant="primary" onClick={handleReset} disabled={resetting}>
-              {resetting ? 'Resetting…' : 'Reset'}
+              {resetting ? '…' : dc.reset}
             </Button>
             <Button variant="secondary" onClick={() => setModal(null)} disabled={resetting}>
-              Cancel
+              {dc.cancel}
             </Button>
           </div>
         </BottomModal>
