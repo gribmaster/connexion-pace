@@ -71,9 +71,13 @@ export const getAllCardsCached = unstable_cache(
 // Minimal cards — only id/category/isFree — used for counts and queue building
 export const getAllCardsMinimalCached = unstable_cache(
   async (): Promise<CardMinimal[]> => {
-    return prisma.card.findMany({
+    // log only runs on cache miss; cache hits bypass this function entirely
+    const t0 = Date.now()
+    const rows = await prisma.card.findMany({
       select: { id: true, category: true, isFree: true },
     })
+    console.log(`[getAllCardsMinimalCached] CACHE MISS — db=${Date.now() - t0}ms rows=${rows.length}`)
+    return rows
   },
   ['all-cards-minimal'],
   { revalidate: CARD_REVALIDATE, tags: [CACHE_TAG] }
