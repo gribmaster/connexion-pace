@@ -2,13 +2,13 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { prisma } from '@/lib/prisma'
 import { Category } from '@prisma/client'
 import { Container } from '@/components/ui/Container'
 import { IntuitiveCardSelector } from '@/components/IntuitiveCardSelector'
 import { getCategoryTheme } from '@/lib/categoryThemes'
 import { getUserPremiumStatus } from '@/lib/premium/getUserPremiumStatus'
 import { canAccessCard } from '@/lib/premium/cardAccess'
+import { getCardsByCategoryCached } from '@/lib/cards/cachedCards'
 
 const VALID_CATEGORIES = ['CONNECTION', 'INTIMACY', 'LOVEMAKING']
 
@@ -25,20 +25,7 @@ export default async function CategoryPage({ params }: Props) {
 
   // TODO: pass selected locale to server card queries (currently defaulting to ET).
   const [cards, isPremium] = await Promise.all([
-    prisma.card.findMany({
-      where: { category: upperCategory as Category },
-      orderBy: { createdAt: 'asc' },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        imageUrl: true,
-        additional: true,
-        category: true,
-        isFree: true,
-        translations: { select: { locale: true, title: true, description: true, additional: true } },
-      },
-    }),
+    getCardsByCategoryCached(upperCategory as Category),
     getUserPremiumStatus(),
   ])
 

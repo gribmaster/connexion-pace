@@ -1,8 +1,8 @@
 export const dynamic = 'force-dynamic'
 
-import { prisma } from '@/lib/prisma'
 import { Container } from '@/components/ui/Container'
 import { SurpriseMeSelector } from '@/components/SurpriseMeSelector'
+import { getAllCardsMinimalCached } from '@/lib/cards/cachedCards'
 
 const categories = [
   { label: 'Connection', value: 'CONNECTION' },
@@ -11,15 +11,11 @@ const categories = [
 ] as const
 
 export default async function SurpriseMePage() {
-  const counts = await Promise.all(
-    categories.map(({ value }) =>
-      prisma.card.count({ where: { category: value } })
-    )
-  )
+  const allCards = await getAllCardsMinimalCached()
 
-  const categoriesWithCounts = categories.map((cat, i) => ({
+  const categoriesWithCounts = categories.map((cat) => ({
     ...cat,
-    count: counts[i],
+    count: allCards.filter((c) => c.category === cat.value).length,
   }))
 
   return (

@@ -1,9 +1,9 @@
 export const dynamic = 'force-dynamic'
 
-import { prisma } from '@/lib/prisma'
 import { Container } from '@/components/ui/Container'
 import { GameModeTabs } from '@/components/GameModeTabs'
 import { getUserPremiumStatus } from '@/lib/premium/getUserPremiumStatus'
+import { getAllCardsMinimalCached } from '@/lib/cards/cachedCards'
 
 const categories = [
   { label: 'Connection', value: 'CONNECTION' },
@@ -20,9 +20,7 @@ export default async function GamePage({
   const initialTab = mode === 'surprise' ? 'surprise' : mode === 'journey' ? 'journey' : 'intuitive'
 
   const [cardsRaw, isPremium] = await Promise.all([
-    prisma.card.findMany({
-      select: { id: true, category: true, isFree: true },
-    }),
+    getAllCardsMinimalCached(),
     getUserPremiumStatus(),
   ])
 

@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getDevUser } from '@/lib/devAuth'
-import { prisma } from '@/lib/prisma'
+import { getUserSubscription } from '@/lib/premium/getUserSubscription'
 import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
 import { ProfileClient } from '@/components/ProfileClient'
@@ -33,23 +33,7 @@ export default async function ProfilePage() {
   }
 
   // Resolve plan from DB
-  const prismaUser = await prisma.user.findUnique({
-    where: { email },
-    select: {
-      subscription: {
-        select: {
-          status: true,
-          stripePriceId: true,
-          currentPeriodEnd: true,
-          cancelAtPeriodEnd: true,
-          cancelAt: true,
-          endedAt: true,
-        },
-      },
-    },
-  })
-
-  const sub = prismaUser?.subscription
+  const sub = await getUserSubscription(email)
   const isActiveSub = (sub?.status === 'active' || sub?.status === 'trialing')
     && !sub?.endedAt
     && (!sub?.currentPeriodEnd || sub.currentPeriodEnd > new Date())

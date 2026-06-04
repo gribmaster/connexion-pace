@@ -56,6 +56,8 @@ model UserSubscription {
   user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([status])
+  @@index([currentPeriodEnd])
 }
 
 model Card {
@@ -68,6 +70,9 @@ model Card {
   isFree      Boolean  @default(false)
   createdAt   DateTime @default(now())
   translations CardTranslation[]
+
+  @@index([category])
+  @@index([category, isFree])
 }
 
 model CardTranslation {
