@@ -18,7 +18,7 @@ export function CategoryInfoModal({ category, isOpen, onClose, locale }: Props) 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-center px-4 pb-4 sm:pb-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 sm:items-center px-4 pb-4 sm:pb-4"
       onClick={onClose}
     >
       <div
