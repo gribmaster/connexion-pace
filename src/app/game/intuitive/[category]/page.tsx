@@ -12,11 +12,6 @@ import { canAccessCard } from '@/lib/premium/cardAccess'
 
 const VALID_CATEGORIES = ['CONNECTION', 'INTIMACY', 'LOVEMAKING']
 
-const categoryInfo: Record<string, string> = {
-  CONNECTION: 'Connection cards are focused on emotional closeness and communication.',
-  INTIMACY: 'Intimacy cards are focused on vulnerability, trust, and emotional bonding.',
-  LOVEMAKING: 'Lovemaking cards are focused on physical connection and romantic energy.',
-}
 
 type Props = {
   params: Promise<{ category: string }>
@@ -74,7 +69,6 @@ export default async function CategoryPage({ params }: Props) {
         <IntuitiveCardSelector
           cards={sortedCards}
           category={category}
-          categoryInfo={categoryInfo[upperCategory] ?? ''}
           theme={theme}
           isPremium={isPremium}
         />

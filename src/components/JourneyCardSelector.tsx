@@ -12,6 +12,8 @@ import { useLocale } from '@/lib/i18n/useLocale'
 import { resolveCardTranslation } from '@/lib/i18n/resolveCardTranslation'
 import { canAccessCard } from '@/lib/premium/cardAccess'
 import { PremiumCardModal } from '@/components/PremiumCardModal'
+import { InfoCircleIcon } from '@/components/icons/InfoCircleIcon'
+import { CategoryInfoModal } from '@/components/CategoryInfoModal'
 
 // TODO: enforce free/premium Journey card selection limits here.
 const JOURNEY_FREE_CARD_LIMIT = 5
@@ -71,6 +73,7 @@ export function JourneyCardSelector({ cards, category, theme, isPremium }: Props
   const [previewCard, setPreviewCard] = useState<CardItem | null>(null)
   const [learnMoreCard, setLearnMoreCard] = useState<CardItem | null>(null)
   const [premiumOpen, setPremiumOpen] = useState(false)
+  const [infoOpen, setInfoOpen] = useState(false)
   const { locale, dict } = useLocale()
   const dj = dict.journey
   const dc = dict.common
@@ -142,6 +145,13 @@ export function JourneyCardSelector({ cards, category, theme, isPremium }: Props
               </clipPath>
             </defs>
           </svg>
+        </button>
+        <button
+          onClick={() => setInfoOpen(true)}
+          aria-label="Category info"
+          className="flex items-center justify-center"
+        >
+          <InfoCircleIcon />
         </button>
       </div>
 
@@ -253,6 +263,13 @@ export function JourneyCardSelector({ cards, category, theme, isPremium }: Props
           </div>
         </div>
       )}
+
+      <CategoryInfoModal
+        category={category.toUpperCase()}
+        isOpen={infoOpen}
+        onClose={() => setInfoOpen(false)}
+        locale={locale}
+      />
 
       {premiumOpen && (
         <PremiumCardModal onClose={() => setPremiumOpen(false)} />

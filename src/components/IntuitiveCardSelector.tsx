@@ -11,6 +11,7 @@ import type { CategoryTheme } from '@/lib/categoryThemes'
 import {InfoCircleIcon} from "@/components/icons/InfoCircleIcon";
 import {CollapseIcon} from "@/components/icons/CollapseIcon";
 import { HtmlContent } from '@/components/HtmlContent'
+import { CategoryInfoModal } from '@/components/CategoryInfoModal'
 import { useLocale } from '@/lib/i18n/useLocale'
 import { resolveCardTranslation } from '@/lib/i18n/resolveCardTranslation'
 import { canAccessCard } from '@/lib/premium/cardAccess'
@@ -35,12 +36,11 @@ type CardItem = {
 type Props = {
   cards: CardItem[]
   category: string
-  categoryInfo: string
   theme: CategoryTheme
   isPremium: boolean
 }
 
-export function IntuitiveCardSelector({ cards, category, categoryInfo, theme, isPremium }: Props) {
+export function IntuitiveCardSelector({ cards, category, theme, isPremium }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [previewCard, setPreviewCard] = useState<CardItem | null>(null)
   const [learnMoreCard, setLearnMoreCard] = useState<CardItem | null>(null)
@@ -84,13 +84,13 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme, is
             </defs>
           </svg>
         </Link>
-        <div
-          className="hidden"
-          //onClick={() => setInfoOpen(true)}
+        <button
+          onClick={() => setInfoOpen(true)}
           aria-label="Category info"
+          className="flex items-center justify-center"
         >
           <InfoCircleIcon/>
-        </div>
+        </button>
       </div>
       <h1 className="font-semibold text-[20px] leading-[30px] text-center mb-4">
         {category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}
@@ -163,23 +163,12 @@ export function IntuitiveCardSelector({ cards, category, categoryInfo, theme, is
         </Button>
       </div>
 
-      {infoOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
-          onClick={() => setInfoOpen(false)}
-        >
-          <div
-            className="w-full max-w-sm rounded-3xl bg-white p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="mb-4 text-lg font-semibold capitalize text-[#1a0a0e]">
-              {category.toLowerCase()}
-            </h2>
-            <p className="mb-8 text-sm leading-relaxed text-[#5a3a3a]">{categoryInfo}</p>
-            <Button onClick={() => setInfoOpen(false)}>Close</Button>
-          </div>
-        </div>
-      )}
+      <CategoryInfoModal
+        category={category.toUpperCase()}
+        isOpen={infoOpen}
+        onClose={() => setInfoOpen(false)}
+        locale={locale}
+      />
 
       {previewCard && (
         <div
