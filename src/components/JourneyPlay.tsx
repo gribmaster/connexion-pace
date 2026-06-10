@@ -10,6 +10,8 @@ import { getCategoryTheme } from '@/lib/categoryThemes'
 import { HtmlContent } from '@/components/HtmlContent'
 import { useLocale } from '@/lib/i18n/useLocale'
 import { resolveCardTranslation } from '@/lib/i18n/resolveCardTranslation'
+import {InfoCircleIcon} from "@/components/icons/InfoCircleIcon";
+import { AbcEmotionsModal } from '@/components/AbcEmotionsModal'
 
 const QUEUE_KEY = 'connexion_journey_queue'
 
@@ -94,6 +96,7 @@ export function JourneyPlay({ cards }: Props) {
     initResult.status === 'ok' ? initResult.queue : null
   )
   const stopSoundRef = useRef<() => void>(() => {})
+  const [isAbcEmotionsOpen, setIsAbcEmotionsOpen] = useState(false)
   const { locale, dict } = useLocale()
   const dg = dict.gameplay
 
@@ -165,8 +168,16 @@ export function JourneyPlay({ cards }: Props) {
             className={`h-[582px] overflow-auto border border-[#69584E] p-4 ${theme.cardContainerClassName} rounded-[24px]`}
           >
             <div className="flex justify-between items-start">
-              <h1 className="text-[20px] leading-[26px] mb-4 font-semibold">{card.title}</h1>
-              <img src="/img/x-plhldr.svg" width="48" className="hidden" alt="" />
+              <h1 className="text-[20px] leading-[26px] mb-4 font-semibold flex items-center">
+                {card.title}
+                <span
+                  className="ml-1 abc-emotions-call"
+                  onClick={() => setIsAbcEmotionsOpen(true)}
+                >
+                  <InfoCircleIcon/>
+                </span>
+              </h1>
+              <img src="/img/x-plhldr.svg" width="48" className="" alt="" />
             </div>
 
             {card.imageUrl && (
@@ -206,6 +217,11 @@ export function JourneyPlay({ cards }: Props) {
           </div>
         </div>
       </Container>
+      <AbcEmotionsModal
+        isOpen={isAbcEmotionsOpen}
+        onClose={() => setIsAbcEmotionsOpen(false)}
+        locale={locale}
+      />
     </div>
   )
 }

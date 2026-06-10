@@ -10,6 +10,8 @@ import { getCategoryTheme } from '@/lib/categoryThemes'
 import { HtmlContent } from '@/components/HtmlContent'
 import { useLocale } from '@/lib/i18n/useLocale'
 import { resolveCardTranslation } from '@/lib/i18n/resolveCardTranslation'
+import {InfoCircleIcon} from "@/components/icons/InfoCircleIcon";
+import { AbcEmotionsModal } from '@/components/AbcEmotionsModal'
 
 type Translation = {
   locale: string
@@ -119,6 +121,7 @@ export function SurpriseMePlay({ cards }: Props) {
   )
   const stopSoundRef = useRef<() => void>(() => {})
   const [isNextLoading, setIsNextLoading] = useState(false)
+  const [isAbcEmotionsOpen, setIsAbcEmotionsOpen] = useState(false)
   const { locale, dict } = useLocale()
   const dg = dict.gameplay
 
@@ -180,7 +183,15 @@ export function SurpriseMePlay({ cards }: Props) {
           </div>
           <div className={`h-[582px] overflow-auto border border-[#69584E] p-4 ${theme.cardContainerClassName} rounded-[24px]`}>
             <div className="flex items-start justify-between gap-2 mb-4">
-              <h1 className="text-[20px] leading-[26px] font-semibold">{card.title}</h1>
+              <h1 className="text-[20px] leading-[26px] font-semibold flex items-center">
+                {card.title}
+                <span
+                  className="ml-1 abc-emotions-call"
+                  onClick={() => setIsAbcEmotionsOpen(true)}
+                >
+                  <InfoCircleIcon/>
+                </span>
+              </h1>
               <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${theme.badgeClassName} hidden`}>
                 {CATEGORY_LABELS[card.category] ?? card.category}
               </span>
@@ -213,6 +224,11 @@ export function SurpriseMePlay({ cards }: Props) {
           </div>
         </div>
       </Container>
+      <AbcEmotionsModal
+        isOpen={isAbcEmotionsOpen}
+        onClose={() => setIsAbcEmotionsOpen(false)}
+        locale={locale}
+      />
     </div>
   )
 }
