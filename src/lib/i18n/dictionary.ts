@@ -126,6 +126,8 @@ export const dictionary = {
       timerSound: 'Taimeri heli',
       logOut: 'Logi välja',
       volume: 'Helitugevus',
+      withdrawalAcknowledgement: 'Nõustun saama kohese juurdepääsu digitaalsele premium-sisule ja kinnitan, et seadusega lubatud juhtudel võin pärast juurdepääsu algust kaotada oma 14-päevase taganemisõiguse.',
+      withdrawalRequired: 'Palun kinnita digitaalse sisu juurdepääsu ja taganemisõiguse teavitus enne jätkamist.',
     },
     reminder: {
       choosePlayDate: 'Vali mängu kuupäev',
@@ -285,6 +287,8 @@ export const dictionary = {
       timerSound: 'Timer sound',
       logOut: 'Log out',
       volume: 'Volume',
+      withdrawalAcknowledgement: 'I agree to receive immediate access to the digital premium content and acknowledge that, where permitted by law, I may lose my 14-day right of withdrawal once access begins.',
+      withdrawalRequired: 'Please confirm the digital content access and withdrawal acknowledgement before continuing.',
     },
     reminder: {
       choosePlayDate: 'Choose play date',

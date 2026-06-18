@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import Image from "next/image";
+import Link from 'next/link'
 import { useLocale } from '@/lib/i18n/useLocale'
 
 export function LoginForm() {
@@ -107,13 +108,13 @@ export function LoginForm() {
 
         <p className="text-center text-xs text-[#D2AF9C]/60 leading-relaxed">
           {d.terms}{' '}<br/>
-          <a href="#" className="underline underline-offset-2 hover:text-[#D2AF9C]">
+          <Link href="/terms" className="underline underline-offset-2 hover:text-[#D2AF9C]">
             {d.termsLink}
-          </a>{' '}
+          </Link>{' '}
           {d.and}{' '}
-          <a href="#" className="underline underline-offset-2 hover:text-[#D2AF9C]">
+          <Link href="/privacy-policy" className="underline underline-offset-2 hover:text-[#D2AF9C]">
             {d.privacyLink}
-          </a>
+          </Link>
           .
         </p>
       </div>

@@ -644,4 +644,15 @@ div::-webkit-scrollbar-thumb {
 .abc-emotions-content .tab-item.is-open .tab-body {
   display: block;
 }
+.checkbox-item {
 
+}
+.checkbox-item input {
+
+}
+.checkbox-item input:checked + span {
+  background-image: url('/img/check-light.svg');
+  background-size: 9px;
+  background-repeat: no-repeat;
+  background-position: center;
+}

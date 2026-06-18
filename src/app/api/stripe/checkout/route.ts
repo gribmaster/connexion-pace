@@ -16,13 +16,22 @@ const PLAN_PRICE_IDS: Record<Plan, string | undefined> = {
 
 export async function POST(request: Request) {
   let plan: Plan = 'monthly'
+  let withdrawalAcknowledged = false
   try {
     const body = await request.json()
     if (body?.plan === 'quarterly' || body?.plan === 'yearly' || body?.plan === 'monthly') {
       plan = body.plan
     }
+    withdrawalAcknowledged = body?.withdrawalAcknowledged === true
   } catch {
     // no body or invalid JSON — default to monthly
+  }
+
+  if (withdrawalAcknowledged !== true) {
+    return NextResponse.json(
+      { error: 'Withdrawal acknowledgement is required.' },
+      { status: 400 }
+    )
   }
 
   const priceId = PLAN_PRICE_IDS[plan]
@@ -73,14 +82,27 @@ export async function POST(request: Request) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 
+  const withdrawalAcknowledgedAt = new Date().toISOString()
+
   const session = await getStripe().checkout.sessions.create({
     customer: customerId,
     mode: 'subscription',
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${siteUrl}/profile?checkout=success`,
     cancel_url: `${siteUrl}/profile?checkout=cancelled`,
+    metadata: {
+      prismaUserId: prismaUser.id,
+      priceId,
+      withdrawalAcknowledged: 'true',
+      withdrawalAcknowledgedAt,
+    },
     subscription_data: {
-      metadata: { prismaUserId: prismaUser.id },
+      metadata: {
+        prismaUserId: prismaUser.id,
+        priceId,
+        withdrawalAcknowledged: 'true',
+        withdrawalAcknowledgedAt,
+      },
     },
   })
 

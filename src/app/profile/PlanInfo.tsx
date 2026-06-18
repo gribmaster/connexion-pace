@@ -40,6 +40,8 @@ export function PlanInfo({ isPremium, currentPlan, cancelEndDate, currentPeriodE
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [subDateLine, setSubDateLine] = useState<string | null>(null)
+  const [withdrawalAcknowledged, setWithdrawalAcknowledged] = useState(false)
+  const [withdrawalError, setWithdrawalError] = useState(false)
 
   const isCurrentTab = isPremium && activeTab === currentPlan
 
@@ -55,13 +57,17 @@ export function PlanInfo({ isPremium, currentPlan, cancelEndDate, currentPeriodE
   const { priceText, intervalLabel } = PLAN_CONFIG[activeTab]
 
   async function handleSubscribe() {
+    if (!withdrawalAcknowledged) {
+      setWithdrawalError(true)
+      return
+    }
     setLoading(true)
     setError(null)
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: activeTab }),
+        body: JSON.stringify({ plan: activeTab, withdrawalAcknowledged: true }),
       })
       const data = await res.json()
       if (data.url) {
@@ -176,9 +182,29 @@ export function PlanInfo({ isPremium, currentPlan, cancelEndDate, currentPeriodE
             {loading ? dict.common.redirecting : 'Manage'}
           </Button>
         ) : (
-          <Button variant="primary" onClick={handleSubscribe} disabled={loading}>
-            {loading ? dict.common.redirecting : dp.subscribe}
-          </Button>
+          <>
+            <label className="flex items-start gap-2 text-[13px] text-[#D2AF9C]/80 cursor-pointer mb-2">
+              <span className="checkbox-item">
+                <input
+                  type="checkbox"
+                  checked={withdrawalAcknowledged}
+                  onChange={(e) => {
+                    setWithdrawalAcknowledged(e.target.checked)
+                    if (e.target.checked) setWithdrawalError(false)
+                  }}
+                  className="hidden"
+                />
+                <span className="w-4 h-4 block border border-[#d2af9c] mt-1 rounded"></span>
+              </span>
+              <span>{dp.withdrawalAcknowledgement}</span>
+            </label>
+            {withdrawalError && (
+              <p className="text-[13px] text-red-400">{dp.withdrawalRequired}</p>
+            )}
+            <Button variant="primary" onClick={handleSubscribe} disabled={loading}>
+              {loading ? dict.common.redirecting : dp.subscribe}
+            </Button>
+          </>
         )}
 
         {/* Feature list */}
