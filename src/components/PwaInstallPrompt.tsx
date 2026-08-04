@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { useLocale } from '@/lib/i18n/useLocale'
 
@@ -8,10 +8,6 @@ interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
 }
-
-const DISMISSED_KEY = 'connexion_pwa_install_dismissed_at'
-const DISMISS_TTL_MS = 1 * 24 * 60 * 60 * 1000 // 1 day
-const INSTALLED_ACKNOWLEDGED_KEY = 'connexion_pwa_installed_acknowledged'
 
 function isStandalone(): boolean {
   if (typeof window === 'undefined') return false
@@ -30,26 +26,9 @@ function isIosSafari(): boolean {
   return isIos && isSafari
 }
 
-function wasDismissedRecently(): boolean {
-  try {
-    const raw = localStorage.getItem(DISMISSED_KEY)
-    if (!raw) return false
-    return Date.now() - Number(raw) < DISMISS_TTL_MS
-  } catch {
-    return false
-  }
-}
-
-function saveDismissal() {
-  try {
-    localStorage.setItem(DISMISSED_KEY, String(Date.now()))
-  } catch {}
-}
-
 function shouldShow(pathname: string): { ios: boolean; canListen: boolean } {
   if (pathname === '/auth/callback') return { ios: false, canListen: false }
   if (isStandalone()) return { ios: false, canListen: false }
-  if (wasDismissedRecently()) return { ios: false, canListen: false }
   if (isIosSafari()) return { ios: true, canListen: false }
   return { ios: false, canListen: true }
 }
@@ -62,9 +41,11 @@ export default function PwaInstallPrompt() {
   const [visible, setVisible] = useState(false)
   const [dismissed, setDismissed] = useState(false)
   const [showInstalledModal, setShowInstalledModal] = useState(false)
+  const handledInstallEventRef = useRef(false)
 
   const { ios, canListen } = shouldShow(pathname)
   const showIosBanner = ios && !dismissed
+  const showChromiumBanner = visible && !dismissed && Boolean(deferredPrompt)
 
   useEffect(() => {
     if (!canListen) return
@@ -80,18 +61,11 @@ export default function PwaInstallPrompt() {
 
   useEffect(() => {
     const handleAppInstalled = () => {
+      if (handledInstallEventRef.current) return
+      handledInstallEventRef.current = true
       setVisible(false)
       setDeferredPrompt(null)
-      let alreadyAcknowledged = false
-      try {
-        alreadyAcknowledged = localStorage.getItem(INSTALLED_ACKNOWLEDGED_KEY) === 'true'
-      } catch {}
-      if (!alreadyAcknowledged) {
-        try {
-          localStorage.setItem(INSTALLED_ACKNOWLEDGED_KEY, 'true')
-        } catch {}
-        setShowInstalledModal(true)
-      }
+      setShowInstalledModal(true)
     }
     window.addEventListener('appinstalled', handleAppInstalled)
     return () => window.removeEventListener('appinstalled', handleAppInstalled)
@@ -105,18 +79,14 @@ export default function PwaInstallPrompt() {
     if (!deferredPrompt) return
     await deferredPrompt.prompt()
     await deferredPrompt.userChoice
-    setVisible(false)
     setDeferredPrompt(null)
   }
 
   function handleDismiss() {
-    saveDismissal()
-    setVisible(false)
-    setDeferredPrompt(null)
+    setDismissed(true)
   }
 
   function handleIosDismiss() {
-    saveDismissal()
     setDismissed(true)
     setShowIosModal(false)
   }
@@ -185,7 +155,7 @@ export default function PwaInstallPrompt() {
   }
 
   // ── Chromium banner ───────────────────────────────────────────────
-  if (visible && deferredPrompt) {
+  if (showChromiumBanner) {
     return (
       <div
         role="region"
