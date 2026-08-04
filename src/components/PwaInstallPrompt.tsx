@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
+import { useLocale } from '@/lib/i18n/useLocale'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -10,6 +11,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 const DISMISSED_KEY = 'connexion_pwa_install_dismissed_at'
 const DISMISS_TTL_MS = 1 * 24 * 60 * 60 * 1000 // 1 day
+const INSTALLED_ACKNOWLEDGED_KEY = 'connexion_pwa_installed_acknowledged'
 
 function isStandalone(): boolean {
   if (typeof window === 'undefined') return false
@@ -54,10 +56,12 @@ function shouldShow(pathname: string): { ios: boolean; canListen: boolean } {
 
 export default function PwaInstallPrompt() {
   const pathname = usePathname()
+  const { dict } = useLocale()
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showIosModal, setShowIosModal] = useState(false)
   const [visible, setVisible] = useState(false)
   const [dismissed, setDismissed] = useState(false)
+  const [showInstalledModal, setShowInstalledModal] = useState(false)
 
   const { ios, canListen } = shouldShow(pathname)
   const showIosBanner = ios && !dismissed
@@ -73,6 +77,29 @@ export default function PwaInstallPrompt() {
     window.addEventListener('beforeinstallprompt', handler)
     return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [canListen])
+
+  useEffect(() => {
+    const handleAppInstalled = () => {
+      setVisible(false)
+      setDeferredPrompt(null)
+      let alreadyAcknowledged = false
+      try {
+        alreadyAcknowledged = localStorage.getItem(INSTALLED_ACKNOWLEDGED_KEY) === 'true'
+      } catch {}
+      if (!alreadyAcknowledged) {
+        try {
+          localStorage.setItem(INSTALLED_ACKNOWLEDGED_KEY, 'true')
+        } catch {}
+        setShowInstalledModal(true)
+      }
+    }
+    window.addEventListener('appinstalled', handleAppInstalled)
+    return () => window.removeEventListener('appinstalled', handleAppInstalled)
+  }, [])
+
+  function handleInstalledModalClose() {
+    setShowInstalledModal(false)
+  }
 
   async function handleInstall() {
     if (!deferredPrompt) return
@@ -92,6 +119,69 @@ export default function PwaInstallPrompt() {
     saveDismissal()
     setDismissed(true)
     setShowIosModal(false)
+  }
+
+  // ── Install success modal ─────────────────────────────────────────
+  if (showInstalledModal) {
+    return (
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pwa-installed-title"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 9200,
+          background: 'rgba(0,0,0,0.75)',
+          display: 'flex',
+          alignItems: 'flex-end',
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') handleInstalledModalClose()
+        }}
+      >
+        <div
+          style={{
+            width: '100%',
+            background: '#1a1412',
+            borderRadius: '16px 16px 0 0',
+            padding: '24px 20px',
+            paddingBottom: 'calc(24px + env(safe-area-inset-bottom))',
+            maxWidth: 480,
+            margin: '0 auto',
+            textAlign: 'center',
+          }}
+        >
+          <div style={{ fontSize: 40, marginBottom: 12 }} aria-hidden="true">
+            ✅
+          </div>
+          <p
+            id="pwa-installed-title"
+            style={{ color: '#D2AF9C', fontWeight: 600, fontSize: 18, marginBottom: 10 }}
+          >
+            {dict.pwaInstall.installedTitle}
+          </p>
+          <p style={{ color: '#9a8070', fontSize: 14, marginBottom: 24, lineHeight: 1.4 }}>
+            {dict.pwaInstall.installedMessage}
+          </p>
+          <button
+            onClick={handleInstalledModalClose}
+            style={{
+              width: '100%',
+              padding: '12px 0',
+              borderRadius: 10,
+              background: '#D2AF9C',
+              color: '#000',
+              fontWeight: 600,
+              fontSize: 14,
+              cursor: 'pointer',
+            }}
+          >
+            {dict.pwaInstall.continueButton}
+          </button>
+        </div>
+      </div>
+    )
   }
 
   // ── Chromium banner ───────────────────────────────────────────────

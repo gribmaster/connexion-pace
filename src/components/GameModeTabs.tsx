@@ -226,19 +226,21 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive',
         <>
           <div className="flex flex-col mt-5 gap-3 flex-1 basis-0">
             {categories.map(({ label, value, count }) => (
-              <div
-                key={value}
-                className={`flex items-center justify-between p-3 bg-${value} rounded-[24px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000] cat-card-intuitive`}
-              >
-                <div className="flex flex-col self-start p-2">
-                  <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
-                  <span className="font-normal text-[16px] leading-[24px]">{count} {dg.cards}</span>
+
+              <Link href={`/game/intuitive/${value}`} key={value} className="block">
+                <div
+                  className={`flex items-center justify-between p-3 bg-${value} rounded-[24px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000] cat-card-intuitive`}
+                >
+                  <div className="flex flex-col self-start p-2">
+                    <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
+                    <span className="font-normal text-[16px] leading-[24px]">{count} {dg.cards}</span>
+                  </div>
+                  <div className={`cat-card-${value} cat-img`}>
+                    <img src={`/img/card-container-${value}.svg`} alt=""/>
+                    <div className="font-semibold text-[12px] leading-[100%] absolute cat-label">{dg.choose}</div>
+                  </div>
                 </div>
-                <Link href={`/game/intuitive/${value}`} className={`cat-card-${value} cat-img`}>
-                  <img src={`/img/card-container-${value}.svg`} alt=""/>
-                  <div className="font-semibold text-[12px] leading-[100%] absolute cat-label">{dg.choose}</div>
-                </Link>
-              </div>
+              </Link>
             ))}
           </div>
           <TimerSettings mode={tab} />
@@ -306,7 +308,7 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive',
 
       {/* Journey tab content */}
       {tab === 'journey' && (
-        <div className="flex flex-col mt-5 flex-1 basis-0">
+          <div className="flex flex-col mt-5 flex-1 basis-0">
           <div className="flex flex-col gap-3 flex-1 basis-0">
             {categories.map(({ label, value, count }) => {
               const selectedCount = journeySelection[value as keyof JourneySelection]?.length ?? 0
@@ -317,20 +319,22 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive',
                   ? `1 ${dg.cardSelectedOne}`
                   : `${selectedCount} ${dg.cardsSelectedMany}`
               return (
-                <div
-                  key={value}
-                  className={`flex justify-between p-3 bg-${value} rounded-[24px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000] cat-card-journey`}
-                >
-                  <div className="flex flex-col p-2">
-                    <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
-                    <span className="font-normal flex-grow-1 text-[16px] leading-[24px]">{count} {dg.cards}</span>
-                    <span className="font-normal text-[13px] leading-[20px] opacity-70 mt-[2px]">{selectedLabel}</span>
+
+                <Link href={`/game/journey/${value}`} key={value} className="block">
+                  <div
+                    className={`flex justify-between p-3 bg-${value} rounded-[24px] border border-[#69584E] shadow-[0px_0px_20px_0px_#000000] cat-card-journey`}
+                  >
+                    <div className="flex flex-col p-2">
+                      <span className="font-['Baskervville'] font-normal text-[24px] leading-[31px]">{label}</span>
+                      <span className="font-normal flex-grow-1 text-[16px] leading-[24px]">{count} {dg.cards}</span>
+                      <span className="font-normal text-[13px] leading-[20px] opacity-70 mt-[2px]">{selectedLabel}</span>
+                    </div>
+                    <div className={`-cat-card-${value} cat-card`}>
+                      <img src={`/img/card-container-${value}.svg`} className="journey-card card-img" alt=""/>
+                      <div className="font-semibold text-[12px] leading-[100%] cat-label">{dg.choose}</div>
+                    </div>
                   </div>
-                  <Link href={`/game/journey/${value}`} className={`-cat-card-${value} cat-card`}>
-                    <img src={`/img/card-container-${value}.svg`} className="journey-card card-img" alt=""/>
-                    <div className="font-semibold text-[12px] leading-[100%] cat-label">{dg.choose}</div>
-                  </Link>
-                </div>
+                </Link>
               )
             })}
           </div>

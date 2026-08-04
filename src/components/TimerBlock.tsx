@@ -9,6 +9,7 @@ type TimerState = {
   seconds: number
   noLimit: boolean
   running: boolean
+  started: boolean
   timeUp: boolean
   resetKey: string
   storageKey: string
@@ -34,7 +35,7 @@ function timerReducer(state: TimerState, action: TimerAction): TimerState {
   switch (action.type) {
     case 'RESET': {
       const { seconds, noLimit } = getStoredTimerValues(state.storageKey)
-      return { ...state, seconds, noLimit, running: true, timeUp: false, resetKey: action.resetKey }
+      return { ...state, seconds, noLimit, running: false, started: false, timeUp: false, resetKey: action.resetKey }
     }
     case 'TICK': {
       if (state.noLimit || !state.running || state.seconds <= 0) return state
@@ -46,7 +47,7 @@ function timerReducer(state: TimerState, action: TimerAction): TimerState {
     case 'TOGGLE_RUNNING': {
       const isTimeUp = !state.noLimit && state.seconds <= 0
       if (isTimeUp) return state
-      return { ...state, running: !state.running }
+      return { ...state, running: !state.running, started: true }
     }
     case 'ADD_SECONDS': {
       const next = state.seconds + action.amount
@@ -73,7 +74,7 @@ export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
   const dt = dict.timer
   const [state, dispatch] = useReducer(timerReducer, undefined, () => {
     const { seconds, noLimit } = getStoredTimerValues(storageKey)
-    return { seconds, noLimit, running: true, timeUp: false, resetKey, storageKey }
+    return { seconds, noLimit, running: false, started: false, timeUp: false, resetKey, storageKey }
   })
 
   const currentSoundRef = useRef<string | null>(null)
@@ -124,7 +125,7 @@ export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
     return () => clearInterval(id)
   }, [state.noLimit, state.running, state.seconds])
 
-  const { seconds, noLimit, running, timeUp } = state
+  const { seconds, noLimit, running, started, timeUp } = state
   const mm = String(Math.floor(seconds / 60)).padStart(2, '0')
   const ss = String(seconds % 60).padStart(2, '0')
 
@@ -159,7 +160,7 @@ export function TimerBlock({ resetKey, storageKey, stopSoundRef }: Props) {
           disabled={timeUp}
           onClick={() => { unlockAudio(); dispatch({ type: 'TOGGLE_RUNNING' }) }}
         >
-          {running && !timeUp ? dt.stop : dt.play}
+          {running && !timeUp ? dt.stop : started ? dt.play : dt.start}
         </Button>
       )}
     </div>

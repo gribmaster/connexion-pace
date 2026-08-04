@@ -88,7 +88,7 @@ export const dictionary = {
       line3: 'Siit jätkub päris maagia.',
       question: 'Kas soovite uuesti avastada?',
       chooseNextPlayTime: 'Vali järgmine mänguaeg',
-      backToConnexion: 'Tagasi "Connexion Space" juurde',
+      backToConnexion: 'Tagasi avalehele',
     },
     modal: {
       tuneIntoPlay: 'Häälesta end mänguks',
@@ -154,10 +154,16 @@ export const dictionary = {
     },
     timer: {
       noLimit: 'Piiranguta',
+      start: 'Alusta',
       stop: 'Peata',
-      play: 'Mängi',
+      play: 'Jätka',
       setTimer: 'Sea taimer',
       minutes: 'minutit',
+    },
+    pwaInstall: {
+      installedTitle: 'Rakendus installitud',
+      installedMessage: 'Rakendus on installitud ja otseteeikoon on loodud',
+      continueButton: 'Jätka',
     },
   },
   en: {
@@ -249,7 +255,7 @@ export const dictionary = {
       line3: 'This is where the real magic continues.',
       question: 'Would you like to explore again?',
       chooseNextPlayTime: 'Choose next play time',
-      backToConnexion: 'Back to "Connexion space"',
+      backToConnexion: 'Back to Welcome',
     },
     modal: {
       tuneIntoPlay: 'Tune into the play',
@@ -315,10 +321,16 @@ export const dictionary = {
     },
     timer: {
       noLimit: 'No limit',
-      stop: 'Stop',
-      play: 'Play',
+      start: 'Start',
+      stop: 'Pause',
+      play: 'Resume',
       setTimer: 'Set timer',
       minutes: 'minutes',
+    },
+    pwaInstall: {
+      installedTitle: 'App installed',
+      installedMessage: 'App is installed and shortcut icon is created',
+      continueButton: 'Continue',
     },
   },
 } as const

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
@@ -35,24 +35,10 @@ type Props = {
   allCards: CardData[]
 }
 
-const VISITED_KEY = (cat: string) => `intuitive_visited_${cat}`
-
-function getVisited(category: string): string[] {
-  try {
-    return JSON.parse(localStorage.getItem(VISITED_KEY(category)) ?? '[]')
-  } catch {
-    return []
-  }
-}
-
-function saveVisited(category: string, ids: string[]) {
-  localStorage.setItem(VISITED_KEY(category), JSON.stringify(ids))
-}
-
 export function IntuitiveGameplay({ category, initialCardId, allCards }: Props) {
   const router = useRouter()
   const stopSoundRef = useRef<() => void>(() => {})
-  const [currentCardId, setCurrentCardId] = useState(initialCardId)
+  const [currentCardId] = useState(initialCardId)
   const [isNextLoading, setIsNextLoading] = useState(false)
   const [isAbcEmotionsOpen, setIsAbcEmotionsOpen] = useState(false)
   const { locale, dict } = useLocale()
@@ -65,31 +51,8 @@ export function IntuitiveGameplay({ category, initialCardId, allCards }: Props) 
   const handleNext = () => {
     if (isNextLoading) return
     stopSoundRef.current()
-
-    const otherCardIds = allCards.map((c) => c.id).filter((id) => id !== currentCardId)
-
-    if (otherCardIds.length === 0) {
-      router.push('/game/intuitive/result')
-      return
-    }
-
     setIsNextLoading(true)
-
-    const visited = getVisited(category)
-    let unvisited = otherCardIds.filter((id) => !visited.includes(id))
-
-    if (unvisited.length === 0) {
-      saveVisited(category, [])
-      unvisited = otherCardIds
-    }
-
-    const randomId = unvisited[Math.floor(Math.random() * unvisited.length)]
-    saveVisited(category, [...visited, randomId])
-
-    setCurrentCardId(randomId)
-    // Update URL without triggering route navigation/loading
-    window.history.replaceState(null, '', `/game/intuitive/${category.toLowerCase()}/${randomId}`)
-    setIsNextLoading(false)
+    router.push(`/game/intuitive/${category.toLowerCase()}`)
   }
 
   const handleFinish = () => {

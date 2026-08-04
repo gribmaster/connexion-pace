@@ -89,9 +89,9 @@ export function TimerSettings({ mode }: Props) {
     <>
       <button
         onClick={handleOpen}
-        className="flex w-full items-center justify-between pt-5"
+        className="flex w-full items-center justify-end pt-5"
       >
-        <div className="flex items-center font-normal text-[16px] leading-[100%]">
+        <div className="flex items-center font-normal text-[16px] leading-[100%] mr-2">
           <span>{dt.setTimer}</span>
           <span className="ml-1">
             <InfoCircleIcon />
