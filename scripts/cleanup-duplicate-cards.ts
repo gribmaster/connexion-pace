@@ -465,11 +465,6 @@ async function main() {
     }
   }
   console.log(`\n${remainingMatched}/${EXPECTED_TOTAL} canonical cards matched after cleanup.`)
-
-  const orphanedTranslations = await prisma.cardTranslation.findMany({
-    where: { card: { is: null } },
-  })
-  console.log(`Orphaned CardTranslation rows: ${orphanedTranslations.length}`)
 }
 
 main()
