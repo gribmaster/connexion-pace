@@ -18,7 +18,7 @@ export const abcEmotionsContent: Record<AppLocale, AbcEmotionsEntry> = {
 <h4>Mida tugevat emotsiooni kogedes teha</h4>
 <ul>
   <li>Võta endale aega emotsiooni tunda.</li>
-  <li>Tütle kaaslasele, kas soovid olla koos või üksil.</li>
+  <li>Ütle kaaslasele, kas soovid olla koos või üksi.</li>
   <li>Keskendu sügavale ja aeglasele hingamisele, et keha saaks rahuneda.</li>
   <li>Lase lahti lahenduste otsimisest. Luba sel tundel tulla, olla ja minna.</li>
   <li>Ütle endale: „See tunne on praegu siin ja see on okei. Mul on turvaline seda praegu tunda.“</li>
@@ -71,8 +71,8 @@ export const abcEmotionsContent: Record<AppLocale, AbcEmotionsEntry> = {
 <h5>4. Rahunemine</h5>
 <ul>
   <li>Tunne, kuidas emotsioon tasapisi vaibub.</li>
-  <li>Võta aega.</li>
   <li>Märka, mis kehas muutub.</li>
+  <li>Võta aega.</li>
   <li>Joo vett.</li>
 </ul>
 
@@ -126,7 +126,7 @@ Võta iseennast kaissu või palu seda kaaslasel teha.</p>
     <strong>Käitumuslikud tunnused</strong>
     <p>Hääle tõstmine, karjumine, järsud liigutused, konfliktsus, agressiivne keelekasutus</p>
     <strong>Soovituslikud tehnikad</strong>
-    <p>Üksil olles karju, urise, röögi emotsioon välja, võimalusel patja sisse.<br>
+    <p>Üksi olles karju, urise, röögi emotsioon välja, võimalusel padja sisse.<br>
 Peksa patja või vääna tekki.<br>
 Sulge silmad, kujuta ette ärritavat olukorda ning korruta valjult sulghäälikuid: „K-p-t, k-p-t, k-p-t …“</p>
   </div>
@@ -193,7 +193,7 @@ Kui võimalik, pese emotsioon maha. Kui mitte, siis kujutle, nagu peseksid emots
   <li>Kui emotsioonidega kaasneb soov endale või teisele haiget teha.</li>
 </ul>
 
-<p>Kui soovituslikest tehnikatest ei leia sobivat või ei tule üksik i meelde emotsiooni kogemise ajal, siis vali sobiv asend, hinga sügavalt, hoia fookus südamepiirkonnas ning lõdvestu.</p>`,
+<p>Kui soovituslikest tehnikatest ei leia sobivat või ei tule ükski meelde emotsiooni kogemise ajal, siis vali sobiv asend, hinga sügavalt, hoia fookus südamepiirkonnas ning lõdvestu.</p>`,
   },
   en: {
     title: 'The ABCs of Emotions',

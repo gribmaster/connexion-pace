@@ -14,9 +14,7 @@ export const categoryInfoContent: Record<string, CategoryInfo> = {
   CONNECTION: {
     et: {
       title: 'Ühendus',
-      html: `<p>Ühenduskaartide eesmärk on muuta teid üksteise suhtes tähelepanelikumaks. Tugev emotsionaalne side on sügavama füüsilise sideme eelduseks.</p>
-<p>Kaartidel olevad tegevused võimaldavad teil mõlema keha paremini tundma õppida ja viivad teid peast välja, nii et te ei ole oma mõtetesse mässitud, vaid tunnete ja olete oma kehas kohal.</p>
-<p>Side on intiimsuse ja armastuse alus. Selles pakis kirjeldatud tegevused hoiavad paarisuhet värskena ja toetavad vastastikust lähedust. Ideaalis saab ühenduskaarte põimida igapäevaste tegevustega.</p>`,
+      html: `<p>Ühenduse kaartide eesmärk on häälestuda teineteisele. Ühtlasi aitavad need luua emotsionaalset ühendust, mis loob eelduse sügavama füüsilise sideme tekkele. Need tegevused pakuvad võimalust paremini tunnetada iseenda ja kaaslase keha ning liikuda mõtlemiselt keha tunnetusele. See on kui vundament, mille peale intiimsus ja armatsemine toetuvad. Sellised tegevused aitavad paarisuhtes hoida värskust ning omavahelist lähedust. Ühenduse kaarte sobib suurepäraselt ka igapäevaste toimetuste vahele põimida.</p>`,
     },
     en: {
       title: 'Connection Cards',
@@ -28,9 +26,7 @@ export const categoryInfoContent: Record<string, CategoryInfo> = {
   INTIMACY: {
     et: {
       title: 'Intiimsus',
-      html: `<p>Intiimsuskaartide eesmärk on äratada keha naudingukanaleid ja lasta sellel kogeda erutust. Selle paki tegevused aitavad paaridel laiendada oma intiimsuse repertuaari.</p>
-<p>Naise kehal kulub soojenemiseks tavaliselt 20–30 minutit. Selle aja jooksul mehe esialgu kõrgem erutus väheneb, võimaldades tal olla vastuvõtlikum naise kasvavale erutusele. Erutuse tase peaks ühtlustuma, võimaldades naudingul kauem kesta, ilma et peaks muretsema enneaegse seemnepurske pärast.</p>
-<p>Intiimsuskaartidega seotud tegevused aeglustavad protsessi, keskendudes hetkele ja nautides teekonda, mitte sihtkohta. Eelmäng on peamine mänguvorm.</p>`,
+      html: `<p>Intiimsuse kaartide eesmärk on äratada kehalised naudingud ning kasvatada ja kogeda erutust. Need tegevused aitavad paaridel laiendada intiimsuse repertuaari. Naise keha soojeneb üles tavaliselt 20–30 minuti jooksul. Selle ajaga mehe suurem erutus väheneb, võimaldades tal naise kasvavat erutust paremini vastu võtta. Seeläbi ühtlustub mõlema erutuse tase ja mees võib püsida naudingus pikemalt, vältides enneaegset ejakulatsiooni. Intiimsuse kaartide tegevused võimaldavad aeglustuse teel tuua tähelepanu hetkesse ning nautida teekonda. Eelmäng ongi juba põhimäng.</p>`,
     },
     en: {
       title: 'Intimacy cards',
@@ -41,10 +37,8 @@ export const categoryInfoContent: Record<string, CategoryInfo> = {
   },
   LOVEMAKING: {
     et: {
-      title: 'Armumine',
-      html: `<p>Armatsemiskaartide eesmärk on edendada partnerite vahelist armastavat seksuaalset kontakti, rikastada nende erootilist maailma ning võimaldada neil kogeda õndsust, lõõgastust ja elus olemise joovastust.</p>
-<p>Võite avastada uusi viise, kuidas laiendada suguelundites kogunevat erutust kogu keha hõlmavaks naudingutundeks. Armatsemine võib viia paarid ajatuse ruumi ja esile kutsuda kõrgendatud teadvusseisundi, mis väljendub mõlemas partneris õndsa ühtsustundena.</p>
-<p>Usalduse, helluse ja aeglase uurimise kaudu võib sündida midagi ilusat ja võimsat – mis võib teie paarisuhte täielikult taaselustada. Armatsemiskaartidel olevad tegevused sisendavad arusaama, et seksuaalsus on pidev avastamisretk, mis aja jooksul kasvab ja areneda saab.</p>`,
+      title: 'Armatsemine',
+      html: `<p>Armatsemise kaartide eesmärk on luua paaride vahel armastav seksuaalne ühendus, rikastada paaride erootilist maailma ning kogeda selle kaudu õnnetunnet, lõdvestust ja elurõõmu. Võite avastada uusi viise, kuidas muuta suguelunditesse kogunenud erutus kogu keha hõlmavaks naudinguks. Armatsemine võib viia ajatusse ruumi ning tekitada muutunud teadvuse seisundi, mis avaldub mõlemas kaaslases üksolemise ja õndsuse tundena. Usalduse, õrnuse ja aeglase teineteise uurimise toel võite luua midagi nii kaunist ja võimsat, et see toob värskust teie paarisuhtesse. Armatsemise kaartide tegevused aitavad mõista, et seksuaalsus on pidev avastamise teekond, arenedes ja laienedes aja jooksul.</p>`,
     },
     en: {
       title: 'Lovemaking cards',
