@@ -27,6 +27,7 @@ import { CollapseIcon } from '@/components/icons/CollapseIcon'
 import { HtmlContent } from '@/components/HtmlContent'
 import { getCategoryTheme } from '@/lib/categoryThemes'
 import { getGameGuidanceContent } from '@/lib/gameGuidanceContent'
+import { shouldShowTuneIntoPlay, markTuneIntoPlayShown } from '@/lib/tuneIntoPlayVisibility'
 
 const SELECTION_KEY = 'connexion_journey_selection'
 const QUEUE_KEY = 'connexion_journey_queue'
@@ -310,11 +311,7 @@ export function JourneyPreview({ cards }: Props) {
     saveSelection(updated)
   }
 
-  function handleStartPlaying() {
-    setIntroOpen(true)
-  }
-
-  function handleOK() {
+  function startJourneyPlay() {
     if (!selection) return
     const queue = buildQueue(selection, randomOrder)
     localStorage.setItem(
@@ -322,6 +319,20 @@ export function JourneyPreview({ cards }: Props) {
       JSON.stringify({ cards: queue, currentIndex: 0, randomOrder })
     )
     router.push('/game/journey/play')
+  }
+
+  function handleStartPlaying() {
+    if (shouldShowTuneIntoPlay('journey')) {
+      markTuneIntoPlayShown('journey')
+      setIntroOpen(true)
+      return
+    }
+    startJourneyPlay()
+  }
+
+  function handleOK() {
+    setIntroOpen(false)
+    startJourneyPlay()
   }
 
   if (!mounted || !selection) return null

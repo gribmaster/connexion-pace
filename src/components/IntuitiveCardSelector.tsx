@@ -16,6 +16,7 @@ import { useLocale } from '@/lib/i18n/useLocale'
 import { resolveCardTranslation } from '@/lib/i18n/resolveCardTranslation'
 import { canAccessCard } from '@/lib/premium/cardAccess'
 import { getGameGuidanceContent } from '@/lib/gameGuidanceContent'
+import { shouldShowTuneIntoPlay, markTuneIntoPlayShown } from '@/lib/tuneIntoPlayVisibility'
 
 type Translation = {
   locale: string
@@ -62,7 +63,12 @@ export function IntuitiveCardSelector({ cards, category, theme, isPremium }: Pro
 
   function handleStart() {
     if (!selectedId) return
-    setIntroOpen(true)
+    if (shouldShowTuneIntoPlay('intuitive')) {
+      markTuneIntoPlayShown('intuitive')
+      setIntroOpen(true)
+      return
+    }
+    router.push(`/game/intuitive/${category}/${selectedId}`)
   }
 
   function handleConfirmStart() {

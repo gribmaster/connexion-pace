@@ -13,6 +13,7 @@ import { JourneyInstruction } from '@/components/game/instructions/JourneyInstru
 import { useLocale } from '@/lib/i18n/useLocale'
 import { canAccessCard } from '@/lib/premium/cardAccess'
 import { getGameGuidanceContent } from '@/lib/gameGuidanceContent'
+import { shouldShowTuneIntoPlay, markTuneIntoPlayShown } from '@/lib/tuneIntoPlayVisibility'
 import { HtmlContent } from '@/components/HtmlContent'
 import type { AppLocale } from '@/lib/i18n/locales'
 
@@ -145,17 +146,27 @@ export function GameModeTabs({ categories, cards = [], initialTab = 'intuitive',
     setSelected((prev) => ({ ...prev, [value]: Math.max(prev[value] - 1, 0) }))
   }
 
-  function handleStartSurprise() {
-    setIntroOpen(true)
-  }
-
-  function handleOK() {
+  function startSurprisePlay() {
     const queue = buildSurpriseQueue(cards, selected, isPremium)
     localStorage.setItem(
       'connexion_surprise_queue',
       JSON.stringify({ cards: queue, currentIndex: 0 })
     )
     router.push('/game/surprise-me/play')
+  }
+
+  function handleStartSurprise() {
+    if (shouldShowTuneIntoPlay('surprise')) {
+      markTuneIntoPlayShown('surprise')
+      setIntroOpen(true)
+      return
+    }
+    startSurprisePlay()
+  }
+
+  function handleOK() {
+    setIntroOpen(false)
+    startSurprisePlay()
   }
 
   return (

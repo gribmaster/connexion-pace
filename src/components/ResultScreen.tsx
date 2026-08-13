@@ -34,7 +34,7 @@ export function ResultScreen() {
               <Button variant="primary">{d.chooseNextPlayTime}</Button>
             </Link>
 
-            <Link href="/game">
+            <Link href="/welcome">
               <Button variant="secondary">{d.backToConnexion}</Button>
             </Link>
           </div>

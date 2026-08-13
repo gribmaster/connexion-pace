@@ -5,7 +5,7 @@ import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 import { useLocale } from '@/lib/i18n/useLocale'
 
-export function WelcomeContent() {
+export function WelcomeContent({ isPremium }: { isPremium: boolean }) {
   const { dict } = useLocale()
   const d = dict.welcome
 
@@ -27,7 +27,7 @@ export function WelcomeContent() {
 
           <div className="flex flex-col gap-5">
             <Link href="/game">
-              <Button variant="primary">{d.startFreeSession}</Button>
+              <Button variant="primary">{isPremium ? dict.journey.startPlaying : d.startFreeSession}</Button>
             </Link>
 
             <Link href="/profile">
